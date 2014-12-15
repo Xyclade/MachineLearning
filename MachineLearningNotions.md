@@ -12,3 +12,13 @@
 **Explanation**
 
 **Example with metafor**
+
+
+## Commonly made mistakes
+
+### Overfitting
+
+Making a too specific model that incorporates the noise
+
+### Underfitting
+Making a model that does not completely capture the signal in the data
