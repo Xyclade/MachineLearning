@@ -24,8 +24,8 @@ To start with this example I assume you created a new Scala project in your favo
 
 The first step is to load the CSV data file. As this is no rocket science, I provide the code for this without further explanation:
 
-```
-scala
+```scala
+
 object KNNExample {
     def main(args: Array[String]): Unit = {
     val basePath = "/.../KNN_Example_1.csv"
@@ -61,8 +61,8 @@ First thing you might wonder now is *why the frick is the data formatted that wa
 
 Given the data the first thing to do next is to see what the data looks like. For this Smile provides a nice Plotting library. In order to use this however, the application should be changed to a Swing application. Additionally the data should be fed to the plotting library to get a JPane with the actual plot. After changing your code it should like this:
 
- ```
- scala
+ ```scala
+ 
  object KNNExample extends SimpleSwingApplication {
   def top = new MainFrame {
     title = "KNN Example!"
@@ -89,8 +89,7 @@ Given this choice to use KNN to be a good one, lets continue with the actual Mac
 
 For this example we do [2-fold Cross Validation](http://en.wikipedia.org/wiki/Cross-validation_(statistics) ). In general 2-fold Cross validation is a rather weak method of model Validation, as it splits the dataset in half and only validates twice, which still allows for overfitting, but since the dataset is only 100 points, 10-fold (which is a stronger version) does not make sense, since then there would only be 10 datapoints used for testing, which would give a skewed error rate.
 
-```
-scala
+```scala
 
   def main(args: Array[String]): Unit = {
     val basePath = "/Users/mikedewaard/ML_for_Hackers/10-Recommendations/data/example_data.csv"
