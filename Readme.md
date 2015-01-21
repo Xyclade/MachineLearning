@@ -18,7 +18,7 @@ The examples will start off with the most simple and intuitive [*Classification*
 
 ###Labeling ISPs based on their Down/Upload speed (K-NN using Smile in Scala)
 
-The goal of this section is to use the K-NN implementation from [Smile](https://github.com/haifengl/smile) in Scala to classify download/upload speed pairs as [ISP](http://en.wikipedia.org/wiki/Internet_service_provider) Alpha or Beta.  
+The goal of this section is to use the K-NN implementation from [Smile](https://github.com/haifengl/smile) in Scala to classify download/upload speed pairs as [ISP](http://en.wikipedia.org/wiki/Internet_service_provider) Alpha (represented by 0) or Beta (represented by 1).  
 
 To start with this example I assume you created a new Scala project in your favorite IDE, and downloaded and added the [Smile Machine learning](https://github.com/haifengl/smile/releases)  and its dependency [SwingX](https://java.net/downloads/swingx/releases/) to this project. As final assumption you also downloaded the [example data](https://github.com/Xyclade/MachineLearning/raw/Master/Example%20Data/KNN_Example_1.csv).
 
@@ -83,9 +83,11 @@ The idea behind plotting the data is to verify whether KNN is a fitting Machine 
 
 ![KNN Data plot](https://github.com/Xyclade/MachineLearning/raw/KNN_Example/Images/KNNPlot.png =200x200)
 
-In this plot you can see  that the blue and red points seem to be mixed in the area (3 < x < 5) and (5 < y < 7.5). If the groups were not mixed at all, but were two separate clusters, **Logistic regression**  could be used instead (**Reference to Naive bayesian classifier and explanation on logistic regression**). However, since the groups are mixed the KNN algorithm is a good choice as fitting a linear decision boundary would cause a lot of false classifications in the mixed area.
+In this plot you can see  that the blue and red points seem to be mixed in the area (3 < x < 5) and (5 < y < 7.5). If the groups were not mixed at all, but were two separate clusters, a [regression](#regression) algorithm  such as in the example [Page view prediction with regression](#Page view prediction with regression) could be used instead. However, since the groups are mixed the KNN algorithm is a good choice as fitting a linear decision boundary would cause a lot of false classifications in the mixed area.
 
-Given this choice to use KNN to be a good one, lets continue with the actual Machine Learning part. For this the GUI is ditched since it does not really add any value. Recall from the section [*The global idea of Machine Learning*](#The global idea of machine learning) that in machine learning there are 2 key parts: Prediction and Validation. First we will look at the Validation, as using a model without any validation is never a good idea. The main reason to validate the model here is to prevent [overfitting](#overfitting). 
+Given this choice to use KNN to be a good one, lets continue with the actual Machine Learning part. For this the GUI is ditched since it does not really add any value. Recall from the section [*The global idea of Machine Learning*](#The global idea of machine learning) that in machine learning there are 2 key parts: Prediction and Validation. First we will look at the Validation, as using a model without any validation is never a good idea. The main reason to validate the model here is to prevent [overfitting](#overfitting). However, before we even can do validation, a *correct* K should be chosen. 
+
+The drawback is that there is no golden rule for finding the correct K. However finding a K that allows for most datapoints to be classified correctly can be done by looking at the data. Additionally The K should be picked carefully to prevent undecidability by the algorithm. Say for example ```K=2```, and the problem has 2 labels, then when a point is between both labels, which one should the algorithm pick. There is a *rule of Thumb* that K should be the square root of the number of features (on other words the number of dimensions). In our example this would be ```K=1```, but this is not really a good idea since this would lead to higher false-classifications around decision boundaries. Picking ```K=2``` would result in the error regarding our two labels, thus picking ```K=3``` seems like a good fit for now.
 
 For this example we do [2-fold Cross Validation](http://en.wikipedia.org/wiki/Cross-validation_(statistics) ). In general 2-fold Cross validation is a rather weak method of model Validation, as it splits the dataset in half and only validates twice, which still allows for overfitting, but since the dataset is only 100 points, 10-fold (which is a stronger version) does not make sense, since then there would only be 10 datapoints used for testing, which would give a skewed error rate.
 
@@ -109,7 +111,7 @@ For this example we do [2-fold Cross Validation](http://en.wikipedia.org/wiki/Cr
       val dpForTesting = testData._1.zipWithIndex.filter(x => !cv.test(i).contains(x._2)).map(y => y._1);
       val classifiersForTesting = testData._2.zipWithIndex.filter(x => !cv.test(i).contains(x._2)).map(y => y._1);
 
-      //Then generate a Model with KNN
+      //Then generate a Model with KNN with K = 3 
       val knn = KNN.learn(dpForTraining, classifiersForTraining, 3);
 
       //And for each test data point make a prediction with the model
@@ -131,6 +133,25 @@ If you execute this code serveral times you might notice the false prediction ra
 Unfortunately I cannot provide you with a golden rule to when your model was trained with the best possible training set. One would say the model with the least error rate is always the best, but when you recall the term [overfitting](#overfitting) picking this particular model might perform really bad on future data. This is why having a large enough and representative dataset is key to a good Machine Learning application. However when aware of this issue, you could implement manners to keep updating your model based on new data and known correct classifications.
 
 
+Let's suppose you implement the KNN into your application, then you should have passed the following steps. First you took care of getting the training and testing data. Next up you generated and validated serveral models and picked the model which gave the best results. Then the final step of this example is to do actual predictions.
+
+If you have the model this is actually fairly simple:
+
+
+```scala
+
+//Code example should be added
+
+```
+
+These predictions can then be used to present to the users of your system, for example as friend suggestion on a social networking site. The feedback the user gives on these predictions is valuable  and should thus be fed into the system for updating your model. 
+
+
+###Classifying Email as Spam or Ham (Naive Bayes)
+
+
+###Page view prediction with regression
+
 
 
 
@@ -142,19 +163,38 @@ The term 'Machine learning' is known by almost everyone, however almost no-one I
 
 In the upcoming subsections the most important notions you need to be aware off when practicing machine learning are (briefly) explained.
 
+###Model
+When one talks about machine learning, often the term *model* is mentioned. The model is the result of any machine learning method and the algorithm used within this method. This model can be used to make predictions in [supervised](#Supervised Learning), or to retrieve clusterings in [unsupervised learning](#Unsupervised learning).
 
-####Model
+###Learning methods
+In the field of machine learning there are two leading ways of learning, namely [Supervised learning](http://en.wikipedia.org/wiki/Supervised_learning) and  [Unsupervised learning](http://en.wikipedia.org/wiki/Unsupervised_learning). A brief introduction is neccesary when you want to use Machine learning in your applications, as picking the right machine learning approach is an important but sometimes also a little tedious process.
 
-####Validation techniques
+####Supervised Learning
+The principle of supervised learning can be used to solve many problem types. In this blog however we will stick to [Classification](#Classification) and [Regression](#Regression) as this covers most of the problems one wants to solve in their every day application.
 
-##### Overfitting
-##### Underfitting
 
-#####Precision
+#####Classification
+The problem of classification within the domain of Supervised learning is relatively simple. Given a set of labels, and some data that already received the correct labels, we want to be able to *predict* labels for new data that we did not label yet. However, before thinking of your data as a classification problem, you should look at what the data looks like. If there is a clear structure in the data such that you can easily draw a regression line it might be better to use a [regression](#Regression) algorithm instead. Given the data does not fit to a regression line, or when performance becomes an issue, classification is a good alternative.
 
-#####Recall
+An example of a classification problem would be to classify emails as Ham or Spam based on their content. Given a training set in which emails are labeled Ham/Spam, a classification algorithm can be used to train a [Model](#Model). This model can then be used to predict for future emails whether they are Ham or Spam. A typical example of a classification algorithm is the [K-NN algorithm](#Labeling ISPs based on their Down/Upload speed (K-NN using Smile in Scala))
 
-####Exploratory Data Analysis
+#####Regression
+
+
+####Unsupervised Learning
+
+
+
+###Validation techniques
+
+#### Overfitting
+#### Underfitting
+
+####Precision
+
+####Recall
+
+###Exploratory Data Analysis
 
 
 
