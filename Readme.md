@@ -165,7 +165,57 @@ The goal of this section is to use the Naive Bayes implementation from [Smile](h
 
 To start with this example I assume you created a new Scala project in your favorite IDE, and downloaded and added the [Smile Machine learning](https://github.com/haifengl/smile/releases)  and its dependency [SwingX](https://java.net/downloads/swingx/releases/) to this project. As final assumption you also downloaded and extracted the [example data](https://github.com/Xyclade/MachineLearning/raw/Master/Example%20Data/NaiveBayes_Example_1.zip). This example data comes from the [SpamAssasins public corpus](http://spamassasin.apache.org/publiccorpus/). 
 
+As with every machine learning implementation, the first step is to load in the training data. However in this example we are taking it 1 step further into machine learning. In the KNN examples we had the download and upload speed as [features](#features), which was rather easy as they where numbers and the only features available. For spam classification it is not completely trivial what to use as features. 
 
+In this example we will use the content of the email as feature. By this we mean, we will select  the features (words in this case) from the content of the training set of emails. In order to be able to do this, we need to build a [Term Document Matrix (TDM)](http://en.wikipedia.org/wiki/Document-term_matrix). We could use a library for it, but in order to gain more insight in why as to use it, let's build it ourselves, as this also gives us all freedom in properly sellecting the features:
+
+```
+scala
+
+//Insert code snippet for loading the filenames + the messages
+
+```
+With the data loaded building the TDM can begin:
+
+```
+scala
+//TDM class implementation
+
+```
+
+```
+scala
+//Showing how the TDM works and how to change round the outputs., including the top spammy and ham words.
+
+```
+
+Ok now that we have some insight in what are 'spammy' words and what are typical 'ham-words', we can decide on building a feature-set which we can then use in the Naive Bayes algorithm for creating the classifier. Note: In most cases it is always better to include **more** features, however performance becomes an issue when having tons of features. This is why in the field, developers tend to drop features that do not have a significant impact, purely for performance reasons.
+
+For now we will select the top **xx** spammy words based on occurence(thus not  frequency) and do the same for ham words and combine this into 1 set of words which we can feed into the bayes algorithm.
+
+
+```
+scala
+//Add the code for getting the tdm data and combining it into a feature bag.
+
+```
+
+Given this feature bag, and a set of test data, we can start training the algorithm. For this we can chose a few different models: 'general',  'multinominal' and bernoulli. In this example we focus on the multinominal but feel free to try out the other model types as well.
+
+
+```
+scala
+//Add the code for creating the bayes classifier, including the training part
+
+```
+
+Now that we have the trained model, we can once again do some validation. However, in the example data we already made a separation between easy and hard ham, and spam, thus we will not apply the cross validation, but rather validate the model on hard-ham.
+
+```
+scala
+//Add code for model validation
+
+```
 
 ###Page view prediction with regression
 
@@ -180,6 +230,9 @@ The term 'Machine learning' is known by almost everyone, however almost no-one I
 
 In the upcoming subsections the most important notions you need to be aware off when practicing machine learning are (briefly) explained.
 
+###Features
+A feature (in the field of machine learning) is a property on which a [Model](#Model) is trained. Say for example that you classify emails as spam/ham based on the frequency of the word 'Buy' and 'Money'. Then these words are features. If you would use machine learning to predict whether one is a friend of you, the amount of 'common' friends could be a feature.
+
 ###Model
 When one talks about machine learning, often the term *model* is mentioned. The model is the result of any machine learning method and the algorithm used within this method. This model can be used to make predictions in [supervised](#Supervised Learning), or to retrieve clusterings in [unsupervised learning](#Unsupervised learning).
 
@@ -193,7 +246,7 @@ The principle of supervised learning can be used to solve many problem types. In
 #####Classification
 The problem of classification within the domain of Supervised learning is relatively simple. Given a set of labels, and some data that already received the correct labels, we want to be able to *predict* labels for new data that we did not label yet. However, before thinking of your data as a classification problem, you should look at what the data looks like. If there is a clear structure in the data such that you can easily draw a regression line it might be better to use a [regression](#Regression) algorithm instead. Given the data does not fit to a regression line, or when performance becomes an issue, classification is a good alternative.
 
-An example of a classification problem would be to classify emails as Ham or Spam based on their content. Given a training set in which emails are labeled Ham/Spam, a classification algorithm can be used to train a [Model](#Model). This model can then be used to predict for future emails whether they are Ham or Spam. A typical example of a classification algorithm is the [K-NN algorithm](#Labeling ISPs based on their Down/Upload speed (K-NN using Smile in Scala))
+An example of a classification problem would be to classify emails as Ham or Spam based on their content. Given a training set in which emails are labeled Ham/Spam, a classification algorithm can be used to train a [Model](#Model). This model can then be used to predict for future emails whether they are Ham or Spam. A typical example of a classification algorithm is the [K-NN algorithm](#Labeling ISPs based on their Down/Upload speed (K-NN using Smile in Scala)). Another more commonly used example of a classification problem is [Classifying Email as Spam or Ham](###Classifying Email as Spam or Ham (Naive Bayes)) which is also one of the examples written on this blog.
 
 #####Regression
 
