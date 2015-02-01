@@ -133,21 +133,38 @@ If you execute this code serveral times you might notice the false prediction ra
 Unfortunately I cannot provide you with a golden rule to when your model was trained with the best possible training set. One would say the model with the least error rate is always the best, but when you recall the term [overfitting](#overfitting) picking this particular model might perform really bad on future data. This is why having a large enough and representative dataset is key to a good Machine Learning application. However when aware of this issue, you could implement manners to keep updating your model based on new data and known correct classifications.
 
 
-Let's suppose you implement the KNN into your application, then you should have passed the following steps. First you took care of getting the training and testing data. Next up you generated and validated serveral models and picked the model which gave the best results. Then the final step of this example is to do actual predictions.
-
-If you have the model this is actually fairly simple:
+Let's suppose you implement the KNN into your application, then you should have gone through the following steps. First you took care of getting the training and testing data. Next up you generated and validated serveral models and picked the model which gave the best results. After these steps you can finally do predictions using your ML implementations:
 
 
 ```scala
+ 
+ 	  val result = knn.predict(unknownDatapoint);
 
-//Code example should be added
+      if (result == 0)
+      {
+        println("Internet Service Provider Alpha")
+      }
+      else if (result == 1)
+      {
+        println("Internet Service Provider Beta")
+      }
+      else
+      {
+        println("Unexpected prediction")
+      }
+    }
 
 ```
 
-These predictions can then be used to present to the users of your system, for example as friend suggestion on a social networking site. The feedback the user gives on these predictions is valuable  and should thus be fed into the system for updating your model. 
+These predictions can then be used to present to the users of your system, for example as friend suggestion on a social networking site. The feedback the user gives on these predictions is valuable and should thus be fed into the system for updating your model.
+ 
 
 
 ###Classifying Email as Spam or Ham (Naive Bayes)
+The goal of this section is to use the Naive Bayes implementation from [Smile](https://github.com/haifengl/smile) in Scala to classify emails as Spam or Ham based on their content.  
+
+To start with this example I assume you created a new Scala project in your favorite IDE, and downloaded and added the [Smile Machine learning](https://github.com/haifengl/smile/releases)  and its dependency [SwingX](https://java.net/downloads/swingx/releases/) to this project. As final assumption you also downloaded and extracted the [example data](https://github.com/Xyclade/MachineLearning/raw/Master/Example%20Data/NaiveBayes_Example_1.zip). This example data comes from the [SpamAssasins public corpus](http://spamassasin.apache.org/publiccorpus/). 
+
 
 
 ###Page view prediction with regression
