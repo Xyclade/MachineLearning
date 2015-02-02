@@ -81,7 +81,7 @@ Given the data the first thing to do next is to see what the data looks like. Fo
  
 The idea behind plotting the data is to verify whether KNN is a fitting Machine Learning algorithm for this specific set of data. In this case the data looks as follows:
 
-![KNN Data plot](https://github.com/Xyclade/MachineLearning/raw/KNN_Example/Images/KNNPlot.png =200x200)
+<img src="/Images/KNNPlot.png" width="300px" height="300px" />
 
 In this plot you can see  that the blue and red points seem to be mixed in the area (3 < x < 5) and (5 < y < 7.5). If the groups were not mixed at all, but were two separate clusters, a [regression](#regression) algorithm  such as in the example [Page view prediction with regression](#Page view prediction with regression) could be used instead. However, since the groups are mixed the KNN algorithm is a good choice as fitting a linear decision boundary would cause a lot of false classifications in the mixed area.
 
