@@ -136,7 +136,8 @@ Unfortunately I cannot provide you with a golden rule to when your model was tra
 Let's suppose you implement the KNN into your application, then you should have gone through the following steps. First you took care of getting the training and testing data. Next up you generated and validated serveral models and picked the model which gave the best results. After these steps you can finally do predictions using your ML implementations:
 
 
-```scala
+```
+scala
  
  	  val result = knn.predict(unknownDatapoint);
 
@@ -171,16 +172,104 @@ In this example we will use the content of the email as feature. By this we mean
 
 ```
 scala
+def getMessage(file : File)  : String  =
+  {
+    //Note that the encoding of the example files is latin1, thus this should be passed to the from file method.
+    val source = scala.io.Source.fromFile(file)("latin1")
+    val lines = source.getLines mkString "\n"
+    source.close()
+    //Find the first line break in the email, as this indicates the message body
+    val firstLineBreak = lines.indexOf("\n\n")
+    //Return the message body filtered by only text from a-z and to lower case 
+    return lines.substring(firstLineBreak).replace("\n"," ").replaceAll("[^a-zA-Z ]","").toLowerCase()
+  }
+  
+  def getFilesFromDir(path: String):List[File] = {
+    val d = new File(path)
+    if (d.exists && d.isDirectory) {
+      //Remove the mac os basic storage file, and alternatively for unix systems "cmds"
+      d.listFiles.filter(_.isFile).toList.filter(x => ! x.toString.contains(".DS_Store") && ! x.toString.contains("cmds"))
+    } else {
+      List[File]()
+    }
+  }
+  
+  def main(args: Array[String]): Unit = {
+    val basePath = "/Users/../../data"
+    val spamPath = basePath + "/spam"
+    val spam2Path = basePath + "/spam_2"
+    val easyHamPath = basePath + "/easy_ham"
+    val easyHam2Path = basePath + "/easy_ham_2"
+    val hardHamPath = basePath + "/hard_ham"
+    val hardHam2Path = basePath + "/hard_ham_2"
 
-//Insert code snippet for loading the filenames + the messages
+  val  amountOfSamplesPerSet = 500;
 
+
+  //First get a subset of the filenames for the spam sample set (500 is the complete set in this case)
+  val listOfSpamFiles =   getFilesFromDir(spamPath).take(amountOfSamplesPerSet)
+  //Then get the messages that are contained in these files
+  }
+  
 ```
 With the data loaded building the TDM can begin:
 
 ```
 scala
-//TDM class implementation
+ val spamMails = listOfSpamFiles.map{x => (x,getMessage(x)) }
+  //Then its time for feature selection, but in order to pick good features we have to gain more insight
+  val spamTDM = new TDM();
+  //Build up the Term-Document Matrix for spam emails
+  spamMails.foreach(x => x._2.split(" ").filter(_.nonEmpty).foreach(y => spamTDM.addTermToRecord(y,x._1.getName)))
+  //Sort the spam by total frequency for ease
+  spamTDM.SortByOccurenceRate(spamMails.size)
+  //Filter out all stopwords
+  spamTDM.records = spamTDM.records.filter(x => !StopWords.contains(x.term));
 
+```
+
+Where the implementation of the TDM class is as follows:
+
+```
+scala
+class TDM {
+
+  var records : List[TDMRecord] =  List[TDMRecord]()
+
+  def addTermToRecord(term : String, documentName : String)  =
+    {
+      //Find a record for the term
+      val record =   records.find( x => x.term == term)
+      if (record.nonEmpty)
+      {
+        val termRecord =  record.get
+        val documentRecord = termRecord.occurrences.find(x => x._1 == documentName)
+        if (documentRecord.nonEmpty)
+        {
+           termRecord.occurrences +=  documentName -> (documentRecord.get._2 + 1)
+        }
+        else
+        {
+          termRecord.occurrences +=  documentName ->  1
+        }
+      }
+      else
+      {
+        //No record yet exists for this term
+        val newRecord  = new TDMRecord(term, mutable.HashMap[String,Int](documentName ->  1))
+        records  = newRecord :: records
+      }
+    }
+  def SortByTotalFrequency = records = records.sortBy( x => -x.totalFrequency)
+  def SortByOccurrenceRate(rate : Int) = records = records.sortBy( x => -x.occurrenceRate(rate))
+}
+
+class TDMRecord(val term : String, var occurrences :  mutable.HashMap[String,Int] )
+{
+  def totalFrequency = occurrences.map(y => y._2).fold(0){ (z, i) => z + i}
+  def occurrenceRate(totalDocuments : Int) : Double  = occurrences.size.toDouble / totalDocuments
+  def densityRate(totalTerms : Int) : Double  = totalFrequency.toDouble / totalTerms;
+}
 ```
 
 ```
