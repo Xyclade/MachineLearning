@@ -307,8 +307,19 @@ Now that we have the trained model, we can once again do some validation. Howeve
 
 ###Page view prediction with regression
 
+//Todo: write
 
+###Predicting O'Reilly top 100 selling books using text regression
 
+//Todo: write
+
+###Using unsupervised learning to create a market index
+
+//Todo: write
+
+###using Support Vector Machine's
+
+//Todo: write
 
 ##The global idea of machine learning
 The term 'Machine learning' is known by almost everyone, however almost no-one I spoke could really explain what it is in **_one_** or even several sentences.
