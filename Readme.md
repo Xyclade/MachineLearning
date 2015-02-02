@@ -5,7 +5,7 @@ Most developers these days have heard of machine learning, but when trying to fi
 
 And then there are books such as [*Machine Learning for Hackers*](http://shop.oreilly.com/product/0636920018483.do) and [*An Introduction to Statistical Learning with Applications in R*](http://www-bcf.usc.edu/~gareth/ISL/)  who use programming language [R](http://www.r-project.org) for their examples. 
 
-However R is not really a programming language in which one writes programs for everyday use such as is done with for example Java, C#, Scala etc. This is why in this blog, Machine learning will be introduced using libraries for java/scala and C# which are languages that almost every developer has worked with once during their study or carreer.
+However R is not really a programming language in which one writes programs for everyday use such as is done with for example Java, C#, Scala etc. This is why in this blog, Machine learning will be introduced using libraries for java/scala and C# which are languages that almost every developer has worked with once during their study or career.
 
 Note that in this blog, 'new' definitions are hyperlinked such that if you want, you **can** read more regarding that specific topic, but you are not obliged to do this in order to be able to work through the examples. However the section ['The global idea of machine learning'](#The global idea of machine learning) helps making things a lot more clear when working through the examples and is advised to be read on beforehand in case you are completely new to Machine Learning.
 
@@ -20,7 +20,7 @@ The examples will start off with the most simple and intuitive [*Classification*
 
 The goal of this section is to use the K-NN implementation from [Smile](https://github.com/haifengl/smile) in Scala to classify download/upload speed pairs as [ISP](http://en.wikipedia.org/wiki/Internet_service_provider) Alpha (represented by 0) or Beta (represented by 1).  
 
-To start with this example I assume you created a new Scala project in your favorite IDE, and downloaded and added the [Smile Machine learning](https://github.com/haifengl/smile/releases)  and its dependency [SwingX](https://java.net/downloads/swingx/releases/) to this project. As final assumption you also downloaded the [example data](https://github.com/Xyclade/MachineLearning/raw/Master/Example%20Data/KNN_Example_1.csv).
+To start with this example I assume you created a new Scala project in your favourite IDE, and downloaded and added the [Smile Machine learning](https://github.com/haifengl/smile/releases)  and its dependency [SwingX](https://java.net/downloads/swingx/releases/) to this project. As final assumption you also downloaded the [example data](https://github.com/Xyclade/MachineLearning/raw/Master/Example%20Data/KNN_Example_1.csv).
 
 The first step is to load the CSV data file. As this is no rocket science, I provide the code for this without further explanation:
 
@@ -97,7 +97,7 @@ For this example we do [2-fold Cross Validation](http://en.wikipedia.org/wiki/Cr
     val basePath = "/Users/mikedewaard/ML_for_Hackers/10-Recommendations/data/example_data.csv"
     val testData = GetDataFromCSV(new File(basePath))
 
-    //Define the amount of rounds, in our case 2 and initialize the cross validation
+    //Define the amount of rounds, in our case 2 and initialise the cross validation
     val validationRounds = 2;
     val cv = new CrossValidation(testData._2.length, validationRounds);
     //Then for each round
@@ -128,12 +128,12 @@ For this example we do [2-fold Cross Validation](http://en.wikipedia.org/wiki/Cr
     }
   }
   ```
-If you execute this code serveral times you might notice the false prediction rate to fluctuate quite a bit. This is due to the random samples taken for training and testing. When this random sample is taken a bit unforunate, the error rate becomes much higher while when taking a good random sample, the error rate could be extremely low. 
+If you execute this code several times you might notice the false prediction rate to fluctuate quite a bit. This is due to the random samples taken for training and testing. When this random sample is taken a bit unfortunate, the error rate becomes much higher while when taking a good random sample, the error rate could be extremely low. 
 
 Unfortunately I cannot provide you with a golden rule to when your model was trained with the best possible training set. One would say the model with the least error rate is always the best, but when you recall the term [overfitting](#overfitting) picking this particular model might perform really bad on future data. This is why having a large enough and representative dataset is key to a good Machine Learning application. However when aware of this issue, you could implement manners to keep updating your model based on new data and known correct classifications.
 
 
-Let's suppose you implement the KNN into your application, then you should have gone through the following steps. First you took care of getting the training and testing data. Next up you generated and validated serveral models and picked the model which gave the best results. After these steps you can finally do predictions using your ML implementations:
+Let's suppose you implement the KNN into your application, then you should have gone through the following steps. First you took care of getting the training and testing data. Next up you generated and validated several models and picked the model which gave the best results. After these steps you can finally do predictions using your ML implementations:
 
 
 ```scala
@@ -163,11 +163,11 @@ These predictions can then be used to present to the users of your system, for e
 ###Classifying Email as Spam or Ham (Naive Bayes)
 The goal of this section is to use the Naive Bayes implementation from [Smile](https://github.com/haifengl/smile) in Scala to classify emails as Spam or Ham based on their content.  
 
-To start with this example I assume you created a new Scala project in your favorite IDE, and downloaded and added the [Smile Machine learning](https://github.com/haifengl/smile/releases)  and its dependency [SwingX](https://java.net/downloads/swingx/releases/) to this project. As final assumption you also downloaded and extracted the [example data](https://github.com/Xyclade/MachineLearning/raw/Master/Example%20Data/NaiveBayes_Example_1.zip). This example data comes from the [SpamAssasins public corpus](http://spamassasin.apache.org/publiccorpus/). 
+To start with this example I assume you created a new Scala project in your favourite IDE, and downloaded and added the [Smile Machine learning](https://github.com/haifengl/smile/releases)  and its dependency [SwingX](https://java.net/downloads/swingx/releases/) to this project. As final assumption you also downloaded and extracted the [example data](https://github.com/Xyclade/MachineLearning/raw/Master/Example%20Data/NaiveBayes_Example_1.zip). This example data comes from the [SpamAssasins public corpus](http://spamassasin.apache.org/publiccorpus/). 
 
 As with every machine learning implementation, the first step is to load in the training data. However in this example we are taking it 1 step further into machine learning. In the KNN examples we had the download and upload speed as [features](#features), which was rather easy as they where numbers and the only features available. For spam classification it is not completely trivial what to use as features. 
 
-In this example we will use the content of the email as feature. By this we mean, we will select  the features (words in this case) from the content of the training set of emails. In order to be able to do this, we need to build a [Term Document Matrix (TDM)](http://en.wikipedia.org/wiki/Document-term_matrix). We could use a library for it, but in order to gain more insight in why as to use it, let's build it ourselves, as this also gives us all freedom in properly sellecting the features:
+In this example we will use the content of the email as feature. By this we mean, we will select  the features (words in this case) from the content of the training set of emails. In order to be able to do this, we need to build a [Term Document Matrix (TDM)](http://en.wikipedia.org/wiki/Document-term_matrix). We could use a library for it, but in order to gain more insight in why as to use it, let's build it ourselves, as this also gives us all freedom in properly selecting the features:
 
 ```scala
 
@@ -279,7 +279,7 @@ scala
 
 Ok now that we have some insight in what are 'spammy' words and what are typical 'ham-words', we can decide on building a feature-set which we can then use in the Naive Bayes algorithm for creating the classifier. Note: In most cases it is always better to include **more** features, however performance becomes an issue when having tons of features. This is why in the field, developers tend to drop features that do not have a significant impact, purely for performance reasons.
 
-For now we will select the top **xx** spammy words based on occurence(thus not  frequency) and do the same for ham words and combine this into 1 set of words which we can feed into the bayes algorithm.
+For now we will select the top **xx** spammy words based on occurrence(thus not  frequency) and do the same for ham words and combine this into 1 set of words which we can feed into the bayes algorithm.
 
 
 ```scala
@@ -288,7 +288,7 @@ For now we will select the top **xx** spammy words based on occurence(thus not  
 
 ```
 
-Given this feature bag, and a set of test data, we can start training the algorithm. For this we can chose a few different models: 'general',  'multinominal' and bernoulli. In this example we focus on the multinominal but feel free to try out the other model types as well.
+Given this feature bag, and a set of test data, we can start training the algorithm. For this we can chose a few different models: 'general',  'multinomial' and Bernoulli. In this example we focus on the multinomial but feel free to try out the other model types as well.
 
 
 ```scala
@@ -311,7 +311,7 @@ Now that we have the trained model, we can once again do some validation. Howeve
 
 
 ##The global idea of machine learning
-The term 'Machine learning' is known by almost everyone, however almost no-one I spoke could really explain what it is in **_one_** or even serveral sentences.
+The term 'Machine learning' is known by almost everyone, however almost no-one I spoke could really explain what it is in **_one_** or even several sentences.
 
 *Explanation of machine learning, preferably with an graphical image*
 
@@ -325,7 +325,7 @@ A feature (in the field of machine learning) is a property on which a [Model](#M
 When one talks about machine learning, often the term *model* is mentioned. The model is the result of any machine learning method and the algorithm used within this method. This model can be used to make predictions in [supervised](#Supervised Learning), or to retrieve clusterings in [unsupervised learning](#Unsupervised learning).
 
 ###Learning methods
-In the field of machine learning there are two leading ways of learning, namely [Supervised learning](http://en.wikipedia.org/wiki/Supervised_learning) and  [Unsupervised learning](http://en.wikipedia.org/wiki/Unsupervised_learning). A brief introduction is neccesary when you want to use Machine learning in your applications, as picking the right machine learning approach is an important but sometimes also a little tedious process.
+In the field of machine learning there are two leading ways of learning, namely [Supervised learning](http://en.wikipedia.org/wiki/Supervised_learning) and  [Unsupervised learning](http://en.wikipedia.org/wiki/Unsupervised_learning). A brief introduction is necessary when you want to use Machine learning in your applications, as picking the right machine learning approach is an important but sometimes also a little tedious process.
 
 ####Supervised Learning
 The principle of supervised learning can be used to solve many problem types. In this blog however we will stick to [Classification](#Classification) and [Regression](#Regression) as this covers most of the problems one wants to solve in their every day application.
@@ -346,7 +346,7 @@ An example of a classification problem would be to classify emails as Ham or Spa
 ###Validation techniques
 
 #### Overfitting
-#### Underfitting
+#### Under-fitting
 
 ####Precision
 
