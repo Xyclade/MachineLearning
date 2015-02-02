@@ -5,10 +5,9 @@ Most developers these days have heard of machine learning, but when trying to fi
 
 And then there are books such as [*Machine Learning for Hackers*](http://shop.oreilly.com/product/0636920018483.do) and [*An Introduction to Statistical Learning with Applications in R*](http://www-bcf.usc.edu/~gareth/ISL/)  who use programming language [R](http://www.r-project.org) for their examples. 
 
-However R is not really a programming language in which one writes programs for everyday use such as is done with for example Java, C#, Scala etc. This is why in this blog, Machine learning will be introduced using libraries for java/scala and C# which are languages that almost every developer has worked with once during their study or career.
+However R is not really a programming language in which one writes programs for everyday use such as is done with for example Java, C#, Scala etc. This is why in this blog, Machine learning will be introduced using [Smile](https://github.com/haifengl/smile), a machine learning library that can be used both in Java and Scala,which are languages that almost every developer has worked with once during their study or career.
 
 Note that in this blog, 'new' definitions are hyperlinked such that if you want, you **can** read more regarding that specific topic, but you are not obliged to do this in order to be able to work through the examples. However the section ['The global idea of machine learning'](#The global idea of machine learning) helps making things a lot more clear when working through the examples and is advised to be read on beforehand in case you are completely new to Machine Learning.
-
 
 
 
@@ -18,7 +17,7 @@ The examples will start off with the most simple and intuitive [*Classification*
 
 ###Labeling ISPs based on their Down/Upload speed (K-NN using Smile in Scala)
 
-The goal of this section is to use the K-NN implementation from [Smile](https://github.com/haifengl/smile) in Scala to classify download/upload speed pairs as [ISP](http://en.wikipedia.org/wiki/Internet_service_provider) Alpha (represented by 0) or Beta (represented by 1).  
+The goal of this section is to use the K-NN implementation from  in Scala to classify download/upload speed pairs as [ISP](http://en.wikipedia.org/wiki/Internet_service_provider) Alpha (represented by 0) or Beta (represented by 1).  
 
 To start with this example I assume you created a new Scala project in your favourite IDE, and downloaded and added the [Smile Machine learning](https://github.com/haifengl/smile/releases)  and its dependency [SwingX](https://java.net/downloads/swingx/releases/) to this project. As final assumption you also downloaded the [example data](https://github.com/Xyclade/MachineLearning/raw/Master/Example%20Data/KNN_Example_1.csv).
 
@@ -163,11 +162,14 @@ These predictions can then be used to present to the users of your system, for e
 ###Classifying Email as Spam or Ham (Naive Bayes)
 The goal of this section is to use the Naive Bayes implementation from [Smile](https://github.com/haifengl/smile) in Scala to classify emails as Spam or Ham based on their content.  
 
-To start with this example I assume you created a new Scala project in your favourite IDE, and downloaded and added the [Smile Machine learning](https://github.com/haifengl/smile/releases)  and its dependency [SwingX](https://java.net/downloads/swingx/releases/) to this project. As final assumption you also downloaded and extracted the [example data](https://github.com/Xyclade/MachineLearning/raw/Master/Example%20Data/NaiveBayes_Example_1.zip). This example data comes from the [SpamAssasins public corpus](http://spamassasin.apache.org/publiccorpus/). 
+To start with this example I assume you created a new Scala project in your favourite IDE, and downloaded and added the [Smile Machine learning](https://github.com/haifengl/smile/releases)  and its dependency [SwingX](https://java.net/downloads/swingx/releases/) to this project. As final assumption you also downloaded and extracted the [example data](./Example%20Data/NaiveBayes_Example_1.zip). This example data comes from the [SpamAssasins public corpus](http://spamassasin.apache.org/publiccorpus/). 
 
-As with every machine learning implementation, the first step is to load in the training data. However in this example we are taking it 1 step further into machine learning. In the KNN examples we had the download and upload speed as [features](#features), which was rather easy as they where numbers and the only features available. For spam classification it is not completely trivial what to use as features. 
+As with every machine learning implementation, the first step is to load in the training data. However in this example we are taking it 1 step further into machine learning. In the [KNN examples](#Labeling ISPs based on their Down/Upload speed (K-NN using Smile in Scala)) we had the download and upload speed as [features](#features). We did not refer to them as features, as they where the only properties available. For spam classification it is not completely trivial what to use as features. One can use the Sender, the subject, the message content, and even the time of sending as features for classifying as spam or ham.  
 
-In this example we will use the content of the email as feature. By this we mean, we will select  the features (words in this case) from the content of the training set of emails. In order to be able to do this, we need to build a [Term Document Matrix (TDM)](http://en.wikipedia.org/wiki/Document-term_matrix). We could use a library for it, but in order to gain more insight in why as to use it, let's build it ourselves, as this also gives us all freedom in properly selecting the features:
+In this example we will use the content of the email as feature. By this we mean, we will select the features (words in this case) from the bodies of the emails in the training set. In order to be able to do this, we need to build a [Term Document Matrix (TDM)](http://en.wikipedia.org/wiki/Document-term_matrix). We could use a library for this, but in order to gain more insight, let's build it ourselves. This also gives us all freedom in changing around stuff for properly selecting features.
+
+
+We will start off with writing the functions for loading the example data. This will be done with a ```getMessage``` method which gets a filtered body from an email given a filename as parameter.
 
 ```scala
 
@@ -182,6 +184,11 @@ def getMessage(file : File)  : String  =
     //Return the message body filtered by only text from a-z and to lower case 
     return lines.substring(firstLineBreak).replace("\n"," ").replaceAll("[^a-zA-Z ]","").toLowerCase()
   }
+```
+
+Now we need a method that gets all the filenames for the emails, from the example data folder structure that we provided you with.
+
+```scala
   
   def getFilesFromDir(path: String):List[File] = {
     val d = new File(path)
@@ -192,9 +199,14 @@ def getMessage(file : File)  : String  =
       List[File]()
     }
   }
+```
+
+And finally lets define a set of paths that make it easier to load the different datasets from the example data. Together with this we also directly define a sample size of 500, as this is the complete amount of training emails are available for the spam set. We take the same amount of ham emails as the training set should be balanced for these two classification groups.
+
+```scala
   
   def main(args: Array[String]): Unit = {
-    val basePath = "/Users/../../data"
+    val basePath = "/Users/../Downloads/data"
     val spamPath = basePath + "/spam"
     val spam2Path = basePath + "/spam_2"
     val easyHamPath = basePath + "/easy_ham"
@@ -202,32 +214,20 @@ def getMessage(file : File)  : String  =
     val hardHamPath = basePath + "/hard_ham"
     val hardHam2Path = basePath + "/hard_ham_2"
 
-  val  amountOfSamplesPerSet = 500;
+  	val  amountOfSamplesPerSet = 500;
 
-
-  //First get a subset of the filenames for the spam sample set (500 is the complete set in this case)
-  val listOfSpamFiles =   getFilesFromDir(spamPath).take(amountOfSamplesPerSet)
-  //Then get the messages that are contained in these files
+    //First get a subset of the filenames for the spam sample set (500 is the complete set in this case)
+    val listOfSpamFiles =   getFilesFromDir(spamPath).take(amountOfSamplesPerSet)
+    //Then get the messages that are contained in these files
+    val spamMails = listOfSpamFiles.map{x => (x,getMessage(x)) }
   }
+
   
 ```
-With the data loaded building the TDM can begin:
 
-```scala
 
- val spamMails = listOfSpamFiles.map{x => (x,getMessage(x)) }
-  //Then its time for feature selection, but in order to pick good features we have to gain more insight
-  val spamTDM = new TDM();
-  //Build up the Term-Document Matrix for spam emails
-  spamMails.foreach(x => x._2.split(" ").filter(_.nonEmpty).foreach(y => spamTDM.addTermToRecord(y,x._1.getName)))
-  //Sort the spam by total frequency for ease
-  spamTDM.SortByOccurenceRate(spamMails.size)
-  //Filter out all stopwords
-  spamTDM.records = spamTDM.records.filter(x => !StopWords.contains(x.term));
+Now that we have the training data for both the ham and the spam email, we can start building 2 [TDM's](http://en.wikipedia.org/wiki/Document-term_matrix). But before we show you the code for this, lets first explain shortly why we actually need this. The TDM will contain **ALL** words which are contained in the bodies of the training set, including frequency rate. However, since frequency might not be the best measure (as 1 email which contains 1.000.000 times the word 'pie' would mess up the complete table) we will also compute the **occurrence rate**. By this we mean, the amount of documents that contain that specific term. So lets start off with implementing the TDM.
 
-```
-
-Where the implementation of the TDM class is as follows:
 
 ```scala
 
@@ -271,15 +271,35 @@ class TDMRecord(val term : String, var occurrences :  mutable.HashMap[String,Int
 }
 ```
 
-```
-scala
-//Showing how the TDM works and how to change round the outputs., including the top spammy and ham words.
+As you can see there are two sort methods: ```SortByTotalFrequency``` and ```SortByOccurenceRate```. In the latter one you need to pass the rate, which represents the total amount of documents that are contained in the TDM. This is done for performance reasons, since the TMD does not keep track of the amount of documents that was used to build up this TDM. Given this implementation, we can now actually make the two tables, one for spam and one for ham.
+
+```scala
+
+  //Then its time for feature selection, but in order to pick good features we have to gain more insight
+  val spamTDM = new TDM();
+  //Build up the Term-Document Matrix for spam emails
+  spamMails.foreach(x => x._2.split(" ").filter(_.nonEmpty).foreach(y => spamTDM.addTermToRecord(y,x._1.getName)))
+  //Sort the spam by total frequency for ease
+  spamTDM.SortByOccurenceRate(spamMails.size)
+  //Filter out all stopwords
+  spamTDM.records = spamTDM.records.filter(x => !StopWords.contains(x.term));
 
 ```
 
-Ok now that we have some insight in what are 'spammy' words and what are typical 'ham-words', we can decide on building a feature-set which we can then use in the Naive Bayes algorithm for creating the classifier. Note: In most cases it is always better to include **more** features, however performance becomes an issue when having tons of features. This is why in the field, developers tend to drop features that do not have a significant impact, purely for performance reasons.
+Given the tables, lets take a look at the top 50 words for each table
 
-For now we will select the top **xx** spammy words based on occurrence(thus not  frequency) and do the same for ham words and combine this into 1 set of words which we can feed into the bayes algorithm.
+**ADD images with top 50 words for both spam and ham**
+
+Note that in these top words, a few stop words come forward. These stopwords are noise, which we should not use in our feature selection, this we should remove these from the tables before selecting the features. We've included a list of stopwords in the example dataset.
+
+```scala
+//Add the code for removing the stopwords from both the TDM's
+ 
+```
+
+If we once again look at the top 50 words for spam and ham, we see that the stopwords are gone. With this insight in what 'spammy' words and what typical 'ham-words' are, we can decide on building a feature-set which we can then use in the Naive Bayes algorithm for creating the classifier. Note: it is always better to include **more** features, however performance might become an issue when having all words as features. This is why in the field, developers tend to drop features that do not have a significant impact, purely for performance reasons. Alternatively machine learning is done running complete [Hadoop](http://hadoop.apache.org/) clusters, but explaining this would be outside the scope of this blog.
+
+For now we will select the top **xx** spammy words based on occurrence(thus not frequency) and do the same for ham words and combine this into 1 set of words which we can feed into the bayes algorithm.
 
 
 ```scala
@@ -288,7 +308,7 @@ For now we will select the top **xx** spammy words based on occurrence(thus not 
 
 ```
 
-Given this feature bag, and a set of test data, we can start training the algorithm. For this we can chose a few different models: 'general',  'multinomial' and Bernoulli. In this example we focus on the multinomial but feel free to try out the other model types as well.
+Given this feature bag, and a set of test data, we can start training the algorithm. For this we can chose a few different models: 'general', 'multinomial' and Bernoulli. In this example we focus on the multinomial but feel free to try out the other model types as well.
 
 
 ```scala
