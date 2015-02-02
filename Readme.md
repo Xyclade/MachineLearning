@@ -136,8 +136,7 @@ Unfortunately I cannot provide you with a golden rule to when your model was tra
 Let's suppose you implement the KNN into your application, then you should have gone through the following steps. First you took care of getting the training and testing data. Next up you generated and validated serveral models and picked the model which gave the best results. After these steps you can finally do predictions using your ML implementations:
 
 
-```
-scala
+```scala
  
  	  val result = knn.predict(unknownDatapoint);
 
