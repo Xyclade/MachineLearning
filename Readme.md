@@ -170,8 +170,8 @@ As with every machine learning implementation, the first step is to load in the 
 
 In this example we will use the content of the email as feature. By this we mean, we will select  the features (words in this case) from the content of the training set of emails. In order to be able to do this, we need to build a [Term Document Matrix (TDM)](http://en.wikipedia.org/wiki/Document-term_matrix). We could use a library for it, but in order to gain more insight in why as to use it, let's build it ourselves, as this also gives us all freedom in properly sellecting the features:
 
-```
-scala
+```scala
+
 def getMessage(file : File)  : String  =
   {
     //Note that the encoding of the example files is latin1, thus this should be passed to the from file method.
@@ -214,8 +214,8 @@ def getMessage(file : File)  : String  =
 ```
 With the data loaded building the TDM can begin:
 
-```
-scala
+```scala
+
  val spamMails = listOfSpamFiles.map{x => (x,getMessage(x)) }
   //Then its time for feature selection, but in order to pick good features we have to gain more insight
   val spamTDM = new TDM();
@@ -230,8 +230,8 @@ scala
 
 Where the implementation of the TDM class is as follows:
 
-```
-scala
+```scala
+
 class TDM {
 
   var records : List[TDMRecord] =  List[TDMRecord]()
@@ -283,8 +283,8 @@ Ok now that we have some insight in what are 'spammy' words and what are typical
 For now we will select the top **xx** spammy words based on occurence(thus not  frequency) and do the same for ham words and combine this into 1 set of words which we can feed into the bayes algorithm.
 
 
-```
-scala
+```scala
+
 //Add the code for getting the tdm data and combining it into a feature bag.
 
 ```
@@ -292,16 +292,16 @@ scala
 Given this feature bag, and a set of test data, we can start training the algorithm. For this we can chose a few different models: 'general',  'multinominal' and bernoulli. In this example we focus on the multinominal but feel free to try out the other model types as well.
 
 
-```
-scala
+```scala
+
 //Add the code for creating the bayes classifier, including the training part
 
 ```
 
 Now that we have the trained model, we can once again do some validation. However, in the example data we already made a separation between easy and hard ham, and spam, thus we will not apply the cross validation, but rather validate the model on hard-ham.
 
-```
-scala
+```scala
+
 //Add code for model validation
 
 ```
