@@ -213,8 +213,8 @@ And finally lets define a set of paths that make it easier to load the different
     val hardHamPath = basePath + "/hard_ham"
     val hardHam2Path = basePath + "/hard_ham_2"
 
-  	val  amountOfSamplesPerSet = 500;
-
+  	val amountOfSamplesPerSet = 500;
+    val amountOfFeaturesToTake = 100;    
     //First get a subset of the filenames for the spam sample set (500 is the complete set in this case)
     val listOfSpamFiles =   getFilesFromDir(spamPath).take(amountOfSamplesPerSet)
     //Then get the messages that are contained in these files
@@ -296,8 +296,8 @@ hamTDM.SortByOccurrenceRate(spamMails.size)
 
 Given the tables, lets take a look at the top 50 words for each table. Note that the red words are from the spam table and the green words are from the ham table. Additionaly, the size of the words represents the occurrence rate. Thus the larger the word, the more documents contained that word atleast once.
 
-<img src="./Images/Ham_Stopwords.png" width="415px" height="207px" />
-<img src="./Images/Spam_Stopwords.png" width="415px" height="207px" />
+<img src="./Images/Ham_Stopwords.png" width="400px" height="200px" />
+<img src="./Images/Spam_Stopwords.png" width="400px" height="200px" />
 
 As you can see, mostly stop words come forward. These stopwords are noise, which we should not use in our feature selection, this we should remove these from the tables before selecting the features. We've included a list of stopwords in the example dataset. Lets first define the code to get these stopwords.
 ```scala
@@ -320,12 +320,14 @@ spamTDM.records = spamTDM.records.filter(x => !StopWords.contains(x.term));
 
 ```
 
-<img src="./Images/Ham_No_Stopwords.png" width="415px" height="207px" />
-<img src="./Images/Spam_No_Stopwords.png" width="415px" height="207px" />
+If we once again look at the top 50 words for spam and ham, we see that most of the stopwords are gone. We could fine-tune more, but for now lets go with this.
 
-If we once again look at the top 50 words for spam and ham, we see that most of the stopwords are gone. We could fine-tune more, but for now lets go with this. With this insight in what 'spammy' words and what typical 'ham-words' are, we can decide on building a feature-set which we can then use in the Naive Bayes algorithm for creating the classifier. Note: it is always better to include **more** features, however performance might become an issue when having all words as features. This is why in the field, developers tend to drop features that do not have a significant impact, purely for performance reasons. Alternatively machine learning is done running complete [Hadoop](http://hadoop.apache.org/) clusters, but explaining this would be outside the scope of this blog.
+<img src="./Images/Ham_No_Stopwords.png" width="400px" height="200px" />
+<img src="./Images/Spam_No_Stopwords.png" width="400px" height="200px" />
 
-For now we will select the top **xx** spammy words based on occurrence(thus not frequency) and do the same for ham words and combine this into 1 set of words which we can feed into the bayes algorithm. Finally we also convert the training data to fit the input of the Bayes algorithm.
+With this insight in what 'spammy' words and what typical 'ham-words' are, we can decide on building a feature-set which we can then use in the Naive Bayes algorithm for creating the classifier. Note: it is always better to include **more** features, however performance might become an issue when having all words as features. This is why in the field, developers tend to drop features that do not have a significant impact, purely for performance reasons. Alternatively machine learning is done running complete [Hadoop](http://hadoop.apache.org/) clusters, but explaining this would be outside the scope of this blog.
+
+For now we will select the top 100 spammy words based on occurrence(thus not frequency) and do the same for ham words and combine this into 1 set of words which we can feed into the bayes algorithm. Finally we also convert the training data to fit the input of the Bayes algorithm. Note that the final feature set thus is 200 - (#intersecting words *2). Feel free to experiment with higher and lower feature counts.
 
 
 ```scala
@@ -359,17 +361,56 @@ Given this feature bag, and a set of training data, we can start training the al
 ```scala
 //Create the bayes model as a multinomial with 2 classification groups and the amount of features passed in the constructor.
   var bayes = new NaiveBayes(NaiveBayes.Model.MULTINOMIAL, 2, data.size)
-  //Now train the bayes instance with the training data, which is represented in a specific formad due to the bag.featre method, and the known classifiers.
+  //Now train the bayes instance with the training data, which is represented in a specific format due to the bag.feature method, and the known classifiers.
+
   bayes.learn(trainingData, classifiers)
 ```
 
-Now that we have the trained model, we can once again do some validation. However, in the example data we already made a separation between easy and hard ham, and spam, thus we will not apply the cross validation, but rather validate the model on hard-ham.
+Now that we have the trained model, we can once again do some validation. However, in the example data we already made a separation between easy and hard ham, and spam, thus we will not apply the cross validation, but rather validate the model these test sets. We will start with validation of spam classification. For this we use the 1397 spam emails from the spam2 folder.
 
 ```scala
+val listOfSpam2Files =   getFilesFromDir(spam2Path)
+val spam2Mails = listOfSpam2Files.map{x => (x,getMessage(x)) }
+val spam2FeatureVectors = spam2Mails.map(x => bag.feature(x._2.split(" ")))
+val spam2ClassificationResults = spam2FeatureVectors.map(x => bayes.predict(x))
 
-//Add code for model validation
+//Correct classifications are those who resulted in a spam classification (0)
+val correctClassifications = spam2ClassificationResults.count( x=> x == 0);
+println(correctClassifications + " of " + listOfSpam2Files.length + "were correctly classified")
+println(((correctClassifications.toDouble /  listOfSpam2Files.length) * 100)  + "% was correctly classified")
+
+//In case the algorithm could not decide which category the email belongs to, it gives a -1 (unknown) rather than a 0 (spam) or 1 (ham)
+val unknownClassifications = spam2ClassificationResults.count( x=> x == -1);
+println(unknownClassifications + " of " + listOfSpam2Files.length + "were unknownly classified")
+println(((unknownClassifications.toDouble /  listOfSpam2Files.length) * 100)  + "% was unknownly classified")
 
 ```
+
+If we run this code serveral times with different feature amounts we get the following results:
+
+
+| amountOfFeaturesToTake	| Spam (Correct)| Unknown| Ham | 
+| ---------------------		|:-------------	| :----- |:----|
+| 50      					| 1281 (91.70%)	| 16 (1.15%)	| 100 (7.15%) |
+| 100     					| 1189 (85.11%)	| 18 (1.29%)	| 190 (13.6%)|
+| 200     					| 1197 (85.68%)	| 16 (1.15%)	| 184 (13.17%)|
+| 400     					| 1219 (87.26%)	| 13 (0.93%)	| 165 (11.81%)|
+
+Interestingly enough, the algorithm works best with only 50 features. However, if you recall that there were still *stop words* in the top 50 classification terms which could explain this result.  If you look at how the values change as the amount of features increase (starting at 100), you can see that with more features, the overall result increases. Note that there are a group of unknown emails. For these emails the prior was equal for both classes. Note that this also is the case if there are no feature words for ham nor spam in the email, because then the algorithm would classify it 50% ham 50% spam.
+
+
+If we change the path to ```easyHam2Path``` and rerun the code for we get the following results:
+
+| amountOfFeaturesToTake	| Spam | Unknown| Ham  (Correct) | 
+| ---------------------		|:-------------	| :----- |:----|
+| 50      					| 120 (8.57%)	| 28 ( 2.0%)	| 1252 (89.43%)	|
+| 100   					| 44 (3.14%)	| 11 (0.79%)	| 1345 (96.07%)	|
+| 200 						| 36 (2.57%)	| 7 (0.5%)	| 1357 (96.93%)	|
+| 400     					| 24 (1.71%)	| 7 (0.5%)	| 1369 (97.79%) |
+
+Here we see that indeed, when you use only 50 features, the amount of ham that gets classified correctly is significantly lower in comparison to the correct classifications when using 100 features.
+
+We could work through the hard ham, but since the building bricks are already here, we leave this to the reader. 
 
 ###Page view prediction with regression
 
