@@ -67,7 +67,6 @@ Given the data the first thing to do next is to see what the data looks like. Fo
     title = "KNN Example!"
     val basePath = "/Users/mikedewaard/ML_for_Hackers/10-Recommendations/data/example_data.csv"
 
-
     val test_data = GetDataFromCSV(new File(basePath))
 
     val plot = ScatterPlot.plot(test_data._1, test_data._2, '@', Array(Color.red, Color.blue));
@@ -80,7 +79,7 @@ Given the data the first thing to do next is to see what the data looks like. Fo
  
 The idea behind plotting the data is to verify whether KNN is a fitting Machine Learning algorithm for this specific set of data. In this case the data looks as follows:
 
-<img src="/Images/KNNPlot.png" width="300px" height="300px" />
+<img src="./Images/KNNPlot.png" width="300px" height="300px" />
 
 In this plot you can see  that the blue and red points seem to be mixed in the area (3 < x < 5) and (5 < y < 7.5). If the groups were not mixed at all, but were two separate clusters, a [regression](#regression) algorithm  such as in the example [Page view prediction with regression](#Page view prediction with regression) could be used instead. However, since the groups are mixed the KNN algorithm is a good choice as fitting a linear decision boundary would cause a lot of false classifications in the mixed area.
 
@@ -138,7 +137,6 @@ Let's suppose you implement the KNN into your application, then you should have 
 ```scala
  
  	  val result = knn.predict(unknownDatapoint);
-
       if (result == 0)
       {
         println("Internet Service Provider Alpha")
@@ -195,7 +193,8 @@ Now we need a method that gets all the filenames for the emails, from the exampl
     if (d.exists && d.isDirectory) {
       //Remove the mac os basic storage file, and alternatively for unix systems "cmds"
       d.listFiles.filter(_.isFile).toList.filter(x => ! x.toString.contains(".DS_Store") && ! x.toString.contains("cmds"))
-    } else {
+    } 
+    else {
       List[File]()
     }
   }
@@ -222,9 +221,9 @@ And finally lets define a set of paths that make it easier to load the different
     val spamMails = listOfSpamFiles.map{x => (x,getMessage(x)) }
     
      //Get a subset of the filenames from the ham sampleset (note that in this case it is not neccesary to randomly sample as the emails are already randomly ordered)
-  val listOfHamFiles =   getFilesFromDir(easyHamPath).take(amountOfSamplesPerSet)
-  //Get the messages that are contained in the ham files
-  val hamMails  = listOfHamFiles.map{x => (x,getMessage(x)) }
+  	val listOfHamFiles =   getFilesFromDir(easyHamPath).take(amountOfSamplesPerSet)
+  	//Get the messages that are contained in the ham files
+  	val hamMails  = listOfHamFiles.map{x => (x,getMessage(x)) }
   }
 
   
@@ -280,24 +279,27 @@ As you can see there are two sort methods: ```SortByTotalFrequency``` and ```Sor
 
 ```scala
 
-  val spamTDM = new TDM();
-  //Build up the Term-Document Matrix for spam emails
-  spamMails.foreach(x => x._2.split(" ").filter(_.nonEmpty).foreach(y => spamTDM.addTermToRecord(y,x._1.getName))
-    //Sort the spam by the occurence rate to gain more insight
-  spamTDM.SortByOccurrenceRate(hamMails.size)
+val spamTDM = new TDM();
+//Build up the Term-Document Matrix for spam emails
+spamMails.foreach(x => x._2.split(" ").filter(_.nonEmpty).foreach(y => spamTDM.addTermToRecord(y,x._1.getName))
+//Sort the spam by the occurence rate to gain more insight
+spamTDM.SortByOccurrenceRate(hamMails.size)
  
 val hamTDM = new TDM();
-  //Build up the Term-Document Matrix for ham emails
-  hamMails.foreach(x => x._2.split(" ").filter(_.nonEmpty).foreach(y => hamTDM.addTermToRecord(y,x._1.getName)))
-  //Sort the ham by the occurence rate to gain more insight
-  hamTDM.SortByOccurrenceRate(spamMails.size)
+//Build up the Term-Document Matrix for ham emails
+hamMails.foreach(x => x._2.split(" ").filter(_.nonEmpty).foreach(y => hamTDM.addTermToRecord(y,x._1.getName)))
+//Sort the ham by the occurence rate to gain more insight
+hamTDM.SortByOccurrenceRate(spamMails.size)
+
+
 ```
 
-Given the tables, lets take a look at the top 50 words for each table
+Given the tables, lets take a look at the top 50 words for each table. Note that the red words are from the spam table and the green words are from the ham table.
 
-**ADD images with top 50 words for both spam and ham**
+<img src="./Images/Ham_Stopwords.png" width="500px" height="250px" />
+<img src="./Images/Spam_Stopwords.png" width="500px" height="250px" />
 
-Note that in these top words, a few stop words come forward. These stopwords are noise, which we should not use in our feature selection, this we should remove these from the tables before selecting the features. We've included a list of stopwords in the example dataset. Lets first define the code to get these stopwords.
+As you can see, mostly stop words come forward. These stopwords are noise, which we should not use in our feature selection, this we should remove these from the tables before selecting the features. We've included a list of stopwords in the example dataset. Lets first define the code to get these stopwords.
 ```scala
   def getStopWords() : List[String] =
   {
@@ -312,12 +314,16 @@ Note that in these top words, a few stop words come forward. These stopwords are
 Now we can expand the main body with removing the stopwords from the Tables
 
 ```scala
- //Filter out all stopwords
-  hamTDM.records = hamTDM.records.filter(x => !StopWords.contains(x.term));
-  spamTDM.records = spamTDM.records.filter(x => !StopWords.contains(x.term));
+//Filter out all stopwords
+hamTDM.records = hamTDM.records.filter(x => !StopWords.contains(x.term));
+spamTDM.records = spamTDM.records.filter(x => !StopWords.contains(x.term));
 
 ```
-If we once again look at the top 50 words for spam and ham, we see that the stopwords are gone. With this insight in what 'spammy' words and what typical 'ham-words' are, we can decide on building a feature-set which we can then use in the Naive Bayes algorithm for creating the classifier. Note: it is always better to include **more** features, however performance might become an issue when having all words as features. This is why in the field, developers tend to drop features that do not have a significant impact, purely for performance reasons. Alternatively machine learning is done running complete [Hadoop](http://hadoop.apache.org/) clusters, but explaining this would be outside the scope of this blog.
+
+<img src="./Images/Ham_No_Stopwords.png" width="500px" height="250px" />
+<img src="./Images/Spam_No_Stopwords.png" width="500px" height="250px" />
+
+If we once again look at the top 50 words for spam and ham, we see that most of the stopwords are gone. We could fine-tune more, but for now lets go with this. With this insight in what 'spammy' words and what typical 'ham-words' are, we can decide on building a feature-set which we can then use in the Naive Bayes algorithm for creating the classifier. Note: it is always better to include **more** features, however performance might become an issue when having all words as features. This is why in the field, developers tend to drop features that do not have a significant impact, purely for performance reasons. Alternatively machine learning is done running complete [Hadoop](http://hadoop.apache.org/) clusters, but explaining this would be outside the scope of this blog.
 
 For now we will select the top **xx** spammy words based on occurrence(thus not frequency) and do the same for ham words and combine this into 1 set of words which we can feed into the bayes algorithm. Finally we also convert the training data to fit the input of the Bayes algorithm.
 
@@ -328,24 +334,23 @@ For now we will select the top **xx** spammy words based on occurrence(thus not 
 val hamFeatures = hamTDM.records.take(amountOfFeaturesToTake).map(x => x.term)
 val spamFeatures = spamTDM.records.take(amountOfFeaturesToTake).map(x => x.term)
 
- //Now we have a set of ham and spam features, we group them and then remove the intersecting features, as these are noise.
-  var data = (hamFeatures ++ spamFeatures).toSet
-  hamFeatures.intersect(spamFeatures).foreach(x => data = (data - x))
+//Now we have a set of ham and spam features, we group them and then remove the intersecting features, as these are noise.
+var data = (hamFeatures ++ spamFeatures).toSet
+hamFeatures.intersect(spamFeatures).foreach(x => data = (data - x))
 
-
-  //Initialize a bag of words that takes the top x features from both spam and ham and combines them
-  var bag = new Bag[String] (data.toArray);
+//Initialize a bag of words that takes the top x features from both spam and ham and combines them
+var bag = new Bag[String] (data.toArray);
 //Initialize the classifier array with first a set of 0(spam) and then a set of 1(ham) values that represent the emails
-  var classifiers =  Array.fill[Int](amountOfSamplesPerSet)(0) ++  Array.fill[Int](amountOfSamplesPerSet)(1)
+var classifiers =  Array.fill[Int](amountOfSamplesPerSet)(0) ++  Array.fill[Int](amountOfSamplesPerSet)(1)
 
-  //Get the trainingData in the right format for the spam mails
-  var spamData = spamMails.map(x => bag.feature(x._2.split(" "))).toArray
+//Get the trainingData in the right format for the spam mails
+var spamData = spamMails.map(x => bag.feature(x._2.split(" "))).toArray
 
-  //Get the trainingData in the right format for the ham mails
-  var hamData = hamMails.map(x => bag.feature(x._2.split(" "))).toArray
+//Get the trainingData in the right format for the ham mails
+var hamData = hamMails.map(x => bag.feature(x._2.split(" "))).toArray
 
-  //Combine the training data from both categories
-  var trainingData = spamData ++ hamData
+//Combine the training data from both categories
+var trainingData = spamData ++ hamData
 ```
 
 Given this feature bag, and a set of training data, we can start training the algorithm. For this we can chose a few different models: 'general', 'multinomial' and Bernoulli. In this example we focus on the multinomial but feel free to try out the other model types as well.
