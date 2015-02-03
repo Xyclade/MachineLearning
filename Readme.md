@@ -296,8 +296,8 @@ hamTDM.SortByOccurrenceRate(spamMails.size)
 
 Given the tables, lets take a look at the top 50 words for each table. Note that the red words are from the spam table and the green words are from the ham table. Additionaly, the size of the words represents the occurrence rate. Thus the larger the word, the more documents contained that word atleast once.
 
-<img src="./Images/Ham_Stopwords.png" width="400px" height="200px" />
-<img src="./Images/Spam_Stopwords.png" width="400px" height="200px" />
+<img src="./Images/Ham_Stopwords.png" width="335px" height="167px" />
+<img src="./Images/Spam_Stopwords.png" width="335px" height="167px" />
 
 As you can see, mostly stop words come forward. These stopwords are noise, which we should not use in our feature selection, this we should remove these from the tables before selecting the features. We've included a list of stopwords in the example dataset. Lets first define the code to get these stopwords.
 ```scala
@@ -320,8 +320,8 @@ spamTDM.records = spamTDM.records.filter(x => !StopWords.contains(x.term));
 
 ```
 
-<img src="./Images/Ham_No_Stopwords.png" width="400px" height="200px" />
-<img src="./Images/Spam_No_Stopwords.png" width="400px" height="200px" />
+<img src="./Images/Ham_No_Stopwords.png" width="335px" height="167px" />
+<img src="./Images/Spam_No_Stopwords.png" width="335px" height="167px" />
 
 If we once again look at the top 50 words for spam and ham, we see that most of the stopwords are gone. We could fine-tune more, but for now lets go with this. With this insight in what 'spammy' words and what typical 'ham-words' are, we can decide on building a feature-set which we can then use in the Naive Bayes algorithm for creating the classifier. Note: it is always better to include **more** features, however performance might become an issue when having all words as features. This is why in the field, developers tend to drop features that do not have a significant impact, purely for performance reasons. Alternatively machine learning is done running complete [Hadoop](http://hadoop.apache.org/) clusters, but explaining this would be outside the scope of this blog.
 
