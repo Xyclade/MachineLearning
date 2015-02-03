@@ -220,6 +220,11 @@ And finally lets define a set of paths that make it easier to load the different
     val listOfSpamFiles =   getFilesFromDir(spamPath).take(amountOfSamplesPerSet)
     //Then get the messages that are contained in these files
     val spamMails = listOfSpamFiles.map{x => (x,getMessage(x)) }
+    
+     //Get a subset of the filenames from the ham sampleset (note that in this case it is not neccesary to randomly sample as the emails are already randomly ordered)
+  val listOfHamFiles =   getFilesFromDir(easyHamPath).take(amountOfSamplesPerSet)
+  //Get the messages that are contained in the ham files
+  val hamMails  = listOfHamFiles.map{x => (x,getMessage(x)) }
   }
 
   
@@ -271,50 +276,86 @@ class TDMRecord(val term : String, var occurrences :  mutable.HashMap[String,Int
 }
 ```
 
-As you can see there are two sort methods: ```SortByTotalFrequency``` and ```SortByOccurenceRate```. In the latter one you need to pass the rate, which represents the total amount of documents that are contained in the TDM. This is done for performance reasons, since the TMD does not keep track of the amount of documents that was used to build up this TDM. Given this implementation, we can now actually make the two tables, one for spam and one for ham.
+As you can see there are two sort methods: ```SortByTotalFrequency``` and ```SortByOccurenceRate```. In the latter one you need to pass the rate, which represents the total amount of documents that are contained in the TDM. This is done for performance reasons, since the TMD does not keep track of the amount of documents that was used to build up this TDM. Given this implementation, we can now actually make the two tables, one for spam and one for ham. We will add this code to the main class.
 
 ```scala
 
-  //Then its time for feature selection, but in order to pick good features we have to gain more insight
   val spamTDM = new TDM();
   //Build up the Term-Document Matrix for spam emails
-  spamMails.foreach(x => x._2.split(" ").filter(_.nonEmpty).foreach(y => spamTDM.addTermToRecord(y,x._1.getName)))
-  //Sort the spam by total frequency for ease
-  spamTDM.SortByOccurenceRate(spamMails.size)
-  //Filter out all stopwords
-  spamTDM.records = spamTDM.records.filter(x => !StopWords.contains(x.term));
-
+  spamMails.foreach(x => x._2.split(" ").filter(_.nonEmpty).foreach(y => spamTDM.addTermToRecord(y,x._1.getName))
+    //Sort the spam by the occurence rate to gain more insight
+  spamTDM.SortByOccurrenceRate(hamMails.size)
+ 
+val hamTDM = new TDM();
+  //Build up the Term-Document Matrix for ham emails
+  hamMails.foreach(x => x._2.split(" ").filter(_.nonEmpty).foreach(y => hamTDM.addTermToRecord(y,x._1.getName)))
+  //Sort the ham by the occurence rate to gain more insight
+  hamTDM.SortByOccurrenceRate(spamMails.size)
 ```
 
 Given the tables, lets take a look at the top 50 words for each table
 
 **ADD images with top 50 words for both spam and ham**
 
-Note that in these top words, a few stop words come forward. These stopwords are noise, which we should not use in our feature selection, this we should remove these from the tables before selecting the features. We've included a list of stopwords in the example dataset.
-
+Note that in these top words, a few stop words come forward. These stopwords are noise, which we should not use in our feature selection, this we should remove these from the tables before selecting the features. We've included a list of stopwords in the example dataset. Lets first define the code to get these stopwords.
 ```scala
-//Add the code for removing the stopwords from both the TDM's
+  def getStopWords() : List[String] =
+  {
+    val source = scala.io.Source.fromFile(new File("/Users/.../.../Example Data/stopwords.txt"))("latin1")
+    val lines = source.mkString.split("\n")
+    source.close()
+    return  lines.toList
+  }
  
 ```
 
+Now we can expand the main body with removing the stopwords from the Tables
+
+```scala
+ //Filter out all stopwords
+  hamTDM.records = hamTDM.records.filter(x => !StopWords.contains(x.term));
+  spamTDM.records = spamTDM.records.filter(x => !StopWords.contains(x.term));
+
+```
 If we once again look at the top 50 words for spam and ham, we see that the stopwords are gone. With this insight in what 'spammy' words and what typical 'ham-words' are, we can decide on building a feature-set which we can then use in the Naive Bayes algorithm for creating the classifier. Note: it is always better to include **more** features, however performance might become an issue when having all words as features. This is why in the field, developers tend to drop features that do not have a significant impact, purely for performance reasons. Alternatively machine learning is done running complete [Hadoop](http://hadoop.apache.org/) clusters, but explaining this would be outside the scope of this blog.
 
-For now we will select the top **xx** spammy words based on occurrence(thus not frequency) and do the same for ham words and combine this into 1 set of words which we can feed into the bayes algorithm.
+For now we will select the top **xx** spammy words based on occurrence(thus not frequency) and do the same for ham words and combine this into 1 set of words which we can feed into the bayes algorithm. Finally we also convert the training data to fit the input of the Bayes algorithm.
 
 
 ```scala
 
 //Add the code for getting the tdm data and combining it into a feature bag.
+val hamFeatures = hamTDM.records.take(amountOfFeaturesToTake).map(x => x.term)
+val spamFeatures = spamTDM.records.take(amountOfFeaturesToTake).map(x => x.term)
 
+ //Now we have a set of ham and spam features, we group them and then remove the intersecting features, as these are noise.
+  var data = (hamFeatures ++ spamFeatures).toSet
+  hamFeatures.intersect(spamFeatures).foreach(x => data = (data - x))
+
+
+  //Initialize a bag of words that takes the top x features from both spam and ham and combines them
+  var bag = new Bag[String] (data.toArray);
+//Initialize the classifier array with first a set of 0(spam) and then a set of 1(ham) values that represent the emails
+  var classifiers =  Array.fill[Int](amountOfSamplesPerSet)(0) ++  Array.fill[Int](amountOfSamplesPerSet)(1)
+
+  //Get the trainingData in the right format for the spam mails
+  var spamData = spamMails.map(x => bag.feature(x._2.split(" "))).toArray
+
+  //Get the trainingData in the right format for the ham mails
+  var hamData = hamMails.map(x => bag.feature(x._2.split(" "))).toArray
+
+  //Combine the training data from both categories
+  var trainingData = spamData ++ hamData
 ```
 
-Given this feature bag, and a set of test data, we can start training the algorithm. For this we can chose a few different models: 'general', 'multinomial' and Bernoulli. In this example we focus on the multinomial but feel free to try out the other model types as well.
+Given this feature bag, and a set of training data, we can start training the algorithm. For this we can chose a few different models: 'general', 'multinomial' and Bernoulli. In this example we focus on the multinomial but feel free to try out the other model types as well.
 
 
 ```scala
-
-//Add the code for creating the bayes classifier, including the training part
-
+//Create the bayes model as a multinomial with 2 classification groups and the amount of features passed in the constructor.
+  var bayes = new NaiveBayes(NaiveBayes.Model.MULTINOMIAL, 2, data.size)
+  //Now train the bayes instance with the training data, which is represented in a specific formad due to the bag.featre method, and the known classifiers.
+  bayes.learn(trainingData, classifiers)
 ```
 
 Now that we have the trained model, we can once again do some validation. However, in the example data we already made a separation between easy and hard ham, and spam, thus we will not apply the cross validation, but rather validate the model on hard-ham.
