@@ -412,9 +412,13 @@ Here we see that indeed, when you use only 50 features, the amount of ham that g
 
 We could work through the hard ham, but since the building bricks are already here, we leave this to the reader. 
 
-###Page view prediction with regression
+###Predicting weight based on height (using Ordinary Least Squares)
+In this section we will introduce the [Ordinary Least Squares] techique which is a form of linear regression. As this techique is quite powerfull, it is important to have read [regression](#regression) and the common pitfalls before starting with this example. We will cover some of these issues in this section, while others are shown in the sections [under-fitting](#under-fitting) and [overfitting](#overfitting)
+
 
 //Todo: write
+
+
 
 ###Predicting O'Reilly top 100 selling books using text regression
 
@@ -455,20 +459,28 @@ The problem of classification within the domain of Supervised learning is relati
 An example of a classification problem would be to classify emails as Ham or Spam based on their content. Given a training set in which emails are labeled Ham/Spam, a classification algorithm can be used to train a [Model](#Model). This model can then be used to predict for future emails whether they are Ham or Spam. A typical example of a classification algorithm is the [K-NN algorithm](#Labeling ISPs based on their Down/Upload speed (K-NN using Smile in Scala)). Another more commonly used example of a classification problem is [Classifying Email as Spam or Ham](###Classifying Email as Spam or Ham (Naive Bayes)) which is also one of the examples written on this blog.
 
 #####Regression
+Regression is a lot stronger in comparison to [classification](#classification). This is because in regression you are predicting actual values, rather than labels. Let us clarify this with a short example: given a table of weights, heights, and genders, you can use [KNN](#Labeling ISPs based on their Down/Upload speed (K-NN using Smile in Scala)) to predict ones gender when given a weight and height. With this same dataset using regression, you could instead predict ones weight or height, given the gender the respective other missing parameter. 
 
+With this extra power, comes great responsibility, thus in the field of regression one should be very careful when generating the model. Common pitfalls are [overfitting](#overfitting), [underfitting](#under-fitting) and not taking into account how the model handles  [extrapolation](http://en.wikipedia.org/wiki/Extrapolation) and [interpolation](http://en.wikipedia.org/wiki/Interpolation)
 
 ####Unsupervised Learning
 
 
 
 ###Validation techniques
+In this section we will explain some of the techniques available for model validation, and will explain some terms that are commonly used in the Machine Learning field.
 
-#### Overfitting
-#### Under-fitting
+#### (2-fold) Cross Validation
 
-####Precision
+##### Precision
 
-####Recall
+##### Recall
+
+##### Overfitting
+
+##### Under-fitting
+
+
 
 ###Exploratory Data Analysis
 
