@@ -12,54 +12,50 @@ import scala.swing._
 object LinearRegression extends SimpleSwingApplication {
   def top = new MainFrame {
     title = "KNN Example!"
-    val basePath = "/Users/mikedewaard/ML_for_Hackers/05-Regression/data/longevity.csv"
+    val basePath = "/Users/mikedewaard/MachineLearning/Example Data/OLS_Regression_Example_3.csv"
 
     val test_data = GetDataFromCSV(new File(basePath))
 
-
-    val plot =  LinePlot.plot(test_data._1,Line.Style.SOLID,Color.red)//ScatterPlot.plot(test_data._1, test_data._2, '@', Array(Color.red, Color.blue));
+val plotData = (test_data._1 zip test_data._2).map(x => Array(x._1(1) ,x._2))
+val maleFemaleLabels = test_data._1.map( x=> x(0).toInt);
+    val plot =  ScatterPlot.plot(plotData,maleFemaleLabels,'@',Array(Color.red, Color.blue, Color.green))
      peer.setContentPane(plot)
     size = new Dimension(400, 400)
 
-    //data - a matrix containing the explanatory variables.
-    val data : Array[Array[Double]] =  Array(Array(50.0),Array(100.0),Array(150.0))
+    val ols = new OLS(test_data._1,test_data._2)
 
-
-    //y - the response values.
-      val response : Array[Double] = Array(100.0,200.0, 300.0)
-
-    val ols = new OLS(data,response)
-   val result =  ols.predict(Array(200.0))
-
-println(result);
+    println("Error: " + ols.error())
+    println(ols.predict(Array(1.0,60.0)));
+println(ols.predict(Array(2.0,60.0)));
 
   }
 
 
-  def GetDataFromCSV(file: File): (Array[Array[Double]], Array[Array[Double]]) = {
+  def GetDataFromCSV(file: File): (Array[Array[Double]], Array[Double]) = {
     val source = scala.io.Source.fromFile(file)
     val data = source.getLines().drop(1).map(x => GetDataFromString(x)).toArray
     source.close()
-    val smokerAges = data.filter(x => x._1 == 1).map(y => y._2.toDouble);
-    val nonSmokerAges = data.filter(x => x._1 == 0).map(y => y._2);
+    var inputData = data.map(x => x._1)
+    var resultData = data.map(x => x._2)
 
-    val nonSmokerDensity = nonSmokerAges.groupBy(x => x).toArray.sortBy(x => x._1).map(y => Array(y._1.toDouble, y._2.length.toDouble / nonSmokerAges.length)).toArray
-    val smokerDensity = smokerAges.groupBy(x => x).toArray.sortBy(x => x._1).map(y => Array(y._1.toDouble, y._2.length.toDouble / smokerAges.length)).toArray
-
-    return (smokerDensity, nonSmokerDensity)
-
+    return (inputData,resultData)
   }
 
-  def GetDataFromString(dataString: String): (Int, Int) = {
+  def GetDataFromString(dataString: String): (Array[Double], Double) = {
 
     //Split the comma separated value string into an array of strings
     val dataArray: Array[String] = dataString.split(',')
+    var person = 2.0;
+
+ if (dataArray(0) == "\"Male\"") {
+   person = 1.0
+ }
 
     //Extract the values from the strings
-    val smoker: Int = dataArray(0).toInt
-    val ageAtDeath: Int = dataArray(1).toInt
+    val data : Array[Double] = Array(person,dataArray(1).toDouble)
+    val weight: Double = dataArray(2).toDouble
 
     //And return the result in a format that can later easily be used to feed to Smile
-    return (smoker, ageAtDeath)
+    return (data, weight)
   }
 }
