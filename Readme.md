@@ -478,7 +478,17 @@ In this section we will explain some of the techniques available for model valid
 
 ##### Overfitting
 
+
+| Overfitting | Good fit |
+| : --: |: --- : |
+| <img src="./Images/OverFitting.png" width="300px" /> | <img src="./Images/Good_Fit.png" width="300px" />| 
+
 ##### Under-fitting
+
+| Under-fit | Good fit |
+| : --: |: --- : |
+| <img src="./Images/Under-Fitting.png" width="300px" /> | <img src="./Images/Good_Fit.png" width="300px" />| 
+
 
 
 
