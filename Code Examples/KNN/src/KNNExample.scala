@@ -26,7 +26,7 @@ object KNNExample extends SimpleSwingApplication {
 
     val cv = new CrossValidation(testData._2.length, validationRounds)
     //Then for each round
-    for (i <- 0 to validationRounds - 1) {
+    for (i <- 0 until validationRounds) {
 
       //Generate a subset of data points and their classifiers for Training
       val dpForTraining = testData._1.zipWithIndex.filter(x => cv.test(i).toList.contains(x._2)).map(y => y._1)
@@ -44,7 +44,7 @@ object KNNExample extends SimpleSwingApplication {
 
       //Finally evaluate the predictions as correct or incorrect and count the amount of wrongly classified data points.
       var error = 0.0;
-      for (j <- 0 to predictions.length - 1) {
+      for (j <- 0 until predictions.length) {
         if (predictions(j) != classifiersForTesting(j)) {
           error += 1
         }
