@@ -65,11 +65,11 @@ Given the data the first thing to do next is to see what the data looks like. Fo
  object KNNExample extends SimpleSwingApplication {
   def top = new MainFrame {
     title = "KNN Example!"
-    val basePath = "/Users/mikedewaard/ML_for_Hackers/10-Recommendations/data/example_data.csv"
+    val basePath = "/.../KNN_Example_1.csv"
 
     val test_data = GetDataFromCSV(new File(basePath))
 
-    val plot = ScatterPlot.plot(test_data._1, test_data._2, '@', Array(Color.red, Color.blue));
+    val plot = ScatterPlot.plot(test_data._1, test_data._2, '@', Array(Color.red, Color.blue))
     peer.setContentPane(plot)
     size = new Dimension(400, 400)
 
@@ -92,25 +92,25 @@ For this example we do [2-fold Cross Validation](http://en.wikipedia.org/wiki/Cr
 ```scala
 
   def main(args: Array[String]): Unit = {
-    val basePath = "/Users/mikedewaard/ML_for_Hackers/10-Recommendations/data/example_data.csv"
+   val basePath = "/.../KNN_Example_1.csv"
     val testData = GetDataFromCSV(new File(basePath))
 
     //Define the amount of rounds, in our case 2 and initialise the cross validation
     val validationRounds = 2;
-    val cv = new CrossValidation(testData._2.length, validationRounds);
+    val cv = new CrossValidation(testData._2.length, validationRounds)
     //Then for each round
     for (i <- 0 to validationRounds - 1) {
 
       //Generate a subset of data points and their classifiers for Training
-      val dpForTraining = testData._1.zipWithIndex.filter(x => cv.test(i).toList.contains(x._2)).map(y => y._1);
-      val classifiersForTraining = testData._2.zipWithIndex.filter(x => cv.test(i).toList.contains(x._2)).map(y => y._1);
+      val dpForTraining = testData._1.zipWithIndex.filter(x => cv.test(i).toList.contains(x._2)).map(y => y._1)
+      val classifiersForTraining = testData._2.zipWithIndex.filter(x => cv.test(i).toList.contains(x._2)).map(y => y._1)
 
       //And the corresponding subset of datapoints and their classifiers for testing
-      val dpForTesting = testData._1.zipWithIndex.filter(x => !cv.test(i).contains(x._2)).map(y => y._1);
-      val classifiersForTesting = testData._2.zipWithIndex.filter(x => !cv.test(i).contains(x._2)).map(y => y._1);
+      val dpForTesting = testData._1.zipWithIndex.filter(x => !cv.test(i).contains(x._2)).map(y => y._1)
+      val classifiersForTesting = testData._2.zipWithIndex.filter(x => !cv.test(i).contains(x._2)).map(y => y._1)
 
       //Then generate a Model with KNN with K = 3 
-      val knn = KNN.learn(dpForTraining, classifiersForTraining, 3);
+      val knn = KNN.learn(dpForTraining, classifiersForTraining, 3)
 
       //And for each test data point make a prediction with the model
       val predictions = dpForTesting.map(x => knn.predict(x))
@@ -136,20 +136,20 @@ Let's suppose you implement the KNN into your application, then you should have 
 
 ```scala
  
- 	  val result = knn.predict(unknownDatapoint);
-      if (result == 0)
-      {
-        println("Internet Service Provider Alpha")
-      }
-      else if (result == 1)
-      {
-        println("Internet Service Provider Beta")
-      }
-      else
-      {
-        println("Unexpected prediction")
-      }
-    }
+val unknownDataPoint = Array(5.3, 4.3)
+val result = knn.predict(unknownDatapoint)
+if (result == 0)
+{
+	println("Internet Service Provider Alpha")
+}
+else if (result == 1)
+{
+	println("Internet Service Provider Beta")
+}
+else
+{
+	println("Unexpected prediction")
+}
 
 ```
 
