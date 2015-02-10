@@ -413,7 +413,7 @@ Here we see that indeed, when you use only 50 features, the amount of ham that g
 We could work through the hard ham, but since the building bricks are already here, we leave this to the reader. 
 
 ###Predicting weight based on height (using Ordinary Least Squares)
-In this section we will introduce the [Ordinary Least Squares] techique which is a form of linear regression. As this techique is quite powerfull, it is important to have read [regression](#regression) and the common pitfalls before starting with this example. We will cover some of these issues in this section, while others are shown in the sections [under-fitting](#under-fitting) and [overfitting](#overfitting)
+In this section we will introduce the [Ordinary Least Squares](http://en.wikipedia.org/wiki/Ordinary_least_squares) techique which is a form of linear regression. As this techique is quite powerfull, it is important to have read [regression](#regression) and the common pitfalls before starting with this example. We will cover some of these issues in this section, while others are shown in the sections [under-fitting](#under-fitting) and [overfitting](#overfitting)
 
 
 //Todo: write
