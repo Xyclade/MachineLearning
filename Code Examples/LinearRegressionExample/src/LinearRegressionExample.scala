@@ -19,10 +19,11 @@ object LinearRegressionExample extends SimpleSwingApplication {
 
     val plotData = (test_data._1 zip test_data._2).map(x => Array(x._1(1) ,x._2))
     val maleFemaleLabels = test_data._1.map( x=> x(0).toInt);
-    val plot =  ScatterPlot.plot(plotData,maleFemaleLabels,'@',Array(Color.red, Color.blue, Color.green))
-    plot.setTitle("Weight and heights for male and females")
+    val plot =  ScatterPlot.plot(plotData,maleFemaleLabels,'@',Array(Color.blue, Color.blue))
+    plot.setTitle("Weight and heights for humans")
     plot.setAxisLabel(0,"Heights")
     plot.setAxisLabel(1,"Weights")
+
 
 
     peer.setContentPane(plot)
@@ -31,8 +32,8 @@ object LinearRegressionExample extends SimpleSwingApplication {
     val ols = new OLS(test_data._1,test_data._2)
 
     println("Error: " + ols.error())
-    println(ols.predict(Array(1.0,60.0)));
-    println(ols.predict(Array(2.0,60.0)));
+    println(ols.predict(Array(1.0,140.0)));
+    println(ols.predict(Array(2.0,140.0)));
   }
 
   def GetDataFromCSV(file: File): (Array[Array[Double]], Array[Double]) = {
@@ -49,16 +50,14 @@ object LinearRegressionExample extends SimpleSwingApplication {
 
     //Split the comma separated value string into an array of strings
     val dataArray: Array[String] = dataString.split(',')
-    var person = 2.0;
+    var person = 1.0;
 
     if (dataArray(0) == "\"Male\"") {
-      person = 1.0
+      person = 0.0
     }
 
     //Extract the values from the strings
-
     //Since the data is in US metrics (inch and pounts we will recalculate this to cm and kilo's)
-
     val data : Array[Double] = Array(person,dataArray(1).toDouble * 2.54)
     val weight: Double = dataArray(2).toDouble * 0.45359237
 

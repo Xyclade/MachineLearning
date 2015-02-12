@@ -416,6 +416,86 @@ We could work through the hard ham, but since the building bricks are already he
 In this section we will introduce the [Ordinary Least Squares](http://en.wikipedia.org/wiki/Ordinary_least_squares) techique which is a form of linear regression. As this techique is quite powerfull, it is important to have read [regression](#regression) and the common pitfalls before starting with this example. We will cover some of these issues in this section, while others are shown in the sections [under-fitting](#under-fitting) and [overfitting](#overfitting)
 
 
+As always, the first thing to do is to import a dataset. For this we provide you with the following [csv file](./Example%20Data/OLS_Regression_Example_3.csv) and code for reading this file:
+
+
+```scala
+
+  def GetDataFromCSV(file: File): (Array[Array[Double]], Array[Double]) = {
+    val source = scala.io.Source.fromFile(file)
+    val data = source.getLines().drop(1).map(x => GetDataFromString(x)).toArray
+    source.close()
+    var inputData = data.map(x => x._1)
+    var resultData = data.map(x => x._2)
+
+    return (inputData,resultData)
+  }
+
+  def GetDataFromString(dataString: String): (Array[Double], Double) = {
+
+    //Split the comma separated value string into an array of strings
+    val dataArray: Array[String] = dataString.split(',')
+    var person = 2.0;
+
+    if (dataArray(0) == "\"Male\"") {
+      person = 1.0
+    }
+
+    //Extract the values from the strings
+    //Since the data is in US metrics (inch and pounts we will recalculate this to cm and kilo's)
+    val data : Array[Double] = Array(person,dataArray(1).toDouble * 2.54)
+    val weight: Double = dataArray(2).toDouble * 0.45359237
+
+    //And return the result in a format that can later easily be used to feed to Smile
+    return (data, weight)
+  }
+
+```
+
+Note that the data reader converts the values from the [Imperial system](http://en.wikipedia.org/wiki/Imperial_units) into the [Metric] system(http://en.wikipedia.org/wiki/Metric_system). This has no big effects on the OLS implementation, but since the metric system is more commonly used, we prefer to present the data in that system.
+
+With these methods we get the data as an ```Array[Array[Double]]``` which represents the datapoints and an ```Array[Double]``` which represents the classifications as male or female. These formats are good for both plotting the data, and for feeding into the machine learning algorithm.
+
+Let's first see what the data looks like. For this we plot the data using the following code.
+
+
+```scala
+
+object LinearRegressionExample extends SimpleSwingApplication {
+  def top = new MainFrame {
+    title = "KNN Example!"
+    val basePath = "/Users/mikedewaard/MachineLearning/Example Data/OLS_Regression_Example_3.csv"
+
+    val test_data = GetDataFromCSV(new File(basePath))
+
+    val plotData = (test_data._1 zip test_data._2).map(x => Array(x._1(1) ,x._2))
+    val maleFemaleLabels = test_data._1.map( x=> x(0).toInt);
+    val plot =  ScatterPlot.plot(plotData,maleFemaleLabels,'@',Array(Color.blue, Color.green))
+    plot.setTitle("Weight and heights for male and females")
+    plot.setAxisLabel(0,"Heights")
+    plot.setAxisLabel(1,"Weights")
+
+
+
+    peer.setContentPane(plot)
+    size = new Dimension(400, 400)
+  }
+
+```
+
+If you execute the code here above, a window will pop up which shows the **right** plot as shown in the image here below. Note that when you run the code, you can scroll to zoom in and out in the plot.
+
+<img src="./Images/HumanDataPoints.png" width="275px" />
+<img src="./Images/MaleFemalePlot.png" width="275px" />
+
+
+In this plot, given that green is female, and blue is male, you can see that there is a big overlap in their weights and heights. So if we where to ignore the difference between male and female it would still look like there was a linear function in the data (which can be seen in the **left** plot). However when ignoring this difference, the function would be not as accurate as it would be when we incorporate the information regarding males and females. 
+
+Finding this distinction is trivial in this example, but you might encounter datasets where these groups are not so obvious. Making you aware of this this possibility might help you find groups in your data, which can improve the performance of your machine learning application.
+
+
+
+
 //Todo: write
 
 
@@ -470,34 +550,36 @@ With this extra power, comes great responsibility, thus in the field of regressi
 ###Validation techniques
 In this section we will explain some of the techniques available for model validation, and will explain some terms that are commonly used in the Machine Learning field.
 
-#### (2-fold) Cross Validation
+####(2-fold) Cross Validation
 
 ##### Precision
 
 ##### Recall
 
+###Pitfalls 
+This section describes some common pitfalls in applying machine learning techniques. The idea of this section is to make you aware of of these pitfalls and help you prevent actually walking into one yourself.
+
 ##### Overfitting
 
+When fitting a function on the data, there is a possibility the data contains noise (for example by measurement errors). If you fit every point from the data exactly, you incorporate this noise into the [model](#model). This causes the model to predict relatively poor as to when you would do a good fit.
+
+The images here below show how this overfitting would look like if you where to plot your data and the fitted functions.
 
 | Overfitting | Good fit |
 | : --: |: --- : |
 | <img src="./Images/OverFitting.png" width="300px" /> | <img src="./Images/Good_Fit.png" width="300px" />| 
 
+Overfitting can easily happen when applying [regression](#regression) but can just as easily be introduced in [nbayes classifications](#Classifying Email as Spam or Ham (Naive Bayes)). In regression it happens with rounding, bad measurements and noisy data. In naive bayes however, it could be the features that where picked. An example for this would be classifying spam or ham while keeping all stopwords.
+
+Overfitting can be detected by performing [validation techniques](#Validation techniques) and looking into your data's statistical features, and detecting and removing outliers.
+
+
+
 ##### Under-fitting
+When you are turning your data into a model, but are leaving (a lot of) statistical data behind, this is called under-fitting. This can happen due to various reasons, such as using a wrong regression type on the data. If you have a non-linear structure in the data, and you apply linear regression, this would result in an under-fitted model, such as in the images here below.
 
 | Under-fit | Good fit |
 | : --: |: --- : |
 | <img src="./Images/Under-Fitting.png" width="300px" /> | <img src="./Images/Good_Fit.png" width="300px" />| 
 
-
-
-
-###Exploratory Data Analysis
-
-
-
-
-
-
-
-
+You can prevent underfitting by plotting the data to get insights in the underlying structure, and using [validation techniques](#validation techniques) such as [cross validation](#(2-fold) Cross Validation). 
