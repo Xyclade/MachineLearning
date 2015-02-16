@@ -64,7 +64,7 @@ Given the data the first thing to do next is to see what the data looks like. Fo
  
  object KNNExample extends SimpleSwingApplication {
   def top = new MainFrame {
-    title = "KNN Example!"
+    title = "KNN Example"
     val basePath = "/.../KNN_Example_1.csv"
 
     val test_data = GetDataFromCSV(new File(basePath))
@@ -396,7 +396,7 @@ If we run this code serveral times with different feature amounts we get the fol
 | 200     					| 1197 (85.68%)	| 16 (1.15%)	| 184 (13.17%)|
 | 400     					| 1219 (87.26%)	| 13 (0.93%)	| 165 (11.81%)|
 
-Interestingly enough, the algorithm works best with only 50 features. However, if you recall that there were still *stop words* in the top 50 classification terms which could explain this result.  If you look at how the values change as the amount of features increase (starting at 100), you can see that with more features, the overall result increases. Note that there are a group of unknown emails. For these emails the prior was equal for both classes. Note that this also is the case if there are no feature words for ham nor spam in the email, because then the algorithm would classify it 50% ham 50% spam.
+Interestingly enough, the algorithm works best with only 50 features. However, if you recall that there were still *stop words* in the top 50 classification terms which could explain this result.  If you look at how the values change as the amount of features increase (starting at 100), you can see that with more features, the overall result increases. Note that there are a group of unknown emails. For these emails the [prior](#Prior) was equal for both classes. Note that this also is the case if there are no feature words for ham nor spam in the email, because then the algorithm would classify it 50% ham 50% spam.
 
 
 If we change the path to ```easyHam2Path``` and rerun the code for we get the following results:
@@ -435,10 +435,10 @@ As always, the first thing to do is to import a dataset. For this we provide you
 
     //Split the comma separated value string into an array of strings
     val dataArray: Array[String] = dataString.split(',')
-    var person = 2.0;
+    var person = 1.0;
 
     if (dataArray(0) == "\"Male\"") {
-      person = 1.0
+      person = 0.0
     }
 
     //Extract the values from the strings
@@ -463,7 +463,7 @@ Let's first see what the data looks like. For this we plot the data using the fo
 
 object LinearRegressionExample extends SimpleSwingApplication {
   def top = new MainFrame {
-    title = "KNN Example!"
+    title = "Linear Regression Example"
     val basePath = "/Users/mikedewaard/MachineLearning/Example Data/OLS_Regression_Example_3.csv"
 
     val test_data = GetDataFromCSV(new File(basePath))
@@ -493,10 +493,31 @@ In this plot, given that green is female, and blue is male, you can see that the
 
 Finding this distinction is trivial in this example, but you might encounter datasets where these groups are not so obvious. Making you aware of this this possibility might help you find groups in your data, which can improve the performance of your machine learning application.
 
+Now that we have seen the data and see that indeed we can come up with a linear regression line to fit this data, it is time to train a [model](#Model). Smile provides us with the [ordinary least squares](http://en.wikipedia.org/wiki/Ordinary_least_squares) algorithm which we can easily use as follows:
 
+```scala
+val olsModel = new OLS(test_data._1,test_data._2)
+```
 
+With this olsModel we can now predict someone's weight based on length and gender as follows: 
 
-//Todo: write
+```scala
+println("Prediction for Male of 1.7M: " +olsModel.predict(Array(0.0,170.0)))
+println("Prediction for Female of 1.7M:" + olsModel.predict(Array(1.0,170.0)))
+println("Model Error:" + olsModel.error())
+```
+
+and this will give the following results:
+
+```
+Prediction for Male of 1.7M: 79.14538559840447
+Prediction for Female of 1.7M:70.35580395758966
+Model Error:4.5423150758157185
+```
+
+If you recall from the classification algorithms, there was a [prior](#Prior) value to be able to say something about the performance of your model. Since regression is a stronger statistical method, you have an actual error value now. This value represents how far off the fitted regression line is in average, such that you can say that for this model, the prediction for a male of 1.70m is 79.15kg  +/- the error of 4.54kg. Note that if you would remove the distinction between males and females, this error would increase to 5.5428. In other words, adding the distinction between male and female, increases the model accuracy by +/- 1 kg in its predictions.
+
+This concludes linear regression, if you want to know more about non-linear regression feel free to work through the next example [Predicting O'Reilly top 100 selling books using text regression](#Predicting O'Reilly top 100 selling books using text regression)
 
 
 
@@ -556,6 +577,9 @@ In this section we will explain some of the techniques available for model valid
 
 ##### Recall
 
+##### Prior
+The prior value that belongs to a classifier given a datapoint represents the likelyhood that this datapoint belongs to this classifier. 
+
 ###Pitfalls 
 This section describes some common pitfalls in applying machine learning techniques. The idea of this section is to make you aware of of these pitfalls and help you prevent actually walking into one yourself.
 
@@ -563,11 +587,11 @@ This section describes some common pitfalls in applying machine learning techniq
 
 When fitting a function on the data, there is a possibility the data contains noise (for example by measurement errors). If you fit every point from the data exactly, you incorporate this noise into the [model](#model). This causes the model to predict relatively poor as to when you would do a good fit.
 
-The images here below show how this overfitting would look like if you where to plot your data and the fitted functions.
+The left image here below show how this overfitting would look like if you where to plot your data and the fitted functions, where as the right image would represent a *good fit* of the regression line through the datapoints.
 
-| Overfitting | Good fit |
-| : --: |: --- : |
-| <img src="./Images/OverFitting.png" width="300px" /> | <img src="./Images/Good_Fit.png" width="300px" />| 
+
+<img src="./Images/OverFitting.png" width="300px" /> 
+ <img src="./Images/Good_Fit.png" width="300px" />
 
 Overfitting can easily happen when applying [regression](#regression) but can just as easily be introduced in [nbayes classifications](#Classifying Email as Spam or Ham (Naive Bayes)). In regression it happens with rounding, bad measurements and noisy data. In naive bayes however, it could be the features that where picked. An example for this would be classifying spam or ham while keeping all stopwords.
 
@@ -576,10 +600,9 @@ Overfitting can be detected by performing [validation techniques](#Validation te
 
 
 ##### Under-fitting
-When you are turning your data into a model, but are leaving (a lot of) statistical data behind, this is called under-fitting. This can happen due to various reasons, such as using a wrong regression type on the data. If you have a non-linear structure in the data, and you apply linear regression, this would result in an under-fitted model, such as in the images here below.
+When you are turning your data into a model, but are leaving (a lot of) statistical data behind, this is called under-fitting. This can happen due to various reasons, such as using a wrong regression type on the data. If you have a non-linear structure in the data, and you apply linear regression, this would result in an under-fitted model. The left image here below represents a under-fitted regression line where as the right image shows a good fit regression line.
 
-| Under-fit | Good fit |
-| : --: |: --- : |
-| <img src="./Images/Under-Fitting.png" width="300px" /> | <img src="./Images/Good_Fit.png" width="300px" />| 
+<img src="./Images/Under-Fitting.png" width="300px" /> 
+<img src="./Images/Good_Fit.png" width="300px" />
 
 You can prevent underfitting by plotting the data to get insights in the underlying structure, and using [validation techniques](#validation techniques) such as [cross validation](#(2-fold) Cross Validation). 

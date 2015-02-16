@@ -19,8 +19,8 @@ object LinearRegressionExample extends SimpleSwingApplication {
 
     val plotData = (test_data._1 zip test_data._2).map(x => Array(x._1(1) ,x._2))
     val maleFemaleLabels = test_data._1.map( x=> x(0).toInt);
-    val plot =  ScatterPlot.plot(plotData,maleFemaleLabels,'@',Array(Color.blue, Color.blue))
-    plot.setTitle("Weight and heights for humans")
+    val plot =  ScatterPlot.plot(plotData,maleFemaleLabels,'@',Array(Color.blue, Color.green))
+    plot.setTitle("Weight and heights for males and females")
     plot.setAxisLabel(0,"Heights")
     plot.setAxisLabel(1,"Weights")
 
@@ -29,11 +29,11 @@ object LinearRegressionExample extends SimpleSwingApplication {
     peer.setContentPane(plot)
     size = new Dimension(400, 400)
 
-    val ols = new OLS(test_data._1,test_data._2)
+    val olsModel = new OLS(test_data._1,test_data._2)
 
-    println("Error: " + ols.error())
-    println(ols.predict(Array(1.0,140.0)));
-    println(ols.predict(Array(2.0,140.0)));
+    println("Prediction for Male of 1.7M: " +olsModel.predict(Array(0.0,170.0)))
+    println("Prediction for Female of 1.7M:" + olsModel.predict(Array(1.0,170.0)))
+    println("Model Error:" + olsModel.error())
   }
 
   def GetDataFromCSV(file: File): (Array[Array[Double]], Array[Double]) = {
