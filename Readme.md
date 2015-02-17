@@ -517,7 +517,9 @@ Model Error:4.5423150758157185
 
 If you recall from the classification algorithms, there was a [prior](#Prior) value to be able to say something about the performance of your model. Since regression is a stronger statistical method, you have an actual error value now. This value represents how far off the fitted regression line is in average, such that you can say that for this model, the prediction for a male of 1.70m is 79.15kg  +/- the error of 4.54kg. Note that if you would remove the distinction between males and females, this error would increase to 5.5428. In other words, adding the distinction between male and female, increases the model accuracy by +/- 1 kg in its predictions.
 
-This concludes linear regression, if you want to know more about non-linear regression feel free to work through the next example [Predicting O'Reilly top 100 selling books using text regression](#Predicting O'Reilly top 100 selling books using text regression)
+Finally smile also provides you with some statistical information regarding your model. The method ```RSquared``` gives you the [root-mean-square error (RMSE)](#RMSE) from the model divided by the [RMSE](#RMSE) from the mean. This value will always be between 0 and 1. If your model predicts every datapoint perfectly, RSquared will be 1, and if the model does not perform better than the mean function, the value will be 0. In the field this measure is often multiplied by 100 and then used as representation of how accurate the model is. Because this is a normalized value, it can be used to compare the performance of different models.
+
+This concludes linear regression, if you want to know more about how to apply regression on  non-linear data, feel free to work through the next example [Predicting O'Reilly top 100 selling books using text regression](#Predicting O'Reilly top 100 selling books using text regression).
 
 
 
@@ -579,6 +581,10 @@ In this section we will explain some of the techniques available for model valid
 
 ##### Prior
 The prior value that belongs to a classifier given a datapoint represents the likelyhood that this datapoint belongs to this classifier. 
+
+##### RMSE
+
+
 
 ###Pitfalls 
 This section describes some common pitfalls in applying machine learning techniques. The idea of this section is to make you aware of of these pitfalls and help you prevent actually walking into one yourself.
