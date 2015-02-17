@@ -10,7 +10,7 @@ import smile.regression._
 import scala.swing._
 
 
-object LinearRegressionExample extends SimpleSwingApplication {
+object LinearRegression extends SimpleSwingApplication {
   def top = new MainFrame {
     title = "KNN Example!"
     val basePath = "/Users/mikedewaard/MachineLearning/Example Data/OLS_Regression_Example_3.csv"
@@ -33,6 +33,7 @@ object LinearRegressionExample extends SimpleSwingApplication {
 
     println("Prediction for Male of 1.7M: " +olsModel.predict(Array(0.0,170.0)))
     println("Prediction for Female of 1.7M:" + olsModel.predict(Array(1.0,170.0)))
+
     println("Model Error:" + olsModel.error())
     println("Accuracy of the model: "  + olsModel.RSquared() * 100 + "%")
   }

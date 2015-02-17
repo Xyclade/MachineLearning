@@ -525,7 +525,7 @@ This concludes linear regression, if you want to know more about how to apply re
 
 ###Predicting O'Reilly top 100 selling books using text regression
 
-//Todo: write
+In the example of [predicting weights based on heights and gender](#Predicting weight based on height (using Ordinary Least Squares)) we introduced the notion of linear regression. In the natural world however, most data does not have a linear form.  
 
 ###Using unsupervised learning to create a market index
 
@@ -564,7 +564,9 @@ An example of a classification problem would be to classify emails as Ham or Spa
 #####Regression
 Regression is a lot stronger in comparison to [classification](#classification). This is because in regression you are predicting actual values, rather than labels. Let us clarify this with a short example: given a table of weights, heights, and genders, you can use [KNN](#Labeling ISPs based on their Down/Upload speed (K-NN using Smile in Scala)) to predict ones gender when given a weight and height. With this same dataset using regression, you could instead predict ones weight or height, given the gender the respective other missing parameter. 
 
-With this extra power, comes great responsibility, thus in the field of regression one should be very careful when generating the model. Common pitfalls are [overfitting](#overfitting), [underfitting](#under-fitting) and not taking into account how the model handles  [extrapolation](http://en.wikipedia.org/wiki/Extrapolation) and [interpolation](http://en.wikipedia.org/wiki/Interpolation)
+With this extra power, comes great responsibility, thus in the working field of regression one should be very careful when generating the model. Common pitfalls are [overfitting](#overfitting), [underfitting](#under-fitting) and not taking into account how the model handles  [extrapolation](http://en.wikipedia.org/wiki/Extrapolation) and [interpolation](http://en.wikipedia.org/wiki/Interpolation).
+
+
 
 ####Unsupervised Learning
 
@@ -573,7 +575,16 @@ With this extra power, comes great responsibility, thus in the field of regressi
 ###Validation techniques
 In this section we will explain some of the techniques available for model validation, and will explain some terms that are commonly used in the Machine Learning field.
 
-####(2-fold) Cross Validation
+
+#### Cross Validation
+The technique of cross validation is one of the most common techniques in the field of machine learning. It's essence is to *ignore part* of your dataset while training your [model](#model), and then using the model to predict this *ignored data*. Comparing the predictions to the actual value then gives an indication of the performance of your model.
+
+
+#####(2-fold) Cross Validation
+
+#### Regularization
+The basic idea of regularization is preventing [overfitting](#overfitting) your [model](#model) by simplifying it. Suppose your data is a polynomial function of degree 3, but your data has noise and this would cause the model to be of a higher degree. Then the model would perform poorly on new data, where as it seems to be a good model at first. Regularization hels preventing this, by simplifying the model with a certain value *lambda*. However to find the right lambda for a model is hard when you have no idea as to when the model is overfitted or not. This is why [cross validation](#Cross Validation) is often used to find the best lambda fitting your model.
+
 
 ##### Precision
 
@@ -591,13 +602,13 @@ This section describes some common pitfalls in applying machine learning techniq
 
 ##### Overfitting
 
-When fitting a function on the data, there is a possibility the data contains noise (for example by measurement errors). If you fit every point from the data exactly, you incorporate this noise into the [model](#model). This causes the model to predict relatively poor as to when you would do a good fit.
+When fitting a function on the data, there is a possibility the data contains noise (for example by measurement errors). If you fit every point from the data exactly, you incorporate this noise into the [model](#model). This causes the model to predict really well on your test data, but relatively poor on future data.
 
 The left image here below show how this overfitting would look like if you where to plot your data and the fitted functions, where as the right image would represent a *good fit* of the regression line through the datapoints.
 
 
 <img src="./Images/OverFitting.png" width="300px" /> 
- <img src="./Images/Good_Fit.png" width="300px" />
+<img src="./Images/Good_Fit.png" width="300px" />
 
 Overfitting can easily happen when applying [regression](#regression) but can just as easily be introduced in [nbayes classifications](#Classifying Email as Spam or Ham (Naive Bayes)). In regression it happens with rounding, bad measurements and noisy data. In naive bayes however, it could be the features that where picked. An example for this would be classifying spam or ham while keeping all stopwords.
 
@@ -608,7 +619,7 @@ Overfitting can be detected by performing [validation techniques](#Validation te
 ##### Under-fitting
 When you are turning your data into a model, but are leaving (a lot of) statistical data behind, this is called under-fitting. This can happen due to various reasons, such as using a wrong regression type on the data. If you have a non-linear structure in the data, and you apply linear regression, this would result in an under-fitted model. The left image here below represents a under-fitted regression line where as the right image shows a good fit regression line.
 
-<img src="./Images/Under-Fitting.png" width="300px" /> 
+<img src="./Images/Under-fitting.png" width="300px" /> 
 <img src="./Images/Good_Fit.png" width="300px" />
 
 You can prevent underfitting by plotting the data to get insights in the underlying structure, and using [validation techniques](#validation techniques) such as [cross validation](#(2-fold) Cross Validation). 

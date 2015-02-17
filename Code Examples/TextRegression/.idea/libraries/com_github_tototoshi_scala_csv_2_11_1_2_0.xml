@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="com.github.tototoshi:scala-csv_2.11:1.2.0" type="repository">
+    <properties maven-id="com.github.tototoshi:scala-csv_2.11:1.2.0" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/tototoshi/scala-csv_2.11/1.2.0/scala-csv_2.11-1.2.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.11.4/scala-library-2.11.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

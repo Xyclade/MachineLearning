@@ -37,7 +37,7 @@ object NaiveBayesExample {
     val StopWords = getStopWords()
 
     //Filter out all stopwords
-    spamTDM.records = spamTDM.records.filter(x => !StopWords.contains(x.term));
+    spamTDM.records = spamTDM.records.filter(x => !StopWords.contains(x.term))
     //  println("SPAM without stopwords")
     //  spamTDM.records.take(50).foreach({x => for (i <- 0 to (x.occurrenceRate(500) * 100).toInt) {print(x.term +" " )}; println()});
     //Take a subset of all non-stopwords found in the spam mail, where they are sorted on highest frequency first
