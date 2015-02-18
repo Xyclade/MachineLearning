@@ -517,7 +517,7 @@ Model Error:4.5423150758157185
 
 If you recall from the classification algorithms, there was a [prior](#Prior) value to be able to say something about the performance of your model. Since regression is a stronger statistical method, you have an actual error value now. This value represents how far off the fitted regression line is in average, such that you can say that for this model, the prediction for a male of 1.70m is 79.15kg  +/- the error of 4.54kg. Note that if you would remove the distinction between males and females, this error would increase to 5.5428. In other words, adding the distinction between male and female, increases the model accuracy by +/- 1 kg in its predictions.
 
-Finally smile also provides you with some statistical information regarding your model. The method ```RSquared``` gives you the [root-mean-square error (RMSE)](#RMSE) from the model divided by the [RMSE](#RMSE) from the mean. This value will always be between 0 and 1. If your model predicts every datapoint perfectly, RSquared will be 1, and if the model does not perform better than the mean function, the value will be 0. In the field this measure is often multiplied by 100 and then used as representation of how accurate the model is. Because this is a normalized value, it can be used to compare the performance of different models.
+Finally smile also provides you with some statistical information regarding your model. The method ```RSquared``` gives you the [root-mean-square error (RMSE)](#Root Mean Squared Error (RMSE)) from the model divided by the [RMSE](#Root Mean Squared Error (RMSE)) from the mean. This value will always be between 0 and 1. If your model predicts every datapoint perfectly, RSquared will be 1, and if the model does not perform better than the mean function, the value will be 0. In the field this measure is often multiplied by 100 and then used as representation of how accurate the model is. Because this is a normalized value, it can be used to compare the performance of different models.
 
 This concludes linear regression, if you want to know more about how to apply regression on  non-linear data, feel free to work through the next example [Predicting O'Reilly top 100 selling books using text regression](#Predicting O'Reilly top 100 selling books using text regression).
 
@@ -525,7 +525,17 @@ This concludes linear regression, if you want to know more about how to apply re
 
 ###Predicting O'Reilly top 100 selling books using text regression
 
-In the example of [predicting weights based on heights and gender](#Predicting weight based on height (using Ordinary Least Squares)) we introduced the notion of linear regression. In the natural world however, most data does not have a linear form.  
+In the example of [predicting weights based on heights and gender](#Predicting weight based on height (using Ordinary Least Squares)) we introduced the notion of linear regression. However, sometimes one would want to apply regression on non numeric data such as Text.
+
+In this example we will show how to do this, but this example will also show that for this particular case it does not work out to use text regression. The reason for this is that the data simply does not contain a signal for our test data. However this does not make this example useless because there might be an actual signal within the text in the data you are using in practice,which then can be detected using text regression as explained here.
+
+
+
+
+
+To conclude this example, we rephrase a quote from [John Tukey](http://en.wikipedia.org/wiki/John_Tukey): *The data may not contain the answer. The combination of some data and an aching desire for an answer does not ensure that a reasonable answer can be extracted from a given body of data*.
+
+
 
 ###Using unsupervised learning to create a market index
 
@@ -593,8 +603,17 @@ The basic idea of regularization is preventing [overfitting](#overfitting) your 
 ##### Prior
 The prior value that belongs to a classifier given a datapoint represents the likelyhood that this datapoint belongs to this classifier. 
 
-##### RMSE
+##### Root Mean Squared Error (RMSE)
+The Root Mean Squared Error (RMSE or RMSD) is the square root of the variance of the differences between the actual value and predicted value.
+Suppose we have the following values:
 
+| Predicted temperature | Actual temperature |  squared difference |
+| :--: | :--:| :--:|
+|10 | 15 | 25 |
+|12 | 16 | 16 |
+
+
+Then the mean of this squared difference is 20.5, and the root of this is 4.527693. So basically in average, the model predicts the values with an average error of 4.52. The lower this RMSE value is, the better the model is in it's predictions. This is why in the field, when selecting features one computes the RMSE with and without a certain feature, in order to say something about the usefullnes of that feature.
 
 
 ###Pitfalls 
