@@ -607,13 +607,33 @@ The prior value that belongs to a classifier given a datapoint represents the li
 The Root Mean Squared Error (RMSE or RMSD) is the square root of the variance of the differences between the actual value and predicted value.
 Suppose we have the following values:
 
-| Predicted temperature | Actual temperature |  squared difference |
-| :--: | :--:| :--:|
-|10 | 15 | 25 |
-|12 | 16 | 16 |
+| Predicted temperature | Actual temperature |  squared difference for Model | square difference for average |
+| :--: | :--:| :--:| : --: | 
+|10 | 12 | 4 |  7.1111 |
+|20 | 17 | 9 |  5.4444 |
+|15 | 15 | 0 |  0.1111 |
+
+Then the mean of this squared difference for the model is 4.33333, and the root of this is 2.081666. So basically in average, the model predicts the values with an average error of 2.09. The lower this RMSE value is, the better the model is in it's predictions. This is why in the field, when selecting features one computes the RMSE with and without a certain feature, in order to say something about how that feature affects the performance of the model.
 
 
-Then the mean of this squared difference is 20.5, and the root of this is 4.527693. So basically in average, the model predicts the values with an average error of 4.52. The lower this RMSE value is, the better the model is in it's predictions. This is why in the field, when selecting features one computes the RMSE with and without a certain feature, in order to say something about the usefullnes of that feature.
+Additionally, because the RMSE is an absolute value, it can be normalized in order to compare models. This results in the Normalized Root mean square error (NRMSE). For computing this however, you need to know the minimum and maximum value that the system can contain. Let's suppose we can have temperatures ranging from minimum of 5 to a maximum of 25 degrees, then computing the NRMSE is as follows:
+
+<img src="./Images/Formula1.png"/>
+
+Now what is this 10.45 value?  This is the error percentage the model has in average on it's datapoints.
+
+Finally we can use RMSE to compute a value that is known in the field as **R Squared**. This value represents how good the model performs in comparison to ignoring the model and just taking the average for each value. For that you need to calculate the RMSE for the average first. This is 4.22222  (taking the mean of the values from the last colomn in the table), and the root is then 2.054805. The first thing you should notice is that this value is lower than that of the model. This is not a good sign, because this means the model performs **worse** than just taking the mean. However to demonstrate how to compute **R Squared** we will continue the computations.
+
+We now have the RMSE for both the model and the mean, and then computing how well the model performs in comparison to the mean is done as follows:
+
+<img src="./Images/Formula2.png"  />
+
+This results in the following computation:
+
+<img src="./Images/Formula3.png"  />
+
+Now what does this -1.307229 represent. Basically it says that the model that predicted these values performs +/- 1.31 percent worse than returning the average each time a value is to be predicted. In other words, we could better use the average function as a predictor rather than the model in this specific case.
+
 
 
 ###Pitfalls 

@@ -47,7 +47,7 @@ object TextRegression extends SimpleSwingApplication {
           println(Calendar.getInstance().getTime() +" Trained the model for lamda: " + x  + " for round:" + i )
         val results  =  dpForTesting.map(y => model.predict(y)) zip classifiersForTesting
           println(Calendar.getInstance().getTime() +" Got results for  lamda: " + x  + " for round:" + i )
-        val rmse =  results.map(x => Math.sqrt(Math.pow(x._1 - x._2,2))).sum / results.length
+        val rmse =  Math.sqrt(results.map(x => Math.pow(x._1 - x._2,2)).sum / results.length)
         println(Calendar.getInstance().getTime() +"\t\t\t\t\t\t\t\t\t\tLambda: " + x + " RMSE: " + rmse);
 
 
