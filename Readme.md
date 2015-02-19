@@ -608,7 +608,7 @@ The Root Mean Squared Error (RMSE or RMSD) is the square root of the variance of
 Suppose we have the following values:
 
 | Predicted temperature | Actual temperature |  squared difference for Model | square difference for average |
-| :--: | :--:| :--:| : --: | 
+| :--: | :--:| :--:| :--: | 
 |10 | 12 | 4 |  7.1111 |
 |20 | 17 | 9 |  5.4444 |
 |15 | 15 | 0 |  0.1111 |
