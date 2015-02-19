@@ -593,7 +593,7 @@ The technique of cross validation is one of the most common techniques in the fi
 #####(2-fold) Cross Validation
 
 #### Regularization
-The basic idea of regularization is preventing [overfitting](#overfitting) your [model](#model) by simplifying it. Suppose your data is a polynomial function of degree 3, but your data has noise and this would cause the model to be of a higher degree. Then the model would perform poorly on new data, where as it seems to be a good model at first. Regularization hels preventing this, by simplifying the model with a certain value *lambda*. However to find the right lambda for a model is hard when you have no idea as to when the model is overfitted or not. This is why [cross validation](#Cross Validation) is often used to find the best lambda fitting your model.
+The basic idea of regularization is preventing [overfitting](#overfitting) your [model](#model) by simplifying it. Suppose your data is a polynomial function of degree 3, but your data has noise and this would cause the model to be of a higher degree. Then the model would perform poorly on new data, where as it seems to be a good model at first. Regularization hels preventing this, by simplifying the model with a certain value *lambda*. However to find the right lambda for a model is hard when you have no idea as to when the model is overfitted or not. This is why [cross validation](#Cross%20Validation) is often used to find the best lambda fitting your model.
 
 
 ##### Precision
@@ -604,7 +604,7 @@ The basic idea of regularization is preventing [overfitting](#overfitting) your 
 The prior value that belongs to a classifier given a datapoint represents the likelyhood that this datapoint belongs to this classifier. 
 
 ##### Root Mean Squared Error (RMSE)
-The Root Mean Squared Error (RMSE or RMSD) is the square root of the variance of the differences between the actual value and predicted value.
+The Root Mean Squared Error (RMSE or RMSD where D is deviation) is the square root of the variance of the differences between the actual value and predicted value.
 Suppose we have the following values:
 
 | Predicted temperature | Actual temperature |  squared difference for Model | square difference for average |
@@ -613,10 +613,13 @@ Suppose we have the following values:
 |20 | 17 | 9 |  5.4444 |
 |15 | 15 | 0 |  0.1111 |
 
-Then the mean of this squared difference for the model is 4.33333, and the root of this is 2.081666. So basically in average, the model predicts the values with an average error of 2.09. The lower this RMSE value is, the better the model is in it's predictions. This is why in the field, when selecting features one computes the RMSE with and without a certain feature, in order to say something about how that feature affects the performance of the model.
+Then the mean of this squared difference for the model is 4.33333, and the root of this is 2.081666. So basically in average, the model predicts the values with an average error of 2.09. The lower this RMSE value is, the better the model is in its predictions. This is why in the field, when selecting features, one computes the RMSE with and without a certain feature, in order to say something about how that feature affects the performance of the model.
 
 
-Additionally, because the RMSE is an absolute value, it can be normalized in order to compare models. This results in the Normalized Root mean square error (NRMSE). For computing this however, you need to know the minimum and maximum value that the system can contain. Let's suppose we can have temperatures ranging from minimum of 5 to a maximum of 25 degrees, then computing the NRMSE is as follows:
+Additionally, because the RMSE is an absolute value, it can be normalized in order to compare models. This results in the Normalized Root Mean Square Error (NRMSE). For computing this however, you need to know the minimum and maximum value that the system can contain. Let's suppose we can have temperatures ranging from minimum of 5 to a maximum of 25 degrees, then computing the NRMSE is as follows:
+<img src="./Images/Formula4.png"/>
+
+When we fill in the actual values we get the following result:
 
 <img src="./Images/Formula1.png"/>
 
