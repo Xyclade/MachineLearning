@@ -530,10 +530,131 @@ In the example of [predicting weights based on heights and gender](#Predicting-w
 In this example we will show how to do this, but this example will also show that for this particular case it does not work out to use text regression. The reason for this is that the data simply does not contain a signal for our test data. However this does not make this example useless because there might be an actual signal within the text in the data you are using in practice,which then can be detected using text regression as explained here.
 
 
+Let's start off with getting the data we need:
+
+```scala
+object TextRegression  {
+
+  def main(args: Array[String]): Unit = {
+
+    //Get the example data
+      val basePath = "/users/mikedewaard/MachineLearning/Example Data/TextRegression_Example_4.csv"
+      val testData = GetDataFromCSV(new File(basePath))
+  }
+
+  def GetDataFromCSV(file: File) : List[(String,Int,String)]= {
+    val reader = CSVReader.open(file)
+    val data = reader.all()
+
+    val documents = data.drop(1).map(x => (x(1),x(3)toInt,x(4)))
+    return documents
+  }
+}
+
+```
+
+We now have the title, rank and long description of the top 100 selling books from O'reilly. However when we want to do regression of some form, we need numeric data. This is why we will build a [Document Term Matrix (DTM)](http://en.wikipedia.org/wiki/Document-term_matrix). Note that this DTM is similar to the Term Document Matrix (TDM) that we built in the spam classification example. It's difference is that we store document records containing which terms are in that document, in contrast to the TDM where we store records of words, containing a list of documents in which this term is available.
+
+We implemented the DTM ourselves as follows:
+
+```scala
+import java.io.File
+import scala.collection.mutable
+
+class DTM {
+
+  var records: List[DTMRecord] = List[DTMRecord]()
+  var wordList: List[String] = List[String]()
+
+  def addDocumentToRecords(documentName: String, rank: Int, documentContent: String) = {
+    //Find a record for the document
+    val record = records.find(x => x.document == documentName)
+    if (record.nonEmpty) {
+      throw new Exception("Document already exists in the records")
+    }
+
+    var wordRecords = mutable.HashMap[String, Int]()
+    val individualWords = documentContent.toLowerCase.split(" ")
+    individualWords.foreach { x =>
+      val wordRecord = wordRecords.find(y => y._1 == x)
+      if (wordRecord.nonEmpty) {
+        wordRecords += x -> (wordRecord.get._2 + 1)
+      }
+      else {
+        wordRecords += x -> 1
+        wordList = x :: wordList
+      }
+    }
+    records = new DTMRecord(documentName, rank, wordRecords) :: records
+  }
+
+  def getStopWords(): List[String] = {
+    val source = scala.io.Source.fromFile(new File("/Users/.../stopwords.txt"))("latin1")
+    val lines = source.mkString.split("\n")
+    source.close()
+    return lines.toList
+  }
+
+  def getNumericRepresentationForRecords(): (Array[Array[Double]], Array[Double]) = {
+    //First filter out all stop words:
+    val StopWords = getStopWords()
+    wordList = wordList.filter(x => !StopWords.contains(x))
+    
+    var dtmNumeric = Array[Array[Double]]()
+    var ranks = Array[Double]()
+
+    records.foreach { x =>
+      //Add the rank to the array of ranks
+      ranks = ranks :+ x.rank.toDouble
+
+      //And create an array representing all words and their occurrences for this document:
+      var dtmNumericRecord: Array[Double] = Array()
+      wordList.foreach { y =>
+
+        val termRecord = x.occurrences.find(z => z._1 == y)
+        if (termRecord.nonEmpty) {
+          dtmNumericRecord = dtmNumericRecord :+ termRecord.get._2.toDouble
+        }
+        else {
+          dtmNumericRecord = dtmNumericRecord :+ 0.0
+        }
+      }
+      dtmNumeric = dtmNumeric :+ dtmNumericRecord
+
+    }
+
+    return (dtmNumeric, ranks)
+  }
+}
+
+class DTMRecord(val document : String, val rank : Int, var occurrences :  mutable.HashMap[String,Int] )
+
+
+```
+
+If you look at this implementation you'll notice that there is a method called  ```def getNumericRepresentationForRecords(): (Array[Array[Double]], Array[Double])```. This method returns a tuple with as first paramter a matrix in which each row represents a document, and each colomn represents one of the words from the complete vocabulary of the DTM's documents. Note that the doubles in the first table represent the # of occurrences of the words.
+
+The second parameter is an array containing all the ranks beloning to the records from the first table. 
+
+We can now extend our main code such that we get the numeric representation of all the documents as follows:
+
+```scala
+
+val documentTermMatrix  = new DTM()
+testData.foreach(x => documentTermMatrix.addDocumentToRecords(x._1,x._2,x._3))
+
+```
+
+
+With this conversion from text to numeric value's we can open our regression toolbox. We used [Ordinary Least Squares(OLS)](http://en.wikipedia.org/wiki/Ordinary_least_squares) in the example [predicting weight based on height](###Predicting-weight-based-on-height-(using-Ordinary-Least-Squares)), however this time we will use [Least Absolute Shrinkage and Selection Operator (Lasso)]() regression. This is because we can give this regression method a certain lambda, which represents a penalty value. This penalty value allows the LASSO algorithm to select relevant features while discarting some of the other features. 
+
+This feature selection that Lasso performs is very useful in our case due too the large set of words that is used in the documents descriptions. Lasso will try to come up with an ideal subset of those words as features, where as when applying the OLS, all words would be used, and the runtime would be extremely high. Additionally, the OLS implementation of SMILE detects rank deficiency. This means that the amount of features (columns) exceeds the amount of datapoints (rows), thus the linear system can not be solved.
 
 
 
-To conclude this example, we rephrase a quote from [John Tukey](http://en.wikipedia.org/wiki/John_Tukey): *The data may not contain the answer. The combination of some data and an aching desire for an answer does not ensure that a reasonable answer can be extracted from a given body of data*.
+
+To conclude this example, we rephrase a quote from [John Tukey](http://en.wikipedia.org/wiki/John_Tukey): 
+>The data may not contain the answer. The combination of some data and an aching desire for an answer does not ensure that a reasonable answer can be extracted from a given body of data.
 
 
 
