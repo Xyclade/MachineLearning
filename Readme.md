@@ -7,7 +7,7 @@ And then there are books such as [*Machine Learning for Hackers*](http://shop.or
 
 However R is not really a programming language in which one writes programs for everyday use such as is done with for example Java, C#, Scala etc. This is why in this blog, Machine learning will be introduced using [Smile](https://github.com/haifengl/smile), a machine learning library that can be used both in Java and Scala,which are languages that almost every developer has worked with once during their study or career.
 
-Note that in this blog, 'new' definitions are hyperlinked such that if you want, you **can** read more regarding that specific topic, but you are not obliged to do this in order to be able to work through the examples. However the section ['The global idea of machine learning'](#The global idea of machine learning) helps making things a lot more clear when working through the examples and is advised to be read on beforehand in case you are completely new to Machine Learning.
+Note that in this blog, 'new' definitions are hyperlinked such that if you want, you **can** read more regarding that specific topic, but you are not obliged to do this in order to be able to work through the examples. However the section ['The global idea of machine learning'](#The-global-idea-of-machine-learning) helps making things a lot more clear when working through the examples and is advised to be read on beforehand in case you are completely new to Machine Learning.
 
 
 
@@ -15,7 +15,7 @@ Note that in this blog, 'new' definitions are hyperlinked such that if you want,
 
 The examples will start off with the most simple and intuitive [*Classification*](http://en.wikipedia.org/wiki/Statistical_classification) Machine learning Algorithm there is: [*K-Nearest Neighbours*](http://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm).
 
-###Labeling ISPs based on their Down/Upload speed (K-NN using Smile in Scala)
+###Labeling ISPs based on their Down/Upload speed (KNN using Smile in Scala)
 
 The goal of this section is to use the K-NN implementation from  in Scala to classify download/upload speed pairs as [ISP](http://en.wikipedia.org/wiki/Internet_service_provider) Alpha (represented by 0) or Beta (represented by 1).  
 
@@ -81,9 +81,9 @@ The idea behind plotting the data is to verify whether KNN is a fitting Machine 
 
 <img src="./Images/KNNPlot.png" width="300px" height="300px" />
 
-In this plot you can see  that the blue and red points seem to be mixed in the area (3 < x < 5) and (5 < y < 7.5). If the groups were not mixed at all, but were two separate clusters, a [regression](#regression) algorithm  such as in the example [Page view prediction with regression](#Page view prediction with regression) could be used instead. However, since the groups are mixed the KNN algorithm is a good choice as fitting a linear decision boundary would cause a lot of false classifications in the mixed area.
+In this plot you can see  that the blue and red points seem to be mixed in the area (3 < x < 5) and (5 < y < 7.5). If the groups were not mixed at all, but were two separate clusters, a [regression](#regression) algorithm  such as in the example [Page view prediction with regression](#Page-view-prediction-with-regression) could be used instead. However, since the groups are mixed the KNN algorithm is a good choice as fitting a linear decision boundary would cause a lot of false classifications in the mixed area.
 
-Given this choice to use KNN to be a good one, lets continue with the actual Machine Learning part. For this the GUI is ditched since it does not really add any value. Recall from the section [*The global idea of Machine Learning*](#The global idea of machine learning) that in machine learning there are 2 key parts: Prediction and Validation. First we will look at the Validation, as using a model without any validation is never a good idea. The main reason to validate the model here is to prevent [overfitting](#overfitting). However, before we even can do validation, a *correct* K should be chosen. 
+Given this choice to use KNN to be a good one, lets continue with the actual Machine Learning part. For this the GUI is ditched since it does not really add any value. Recall from the section [*The global idea of Machine Learning*](#The-global-idea-of-machine-learning) that in machine learning there are 2 key parts: Prediction and Validation. First we will look at the Validation, as using a model without any validation is never a good idea. The main reason to validate the model here is to prevent [overfitting](#overfitting). However, before we even can do validation, a *correct* K should be chosen. 
 
 The drawback is that there is no golden rule for finding the correct K. However finding a K that allows for most datapoints to be classified correctly can be done by looking at the data. Additionally The K should be picked carefully to prevent undecidability by the algorithm. Say for example ```K=2```, and the problem has 2 labels, then when a point is between both labels, which one should the algorithm pick. There is a *rule of Thumb* that K should be the square root of the number of features (on other words the number of dimensions). In our example this would be ```K=1```, but this is not really a good idea since this would lead to higher false-classifications around decision boundaries. Picking ```K=2``` would result in the error regarding our two labels, thus picking ```K=3``` seems like a good fit for now.
 
@@ -525,7 +525,7 @@ This concludes linear regression, if you want to know more about how to apply re
 
 ###Predicting O'Reilly top 100 selling books using text regression
 
-In the example of [predicting weights based on heights and gender](#Predicting weight based on height (using Ordinary Least Squares)) we introduced the notion of linear regression. However, sometimes one would want to apply regression on non numeric data such as Text.
+In the example of [predicting weights based on heights and gender](#Predicting-weight-based-on height-(using-Ordinary-Least-Squares)) we introduced the notion of linear regression. However, sometimes one would want to apply regression on non numeric data such as Text.
 
 In this example we will show how to do this, but this example will also show that for this particular case it does not work out to use text regression. The reason for this is that the data simply does not contain a signal for our test data. However this does not make this example useless because there might be an actual signal within the text in the data you are using in practice,which then can be detected using text regression as explained here.
 
@@ -590,10 +590,10 @@ In this section we will explain some of the techniques available for model valid
 The technique of cross validation is one of the most common techniques in the field of machine learning. It's essence is to *ignore part* of your dataset while training your [model](#model), and then using the model to predict this *ignored data*. Comparing the predictions to the actual value then gives an indication of the performance of your model.
 
 
-#####(2-fold) Cross Validation
+#####(2 fold) Cross Validation
 
 #### Regularization
-The basic idea of regularization is preventing [overfitting](#overfitting) your [model](#model) by simplifying it. Suppose your data is a polynomial function of degree 3, but your data has noise and this would cause the model to be of a higher degree. Then the model would perform poorly on new data, where as it seems to be a good model at first. Regularization hels preventing this, by simplifying the model with a certain value *lambda*. However to find the right lambda for a model is hard when you have no idea as to when the model is overfitted or not. This is why [cross validation](#Cross%20Validation) is often used to find the best lambda fitting your model.
+The basic idea of regularization is preventing [overfitting](#overfitting) your [model](#model) by simplifying it. Suppose your data is a polynomial function of degree 3, but your data has noise and this would cause the model to be of a higher degree. Then the model would perform poorly on new data, where as it seems to be a good model at first. Regularization hels preventing this, by simplifying the model with a certain value *lambda*. However to find the right lambda for a model is hard when you have no idea as to when the model is overfitted or not. This is why [cross validation](#Cross-Validation) is often used to find the best lambda fitting your model.
 
 
 ##### Precision
@@ -617,6 +617,7 @@ Then the mean of this squared difference for the model is 4.33333, and the root 
 
 
 Additionally, because the RMSE is an absolute value, it can be normalized in order to compare models. This results in the Normalized Root Mean Square Error (NRMSE). For computing this however, you need to know the minimum and maximum value that the system can contain. Let's suppose we can have temperatures ranging from minimum of 5 to a maximum of 25 degrees, then computing the NRMSE is as follows:
+
 <img src="./Images/Formula4.png"/>
 
 When we fill in the actual values we get the following result:
@@ -638,7 +639,6 @@ This results in the following computation:
 Now what does this -1.307229 represent. Basically it says that the model that predicted these values performs +/- 1.31 percent worse than returning the average each time a value is to be predicted. In other words, we could better use the average function as a predictor rather than the model in this specific case.
 
 
-
 ###Pitfalls 
 This section describes some common pitfalls in applying machine learning techniques. The idea of this section is to make you aware of of these pitfalls and help you prevent actually walking into one yourself.
 
@@ -654,7 +654,7 @@ The left image here below show how this overfitting would look like if you where
 
 Overfitting can easily happen when applying [regression](#regression) but can just as easily be introduced in [nbayes classifications](#Classifying Email as Spam or Ham (Naive Bayes)). In regression it happens with rounding, bad measurements and noisy data. In naive bayes however, it could be the features that where picked. An example for this would be classifying spam or ham while keeping all stopwords.
 
-Overfitting can be detected by performing [validation techniques](#Validation techniques) and looking into your data's statistical features, and detecting and removing outliers.
+Overfitting can be detected by performing [validation techniques](#Validation-techniques) and looking into your data's statistical features, and detecting and removing outliers.
 
 
 
@@ -664,4 +664,4 @@ When you are turning your data into a model, but are leaving (a lot of) statisti
 <img src="./Images/Under-fitting.png" width="300px" /> 
 <img src="./Images/Good_Fit.png" width="300px" />
 
-You can prevent underfitting by plotting the data to get insights in the underlying structure, and using [validation techniques](#validation techniques) such as [cross validation](#(2-fold) Cross Validation). 
+You can prevent underfitting by plotting the data to get insights in the underlying structure, and using [validation techniques](#validation-techniques) such as [cross validation](#(2-fold)-Cross-Validation). 
