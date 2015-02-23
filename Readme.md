@@ -220,7 +220,7 @@ And finally lets define a set of paths that make it easier to load the different
     //Then get the messages that are contained in these files
     val spamMails = listOfSpamFiles.map{x => (x,getMessage(x)) }
     
-     //Get a subset of the filenames from the ham sampleset (note that in this case it is not neccesary to randomly sample as the emails are already randomly ordered)
+     //Get a subset of the filenames from the ham sampleset (note that in this case it is not necessary to randomly sample as the emails are already randomly ordered)
   	val listOfHamFiles =   getFilesFromDir(easyHamPath).take(amountOfSamplesPerSet)
   	//Get the messages that are contained in the ham files
   	val hamMails  = listOfHamFiles.map{x => (x,getMessage(x)) }
@@ -282,19 +282,19 @@ As you can see there are two sort methods: ```SortByTotalFrequency``` and ```Sor
 val spamTDM = new TDM();
 //Build up the Term-Document Matrix for spam emails
 spamMails.foreach(x => x._2.split(" ").filter(_.nonEmpty).foreach(y => spamTDM.addTermToRecord(y,x._1.getName))
-//Sort the spam by the occurence rate to gain more insight
+//Sort the spam by the occurrence rate to gain more insight
 spamTDM.SortByOccurrenceRate(hamMails.size)
  
 val hamTDM = new TDM();
 //Build up the Term-Document Matrix for ham emails
 hamMails.foreach(x => x._2.split(" ").filter(_.nonEmpty).foreach(y => hamTDM.addTermToRecord(y,x._1.getName)))
-//Sort the ham by the occurence rate to gain more insight
+//Sort the ham by the occurrence rate to gain more insight
 hamTDM.SortByOccurrenceRate(spamMails.size)
 
 
 ```
 
-Given the tables, lets take a look at the top 50 words for each table. Note that the red words are from the spam table and the green words are from the ham table. Additionaly, the size of the words represents the occurrence rate. Thus the larger the word, the more documents contained that word atleast once.
+Given the tables, lets take a look at the top 50 words for each table. Note that the red words are from the spam table and the green words are from the ham table. Additionally, the size of the words represents the occurrence rate. Thus the larger the word, the more documents contained that word at least once.
 
 <img src="./Images/Ham_Stopwords.png" width="400px" height="200px" />
 <img src="./Images/Spam_Stopwords.png" width="400px" height="200px" />
@@ -332,7 +332,7 @@ For now we will select the top 100 spammy words based on occurrence(thus not fre
 
 ```scala
 
-//Add the code for getting the tdm data and combining it into a feature bag.
+//Add the code for getting the TDM data and combining it into a feature bag.
 val hamFeatures = hamTDM.records.take(amountOfFeaturesToTake).map(x => x.term)
 val spamFeatures = spamTDM.records.take(amountOfFeaturesToTake).map(x => x.term)
 
@@ -340,9 +340,9 @@ val spamFeatures = spamTDM.records.take(amountOfFeaturesToTake).map(x => x.term)
 var data = (hamFeatures ++ spamFeatures).toSet
 hamFeatures.intersect(spamFeatures).foreach(x => data = (data - x))
 
-//Initialize a bag of words that takes the top x features from both spam and ham and combines them
+//Initialise a bag of words that takes the top x features from both spam and ham and combines them
 var bag = new Bag[String] (data.toArray);
-//Initialize the classifier array with first a set of 0(spam) and then a set of 1(ham) values that represent the emails
+//Initialise the classifier array with first a set of 0(spam) and then a set of 1(ham) values that represent the emails
 var classifiers =  Array.fill[Int](amountOfSamplesPerSet)(0) ++  Array.fill[Int](amountOfSamplesPerSet)(1)
 
 //Get the trainingData in the right format for the spam mails
@@ -381,12 +381,12 @@ println(((correctClassifications.toDouble /  listOfSpam2Files.length) * 100)  + 
 
 //In case the algorithm could not decide which category the email belongs to, it gives a -1 (unknown) rather than a 0 (spam) or 1 (ham)
 val unknownClassifications = spam2ClassificationResults.count( x=> x == -1);
-println(unknownClassifications + " of " + listOfSpam2Files.length + "were unknownly classified")
-println(((unknownClassifications.toDouble /  listOfSpam2Files.length) * 100)  + "% was unknownly classified")
+println(unknownClassifications + " of " + listOfSpam2Files.length + "were unknowingly classified")
+println(((unknownClassifications.toDouble /  listOfSpam2Files.length) * 100)  + "% was unknowingly classified")
 
 ```
 
-If we run this code serveral times with different feature amounts we get the following results:
+If we run this code several times with different feature amounts we get the following results:
 
 
 | amountOfFeaturesToTake	| Spam (Correct)| Unknown| Ham | 
@@ -413,7 +413,7 @@ Here we see that indeed, when you use only 50 features, the amount of ham that g
 We could work through the hard ham, but since the building bricks are already here, we leave this to the reader. 
 
 ###Predicting weight based on height (using Ordinary Least Squares)
-In this section we will introduce the [Ordinary Least Squares](http://en.wikipedia.org/wiki/Ordinary_least_squares) techique which is a form of linear regression. As this techique is quite powerfull, it is important to have read [regression](#regression) and the common pitfalls before starting with this example. We will cover some of these issues in this section, while others are shown in the sections [under-fitting](#under-fitting) and [overfitting](#overfitting)
+In this section we will introduce the [Ordinary Least Squares](http://en.wikipedia.org/wiki/Ordinary_least_squares) technique which is a form of linear regression. As this technique is quite powerful, it is important to have read [regression](#regression) and the common pitfalls before starting with this example. We will cover some of these issues in this section, while others are shown in the sections [under-fitting](#under-fitting) and [overfitting](#overfitting)
 
 
 As always, the first thing to do is to import a dataset. For this we provide you with the following [csv file](./Example%20Data/OLS_Regression_Example_3.csv) and code for reading this file:
@@ -442,7 +442,7 @@ As always, the first thing to do is to import a dataset. For this we provide you
     }
 
     //Extract the values from the strings
-    //Since the data is in US metrics (inch and pounts we will recalculate this to cm and kilo's)
+    //Since the data is in US metrics (inch and pounds we will recalculate this to cm and kilo's)
     val data : Array[Double] = Array(person,dataArray(1).toDouble * 2.54)
     val weight: Double = dataArray(2).toDouble * 0.45359237
 
@@ -464,7 +464,7 @@ Let's first see what the data looks like. For this we plot the data using the fo
 object LinearRegressionExample extends SimpleSwingApplication {
   def top = new MainFrame {
     title = "Linear Regression Example"
-    val basePath = "/Users/mikedewaard/MachineLearning/Example Data/OLS_Regression_Example_3.csv"
+    val basePath = "/Users/.../OLS_Regression_Example_3.csv"
 
     val test_data = GetDataFromCSV(new File(basePath))
 
@@ -517,7 +517,7 @@ Model Error:4.5423150758157185
 
 If you recall from the classification algorithms, there was a [prior](#Prior) value to be able to say something about the performance of your model. Since regression is a stronger statistical method, you have an actual error value now. This value represents how far off the fitted regression line is in average, such that you can say that for this model, the prediction for a male of 1.70m is 79.15kg  +/- the error of 4.54kg. Note that if you would remove the distinction between males and females, this error would increase to 5.5428. In other words, adding the distinction between male and female, increases the model accuracy by +/- 1 kg in its predictions.
 
-Finally smile also provides you with some statistical information regarding your model. The method ```RSquared``` gives you the [root-mean-square error (RMSE)](#Root Mean Squared Error (RMSE)) from the model divided by the [RMSE](#Root Mean Squared Error (RMSE)) from the mean. This value will always be between 0 and 1. If your model predicts every datapoint perfectly, RSquared will be 1, and if the model does not perform better than the mean function, the value will be 0. In the field this measure is often multiplied by 100 and then used as representation of how accurate the model is. Because this is a normalized value, it can be used to compare the performance of different models.
+Finally smile also provides you with some statistical information regarding your model. The method ```RSquared``` gives you the [root-mean-square error (RMSE)](#Root Mean Squared Error (RMSE)) from the model divided by the [RMSE](#Root Mean Squared Error (RMSE)) from the mean. This value will always be between 0 and 1. If your model predicts every datapoint perfectly, RSquared will be 1, and if the model does not perform better than the mean function, the value will be 0. In the field this measure is often multiplied by 100 and then used as representation of how accurate the model is. Because this is a normalised value, it can be used to compare the performance of different models.
 
 This concludes linear regression, if you want to know more about how to apply regression on  non-linear data, feel free to work through the next example [Predicting O'Reilly top 100 selling books using text regression](#Predicting O'Reilly top 100 selling books using text regression).
 
@@ -538,7 +538,7 @@ object TextRegression  {
   def main(args: Array[String]): Unit = {
 
     //Get the example data
-      val basePath = "/users/mikedewaard/MachineLearning/Example Data/TextRegression_Example_4.csv"
+      val basePath = "/users/.../TextRegression_Example_4.csv"
       val testData = GetDataFromCSV(new File(basePath))
   }
 
@@ -553,7 +553,7 @@ object TextRegression  {
 
 ```
 
-We now have the title, rank and long description of the top 100 selling books from O'reilly. However when we want to do regression of some form, we need numeric data. This is why we will build a [Document Term Matrix (DTM)](http://en.wikipedia.org/wiki/Document-term_matrix). Note that this DTM is similar to the Term Document Matrix (TDM) that we built in the spam classification example. It's difference is that we store document records containing which terms are in that document, in contrast to the TDM where we store records of words, containing a list of documents in which this term is available.
+We now have the title, rank and long description of the top 100 selling books from O'Reilly. However when we want to do regression of some form, we need numeric data. This is why we will build a [Document Term Matrix (DTM)](http://en.wikipedia.org/wiki/Document-term_matrix). Note that this DTM is similar to the Term Document Matrix (TDM) that we built in the spam classification example. It's difference is that we store document records containing which terms are in that document, in contrast to the TDM where we store records of words, containing a list of documents in which this term is available.
 
 We implemented the DTM ourselves as follows:
 
@@ -632,7 +632,7 @@ class DTMRecord(val document : String, val rank : Int, var occurrences :  mutabl
 
 ```
 
-If you look at this implementation you'll notice that there is a method called  ```def getNumericRepresentationForRecords(): (Array[Array[Double]], Array[Double])```. This method returns a tuple with as first paramter a matrix in which each row represents a document, and each colomn represents one of the words from the complete vocabulary of the DTM's documents. Note that the doubles in the first table represent the # of occurrences of the words.
+If you look at this implementation you'll notice that there is a method called  ```def getNumericRepresentationForRecords(): (Array[Array[Double]], Array[Double])```. This method returns a tuple with as first parameter a matrix in which each row represents a document, and each column represents one of the words from the complete vocabulary of the DTM's documents. Note that the doubles in the first table represent the # of occurrences of the words.
 
 The second parameter is an array containing all the ranks beloning to the records from the first table. 
 
@@ -646,19 +646,47 @@ testData.foreach(x => documentTermMatrix.addDocumentToRecords(x._1,x._2,x._3))
 ```
 
 
-With this conversion from text to numeric value's we can open our regression toolbox. We used [Ordinary Least Squares(OLS)](http://en.wikipedia.org/wiki/Ordinary_least_squares) in the example [predicting weight based on height](###Predicting-weight-based-on-height-(using-Ordinary-Least-Squares)), however this time we will use [Least Absolute Shrinkage and Selection Operator (Lasso)]() regression. This is because we can give this regression method a certain lambda, which represents a penalty value. This penalty value allows the LASSO algorithm to select relevant features while discarting some of the other features. 
+With this conversion from text to numeric value's we can open our regression toolbox. We used [Ordinary Least Squares(OLS)](http://en.wikipedia.org/wiki/Ordinary_least_squares) in the example [predicting weight based on height](###Predicting-weight-based-on-height-(using-Ordinary-Least-Squares)), however this time we will use [Least Absolute Shrinkage and Selection Operator (Lasso)](http://en.wikipedia.org/wiki/Least_squares#Lasso_method) regression. This is because we can give this regression method a certain lambda, which represents a penalty value. This penalty value allows the LASSO algorithm to select relevant features while discarding some of the other features. 
 
-This feature selection that Lasso performs is very useful in our case due too the large set of words that is used in the documents descriptions. Lasso will try to come up with an ideal subset of those words as features, where as when applying the OLS, all words would be used, and the runtime would be extremely high. Additionally, the OLS implementation of SMILE detects rank deficiency. This means that the amount of features (columns) exceeds the amount of datapoints (rows), thus the linear system can not be solved.
+This feature selection that Lasso performs is very useful in our case due too the large set of words that is used in the documents descriptions. Lasso will try to come up with an ideal subset of those words as features, where as when applying the OLS, all words would be used, and the runtime would be extremely high. Additionally, the OLS implementation of SMILE detects rank deficiency. This is one of the [curses of dimensionality](#Curse-of-dimensionality)
 
+We need to find an optimal lambda however, thus we should try for several lambda using cross validation. We will do this as follows:
 
+```scala
 
+    for (i <- 0 until cv.k) {
+      //Split off the training datapoints and classifiers from the dataset
+      val dpForTraining = numericDTM._1.zipWithIndex.filter(x => cv.test(i).toList.contains(x._2)).map(y => y._1)
+      val classifiersForTraining = numericDTM._2.zipWithIndex.filter(x => cv.test(i).toList.contains(x._2)).map(y => y._1)
+
+      //And the corresponding subset of data points and their classifiers for testing
+      val dpForTesting = numericDTM._1.zipWithIndex.filter(x => !cv.test(i).contains(x._2)).map(y => y._1)
+      val classifiersForTesting = numericDTM._2.zipWithIndex.filter(x => !cv.test(i).contains(x._2)).map(y => y._1)
+
+      //These are the lambda values we will verify against
+      val lambdas: Array[Double] = Array(0.1, 0.25, 0.5, 1.0, 2.0, 5.0)
+
+      lambdas.foreach { x =>
+        //Define a new model based on the training data and one of the lambda's
+        val model = new LASSO(dpForTraining, classifiersForTraining, x)
+
+        //Compute the RMSE for this model with this lambda
+        val results = dpForTesting.map(y => model.predict(y)) zip classifiersForTesting
+        val RMSE = Math.sqrt(results.map(x => Math.pow(x._1 - x._2, 2)).sum / results.length)
+        println("Lambda: " + x + " RMSE: " + RMSE)
+
+      }
+    }
+    
+    ```
+Running this code multiple times gives an RMSE varying between 36 and 51. This means that the rank prediction we would do would be off by at least 36 ranks. Given the fact that we are trying to predict the top 100 ranks, it shows that the algorithm performs very poorly. Differences in lambda are in this case not noticeable. However when using this in practice you should be careful when picking the lambda value: The higher the lambda you pick, the lower the amount of features for the algorithm becomes. This is why cross validation is important to see how the algorithm performs on different lambda's.
 
 To conclude this example, we rephrase a quote from [John Tukey](http://en.wikipedia.org/wiki/John_Tukey): 
 >The data may not contain the answer. The combination of some data and an aching desire for an answer does not ensure that a reasonable answer can be extracted from a given body of data.
 
 
 
-###Using unsupervised learning to create a market index
+###Using unsupervised learning to create a market index (PCA)
 
 //Todo: write
 
@@ -695,12 +723,17 @@ An example of a classification problem would be to classify emails as Ham or Spa
 #####Regression
 Regression is a lot stronger in comparison to [classification](#classification). This is because in regression you are predicting actual values, rather than labels. Let us clarify this with a short example: given a table of weights, heights, and genders, you can use [KNN](#Labeling ISPs based on their Down/Upload speed (K-NN using Smile in Scala)) to predict ones gender when given a weight and height. With this same dataset using regression, you could instead predict ones weight or height, given the gender the respective other missing parameter. 
 
-With this extra power, comes great responsibility, thus in the working field of regression one should be very careful when generating the model. Common pitfalls are [overfitting](#overfitting), [underfitting](#under-fitting) and not taking into account how the model handles  [extrapolation](http://en.wikipedia.org/wiki/Extrapolation) and [interpolation](http://en.wikipedia.org/wiki/Interpolation).
+With this extra power, comes great responsibility, thus in the working field of regression one should be very careful when generating the model. Common pitfalls are [overfitting](#overfitting), [under fitting](#under-fitting) and not taking into account how the model handles  [extrapolation](http://en.wikipedia.org/wiki/Extrapolation) and [interpolation](http://en.wikipedia.org/wiki/Interpolation).
 
 
 
 ####Unsupervised Learning
 
+
+#####Principal Components Analysis (PCA)
+Principal Components Analysis is a technique used in statistics to convert a set of correlated columns into a smaller set of uncorrelated columns, reducing the amount features of a problem.  This smaller set of columns are called the principal components. This technique is mostly used in exploratory data analysis as it reveals internal structure in the data that can not be found with eye-balling the data.
+
+A big weakness of PCA however are outliers in the data. these heavily influence it's result, thus looking at the data on beforehand, eliminating large outliers can greatly improve its performance.
 
 
 ###Validation techniques
@@ -708,7 +741,7 @@ In this section we will explain some of the techniques available for model valid
 
 
 #### Cross Validation
-The technique of cross validation is one of the most common techniques in the field of machine learning. It's essence is to *ignore part* of your dataset while training your [model](#model), and then using the model to predict this *ignored data*. Comparing the predictions to the actual value then gives an indication of the performance of your model.
+The technique of cross validation is one of the most common techniques in the field of machine learning. It's essence is to *ignore* part of your dataset while training your [model](#model), and then using the model to predict this *ignored data*. Comparing the predictions to the actual value then gives an indication of the performance of your model.
 
 
 #####(2 fold) Cross Validation
@@ -722,7 +755,7 @@ The basic idea of regularization is preventing [overfitting](#overfitting) your 
 ##### Recall
 
 ##### Prior
-The prior value that belongs to a classifier given a datapoint represents the likelyhood that this datapoint belongs to this classifier. 
+The prior value that belongs to a classifier given a datapoint represents the likelihood that this datapoint belongs to this classifier. 
 
 ##### Root Mean Squared Error (RMSE)
 The Root Mean Squared Error (RMSE or RMSD where D is deviation) is the square root of the variance of the differences between the actual value and predicted value.
@@ -737,7 +770,7 @@ Suppose we have the following values:
 Then the mean of this squared difference for the model is 4.33333, and the root of this is 2.081666. So basically in average, the model predicts the values with an average error of 2.09. The lower this RMSE value is, the better the model is in its predictions. This is why in the field, when selecting features, one computes the RMSE with and without a certain feature, in order to say something about how that feature affects the performance of the model.
 
 
-Additionally, because the RMSE is an absolute value, it can be normalized in order to compare models. This results in the Normalized Root Mean Square Error (NRMSE). For computing this however, you need to know the minimum and maximum value that the system can contain. Let's suppose we can have temperatures ranging from minimum of 5 to a maximum of 25 degrees, then computing the NRMSE is as follows:
+Additionally, because the RMSE is an absolute value, it can be normalised in order to compare models. This results in the Normalised Root Mean Square Error (NRMSE). For computing this however, you need to know the minimum and maximum value that the system can contain. Let's suppose we can have temperatures ranging from minimum of 5 to a maximum of 25 degrees, then computing the NRMSE is as follows:
 
 <img src="./Images/Formula4.png"/>
 
@@ -747,7 +780,7 @@ When we fill in the actual values we get the following result:
 
 Now what is this 10.45 value?  This is the error percentage the model has in average on it's datapoints.
 
-Finally we can use RMSE to compute a value that is known in the field as **R Squared**. This value represents how good the model performs in comparison to ignoring the model and just taking the average for each value. For that you need to calculate the RMSE for the average first. This is 4.22222  (taking the mean of the values from the last colomn in the table), and the root is then 2.054805. The first thing you should notice is that this value is lower than that of the model. This is not a good sign, because this means the model performs **worse** than just taking the mean. However to demonstrate how to compute **R Squared** we will continue the computations.
+Finally we can use RMSE to compute a value that is known in the field as **R Squared**. This value represents how good the model performs in comparison to ignoring the model and just taking the average for each value. For that you need to calculate the RMSE for the average first. This is 4.22222  (taking the mean of the values from the last column in the table), and the root is then 2.054805. The first thing you should notice is that this value is lower than that of the model. This is not a good sign, because this means the model performs **worse** than just taking the mean. However to demonstrate how to compute **R Squared** we will continue the computations.
 
 We now have the RMSE for both the model and the mean, and then computing how well the model performs in comparison to the mean is done as follows:
 
@@ -785,4 +818,9 @@ When you are turning your data into a model, but are leaving (a lot of) statisti
 <img src="./Images/Under-fitting.png" width="300px" /> 
 <img src="./Images/Good_Fit.png" width="300px" />
 
-You can prevent underfitting by plotting the data to get insights in the underlying structure, and using [validation techniques](#validation-techniques) such as [cross validation](#(2-fold)-Cross-Validation). 
+You can prevent under fitting by plotting the data to get insights in the underlying structure, and using [validation techniques](#validation-techniques) such as [cross validation](#(2-fold)-Cross-Validation). 
+
+##### Curse of dimensionality
+The curse of dimensionality is a collection of problems that can occur when your data size is lower than the amount of features (dimensions) you are trying to use to create your machine learning [model](#model). An example of a dimensionality curse is matrix rank deficiency. When using [Ordinary Least Squares(OLS)](http://en.wikipedia.org/wiki/Ordinary_least_squares), the underlying algorithm solves a linear system in order to build up a model. However if you have more columns than you have rows, solving this system is not possible. If this is the case, the best solution would be to get more datapoints or reduce the feature set. 
+
+If you want to know more regarding this curse of dimensionality, [a study focussed on this issue](http://lectures.molgen.mpg.de/networkanalysis13/LDA_cancer_classif.pdf). In this study, researchers Haifeng Li, Keshu Zhang and Tao Jiang developed an algorithm that improves cancer classification with very few datapoints in comparison to [support vector machines](http://en.wikipedia.org/wiki/Support_vector_machine) and [random forests](http://en.wikipedia.org/wiki/Random_forest)
