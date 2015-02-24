@@ -1,7 +1,5 @@
 import scala.collection.mutable
-/**
- * Created by Xyclade on 10/02/15.
- */
+
 class TDM {
 
   var records : List[TDMRecord] =  List[TDMRecord]()
@@ -30,7 +28,7 @@ class TDM {
       records  = newRecord :: records
     }
   }
-  def SortByTotalFrequency = records = records.sortBy( x => -x.totalFrequency)
+  def SortByTotalFrequency() = records = records.sortBy( x => -x.totalFrequency)
   def SortByOccurrenceRate(rate : Int) = records = records.sortBy( x => -x.occurrenceRate(rate))
 }
 

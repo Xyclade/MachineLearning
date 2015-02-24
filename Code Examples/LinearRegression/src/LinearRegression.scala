@@ -1,7 +1,3 @@
-/**
- * Created by mikedewaard on 10/02/15.
- */
-
 import java.awt.Color
 import java.io.File
 
@@ -13,12 +9,12 @@ import scala.swing._
 object LinearRegression extends SimpleSwingApplication {
   def top = new MainFrame {
     title = "KNN Example!"
-    val basePath = "/Users/mikedewaard/MachineLearning/Example Data/OLS_Regression_Example_3.csv"
+    val basePath = "/Users/../Example Data/OLS_Regression_Example_3.csv"
 
     val test_data = GetDataFromCSV(new File(basePath))
 
     val plotData = (test_data._1 zip test_data._2).map(x => Array(x._1(1) ,x._2))
-    val maleFemaleLabels = test_data._1.map( x=> x(0).toInt);
+    val maleFemaleLabels = test_data._1.map( x=> x(0).toInt)
     val plot =  ScatterPlot.plot(plotData,maleFemaleLabels,'@',Array(Color.blue, Color.green))
     plot.setTitle("Weight and heights for males and females")
     plot.setAxisLabel(0,"Heights")
@@ -45,25 +41,25 @@ object LinearRegression extends SimpleSwingApplication {
     var inputData = data.map(x => x._1)
     var resultData = data.map(x => x._2)
 
-    return (inputData,resultData)
+    (inputData,resultData)
   }
 
   def GetDataFromString(dataString: String): (Array[Double], Double) = {
 
     //Split the comma separated value string into an array of strings
     val dataArray: Array[String] = dataString.split(',')
-    var person = 1.0;
+    var person = 1.0
 
     if (dataArray(0) == "\"Male\"") {
       person = 0.0
     }
 
     //Extract the values from the strings
-    //Since the data is in US metrics (inch and pounts we will recalculate this to cm and kilo's)
+    //Since the data is in US metrics (inch and pounds we will recalculate this to cm and kilo's)
     val data : Array[Double] = Array(person,dataArray(1).toDouble * 2.54)
     val weight: Double = dataArray(2).toDouble * 0.45359237
 
     //And return the result in a format that can later easily be used to feed to Smile
-    return (data, weight)
+    (data, weight)
   }
 }

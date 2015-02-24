@@ -8,9 +8,7 @@ import smile.validation.CrossValidation
 
 import scala.swing._
 
-/**
- * Created by mikedewaard on 17/02/15.
- */
+
 object TextRegression  {
 
   def main(args: Array[String]): Unit = {
@@ -26,8 +24,7 @@ object TextRegression  {
 
     //Get the cross validation data
     val cv = new CrossValidation(testData.length, 2)
-    val numericDTM = documentTermMatrix.getNumericRepresentationForRecords()
-
+    val numericDTM = documentTermMatrix.getNumericRepresentationForRecords
 
     for (i <- 0 until cv.k) {
       //Split off the training datapoints and classifiers from the dataset
@@ -48,7 +45,7 @@ object TextRegression  {
         //Compute the RMSE for this model with this lambda
         val results = dpForTesting.map(y => model.predict(y)) zip classifiersForTesting
         val RMSE = Math.sqrt(results.map(x => Math.pow(x._1 - x._2, 2)).sum / results.length)
-        println(Calendar.getInstance().getTime() + "Lambda: " + x + " RMSE: " + RMSE)
+        println(Calendar.getInstance().getTime + "Lambda: " + x + " RMSE: " + RMSE)
 
       }
     }
@@ -58,8 +55,8 @@ object TextRegression  {
     val reader = CSVReader.open(file)
     val data = reader.all()
 
-    val documents = data.drop(1).map(x => (x(1),x(3)toInt,x(4)))
-    return documents
+    val documents = data.drop(1).map(x => (x(1),x(3).toInt,x(4)))
+    documents
   }
 
 

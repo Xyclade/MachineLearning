@@ -1,9 +1,6 @@
 import java.io.File
 import scala.collection.mutable
 
-/**
- * Created by mikedewaard on 18/02/15.
- */
 class DTM {
 
   var records: List[DTMRecord] = List[DTMRecord]()
@@ -31,16 +28,16 @@ class DTM {
     records = new DTMRecord(documentName, rank, wordRecords) :: records
   }
 
-  def getStopWords(): List[String] = {
-    val source = scala.io.Source.fromFile(new File("/Users/mikedewaard/MachineLearning/Example Data/stopwords.txt"))("latin1")
+  def getStopWords: List[String] = {
+    val source = scala.io.Source.fromFile(new File("/Users/../Example Data/stopwords.txt"))("latin1")
     val lines = source.mkString.split("\n")
     source.close()
-    return lines.toList
+    lines.toList
   }
 
-  def getNumericRepresentationForRecords(): (Array[Array[Double]], Array[Double]) = {
+  def getNumericRepresentationForRecords: (Array[Array[Double]], Array[Double]) = {
     //First filter out all stop words:
-    val StopWords = getStopWords()
+    val StopWords = getStopWords
     wordList = wordList.filter(x => !StopWords.contains(x))
 
     var dtmNumeric = Array[Array[Double]]()
@@ -66,7 +63,7 @@ class DTM {
 
     }
 
-    return (dtmNumeric, ranks)
+    (dtmNumeric, ranks)
   }
 }
 

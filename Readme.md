@@ -689,7 +689,15 @@ To conclude this example, we rephrase a quote from [John Tukey](http://en.wikipe
 
 ###Using unsupervised learning to create a market index (PCA)
 
-//Todo: write
+In this example we are going to use [PCA](#Principal-Components-Analysis-(PCA)) to compute our own stock market index based on data of 24 stock prices from 2002 until 2012. This market index combines these 24 stock price columns into 1 single column. This significantly reduces the amount of data to process, and decreases the dimension of our problem, which is a big advantage if we later apply other machine learning algortihms such as regression for prediction.  ]
+
+Note that reducing the dimension from 24 to 1 causes data loss. However, because the stock prices are correlated, we accept this 'data loss'. When applying this method yourself, you should verify first whether your data is correlated.
+
+Let's start the example
+
+
+
+
 
 ###using Support Vector Machine's
 

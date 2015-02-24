@@ -5,14 +5,10 @@ import smile.plot._
 import smile.validation._
 import scala.swing._
 
-/**
- * Created by Xyclade on 10/02/15.
- */
-
 object KNNExample extends SimpleSwingApplication {
   def top = new MainFrame {
     title = "KNN Example!"
-    val basePath = "/ .. <Path to github folder> ../Example Data/KNN_Example_1.csv"
+    val basePath = "/.../Example Data/KNN_Example_1.csv"
 
     val testData = GetDataFromCSV(new File(basePath))
 
@@ -43,7 +39,7 @@ object KNNExample extends SimpleSwingApplication {
       val predictions = dpForTesting.map(x => knn.predict(x))
 
       //Finally evaluate the predictions as correct or incorrect and count the amount of wrongly classified data points.
-      var error = 0.0;
+      var error = 0.0
       for (j <- 0 until predictions.length) {
         if (predictions(j) != classifiersForTesting(j)) {
           error += 1
@@ -75,7 +71,7 @@ object KNNExample extends SimpleSwingApplication {
     source.close()
     val dataPoints = data.map(x => x._1)
     val classifierArray = data.map(x => x._2)
-    return (dataPoints, classifierArray)
+    (dataPoints, classifierArray)
   }
 
   def GetDataFromString(dataString: String): (Array[Double], Int) = {
@@ -89,6 +85,6 @@ object KNNExample extends SimpleSwingApplication {
     val classifier: Int = dataArray(2).toInt
 
     //And return the result in a format that can later easily be used to feed to Smile
-    return (Array(xCoordinate, yCoordinate), classifier)
+    (Array(xCoordinate, yCoordinate), classifier)
   }
 }
