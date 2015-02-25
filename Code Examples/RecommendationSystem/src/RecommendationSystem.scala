@@ -9,7 +9,6 @@ import scala.util.Try
 
 object RecommendationSystem extends SimpleSwingApplication {
 
-
   def top = new MainFrame {
     title = "Recommendation System Example"
 
@@ -22,9 +21,9 @@ object RecommendationSystem extends SimpleSwingApplication {
 
     val listOfSpamFiles = getFilesFromDir(easyHamPath)
 
-    val mailBodies = listOfSpamFiles.map(x =>  getFullEmail(x))
+    val mailBodies = listOfSpamFiles.map(x => getFullEmail(x))
 
-    val mailInformation = mailBodies.map(x => (x,getDateFromEmail(x), getSenderFromEmail(x), getSubjectFromEmail(x), getMessageBodyFromEmail(x)))
+    val mailInformation = mailBodies.map(x => (x, getDateFromEmail(x), getSenderFromEmail(x), getSubjectFromEmail(x), getMessageBodyFromEmail(x)))
 
     val timeSortedMails = mailInformation.sortBy(x => x._2)
 
@@ -38,31 +37,31 @@ object RecommendationSystem extends SimpleSwingApplication {
     val mailsGroupedBySender = trainingData.groupBy(x => x._3)
     val senderBarPlotData = mailsGroupedBySender.map(x => (x._1, x._2.length)).toArray.sortBy(x => x._2)
     val senderDescriptions = senderBarPlotData.map(x => x._1)
-    val senderValues  = senderBarPlotData.map(x => Math.log1p(x._2.toDouble))
+    val senderValues = senderBarPlotData.map(x => Math.log1p(x._2.toDouble))
 
     val mailsGroupedByThread = trainingData.groupBy(x => x._4)
-    val mailGroupsWithMinMaxDates = mailsGroupedByThread.map(x => (x._1,x._2, (x._2.maxBy( x=> x._2)._2.getTime - x._2.minBy( x=> x._2)._2.getTime) / 1000))
-     val threadGroupsWithWeights = mailGroupsWithMinMaxDates.filter(x => x._3 != 0).map(x => (x._1,x._2,x._3, 10 + Math.log10( x._2.length.toDouble /x._3)))
+    val mailGroupsWithMinMaxDates = mailsGroupedByThread.map(x => (x._1, x._2, (x._2.maxBy(x => x._2)._2.getTime - x._2.minBy(x => x._2)._2.getTime) / 1000))
+    val threadGroupsWithWeights = mailGroupsWithMinMaxDates.filter(x => x._3 != 0).map(x => (x._1, x._2, x._3, 10 + Math.log10(x._2.length.toDouble / x._3)))
 
     threadGroupsWithWeights.foreach(x => println(x._1 + "  time diff: " + x._3 + "  frequencies: " + x._2.length + "  weight: " + x._4))
 
     val threadBarPlotData = mailsGroupedByThread.map(x => (x._1, x._2.length)).toArray.sortBy(x => x._2)
     val threadDescriptions = threadBarPlotData.map(x => x._1)
-    val threadValues  = threadBarPlotData.map(x => Math.log1p(x._2.toDouble))
+    val threadValues = threadBarPlotData.map(x => Math.log1p(x._2.toDouble))
 
     val weightedThreadBarPlotData = threadGroupsWithWeights.toArray.sortBy(x => x._4)
     val weightedThreadDescriptions = weightedThreadBarPlotData.map(x => x._1)
-    val weightedThreadValues  = weightedThreadBarPlotData.map(x => x._4)
+    val weightedThreadValues = weightedThreadBarPlotData.map(x => x._4)
 
 
-    val barPlot =  BarPlot.plot("Amount of emails per sender",weightedThreadValues,weightedThreadDescriptions)
+    val barPlot = BarPlot.plot("Amount of emails per sender", weightedThreadValues, weightedThreadDescriptions)
     //Rotate the email addresses by -80 degrees such that we can read them
     barPlot.getAxis(0).setRotation(-1.3962634)
-    barPlot.setAxisLabel(0,"")
-    barPlot.setAxisLabel(1,"Amount of emails received on log scale")
+    barPlot.setAxisLabel(0, "")
+    barPlot.setAxisLabel(1, "Amount of emails received on log scale")
     peer.setContentPane(barPlot)
 
-    bounds=  new Rectangle(800, 600)
+    bounds = new Rectangle(800, 600)
 
     //   subjects.foreach(x => println(x._3))
   }
@@ -90,16 +89,15 @@ object RecommendationSystem extends SimpleSwingApplication {
 
   def getSubjectFromEmail(email: String): String = {
 
-    val subjectIndex = email.indexOf("Subject:")
-
     //Find the index of the end of the subject line
+    val subjectIndex = email.indexOf("Subject:")
     val endOfSubjectIndex = email.substring(subjectIndex).indexOf('\n') + subjectIndex
 
     //Extract the subject: start of subject + 7 (length of Subject:) until the end of the line.
-   val subject = email.substring(subjectIndex + 8, endOfSubjectIndex).trim.toLowerCase
+    val subject = email.substring(subjectIndex + 8, endOfSubjectIndex).trim.toLowerCase
 
     //Additionally, we check whether the email was a response and remove the 're: ' tag, to make grouping on topic easier:
-    subject.replace("re: ","")
+    subject.replace("re: ", "")
   }
 
   def getMessageBodyFromEmail(email: String): String = {
@@ -111,21 +109,20 @@ object RecommendationSystem extends SimpleSwingApplication {
 
 
   def getSenderFromEmail(email: String): String = {
-    //Find the index of the From line
+    //Find the index of the From: line
     val fromLineIndex = email.indexOf("From:")
     val endOfLine = email.substring(fromLineIndex).indexOf('\n') + fromLineIndex
 
-    //Search for the <> tags in this line.
+    //Search for the <> tags in this line, as if they are there, the email address is contained inside these tags
     val mailAddressStartIndex = email.substring(fromLineIndex, endOfLine).indexOf('<') + fromLineIndex + 1
     val mailAddressEndIndex = email.substring(fromLineIndex, endOfLine).indexOf('>') + fromLineIndex
 
-
     if (mailAddressStartIndex > mailAddressEndIndex) {
 
-      //The email address was not embedded in <> tags
+      //The email address was not embedded in <> tags, extract the substring without extra spacing and to lower case
       var emailString = email.substring(fromLineIndex + 5, endOfLine).trim.toLowerCase
 
-      //Remove a possible name embedded in () at the end of the line
+      //Remove a possible name embedded in () at the end of the line, for example in test@test.com (tester) the name would be removed here
       val additionalNameStartIndex = emailString.indexOf('(')
       if (additionalNameStartIndex == -1) {
         emailString.toLowerCase
@@ -135,31 +132,24 @@ object RecommendationSystem extends SimpleSwingApplication {
       }
     }
     else {
-      //Extract the email address from the tags
+      //Extract the email address from the tags. If these <> tags are there, there is no () with a name in the From: string in our data
       email.substring(mailAddressStartIndex, mailAddressEndIndex).trim.toLowerCase
     }
   }
 
   def getDateFromEmail(email: String): Date = {
-    //Find the index of the Date: line
+    //Find the index of the Date: line in the complete email
     val dateLineIndex = email.indexOf("Date:")
-    val endOfLine = email.substring(dateLineIndex).indexOf('\n') + dateLineIndex
-
-    //Extract the date from the string
-    getDateFromString(email.substring(dateLineIndex + 5, endOfLine).trim)
-
-  }
-
-  def getDateFromString(dateString: String): Date = {
+    val endOfDateLine = email.substring(dateLineIndex).indexOf('\n') + dateLineIndex
 
     //All possible date patterns in the emails.
     val datePatterns = Array("EEE MMM dd HH:mm:ss yyyy", "EEE, dd MMM yyyy HH:mm", "dd MMM yyyy HH:mm:ss", "EEE MMM dd yyyy HH:mm")
 
     datePatterns.foreach { x =>
-      //Try to directly return a date from the formatting
-      Try(return new SimpleDateFormat(x).parse(dateString.substring(0, x.length)))
+      //Try to directly return a date from the formatting.when it fails on a pattern it continues with the next one until one works
+      Try(return new SimpleDateFormat(x).parse(email.substring(dateLineIndex + 5, endOfDateLine).trim.substring(0, x.length)))
     }
-    //Finally, if all failed return null
+    //Finally, if all failed return null (this will not happen with our example data but without this return the code will not compile)
     null
   }
 }

@@ -160,7 +160,7 @@ These predictions can then be used to present to the users of your system, for e
 ###Classifying Email as Spam or Ham (Naive Bayes)
 The goal of this section is to use the Naive Bayes implementation from [Smile](https://github.com/haifengl/smile) in Scala to classify emails as Spam or Ham based on their content.  
 
-To start with this example I assume you created a new Scala project in your favourite IDE, and downloaded and added the [Smile Machine learning](https://github.com/haifengl/smile/releases)  and its dependency [SwingX](https://java.net/downloads/swingx/releases/) to this project. As final assumption you also downloaded and extracted the [example data](./Example%20Data/NaiveBayes_Example_1.zip). This example data comes from the [SpamAssasins public corpus](http://spamassasin.apache.org/publiccorpus/). 
+To start with this example I assume you created a new Scala project in your favourite IDE, and downloaded and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library and its dependency [SwingX](https://java.net/downloads/swingx/releases/) to this project. As final assumption you also downloaded and extracted the [example data](./Example%20Data/NaiveBayes_Example_1.zip). This example data comes from the [SpamAssasins public corpus](http://spamassasin.apache.org/publiccorpus/). 
 
 As with every machine learning implementation, the first step is to load in the training data. However in this example we are taking it 1 step further into machine learning. In the [KNN examples](#Labeling ISPs based on their Down/Upload speed (K-NN using Smile in Scala)) we had the download and upload speed as [features](#features). We did not refer to them as features, as they where the only properties available. For spam classification it is not completely trivial what to use as features. One can use the Sender, the subject, the message content, and even the time of sending as features for classifying as spam or ham.  
 
@@ -412,7 +412,132 @@ Here we see that indeed, when you use only 50 features, the amount of ham that g
 
 We could work through the hard ham, but since the building bricks are already here, we leave this to the reader. 
 
-###Recommendation Systems, a priority Inbox (using naive Bayes)
+###Ranking emails based on their content (Recommendation system)
+This example will be completely about building your own recommendation system. We will use a subset of the email data which we used in the example [Classifying Email as Spam or Ham](#Classifying-Email-as-Spam-or-Ham-(Naive-Bayes)). This subset can be downloaded [here](https://github.com/Xyclade/MachineLearning/raw/Master/Example%20Data/Recommendation_Example_1.zip). Note that this is a set of received emails, thus we lack 1 half of the data, namely the outgoing emails of this mailbox. However even without this information we can do some pretty accurate rankings as we will see later on.
+
+For this example, as usual we expect you to have created a new Scala project in your favourite IDE, and downloaded and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library and its dependency [SwingX](https://java.net/downloads/swingx/releases/) to this project.
+
+The first thing to do is to determine what features we will base our ranking on. When building your own recommendation system this is one of the hardest parts. Coming up with good features is not trivial, and when you finally selected features the data might not be directly usable for these features. 
+
+This is why we will go into detail a bit more on how we select the features and prepare the data. However before we can get to this step, its time to extract as much data as we can from our email set. Since the data is a bit tedious in it's format we provide the code to do this. The inline comments explain why things are done the way they are. Note that the application is a swing application with a GUI from the start. We do this because we will need to plot data later on using the SMILE plotting library.
+
+
+
+```scala
+
+object RecommendationSystem extends SimpleSwingApplication {
+
+
+  def top = new MainFrame {
+    title = "Recommendation System Example"
+
+    val emailsPath = "/Users/.../PathToZip"
+
+
+    val listOfSpamFiles = getFilesFromDir(emailsPath)
+
+    val mailBodies = listOfSpamFiles.map(x => getFullEmail(x))
+
+    val mailInformation = mailBodies.map(x => (x, getDateFromEmail(x), getSenderFromEmail(x), getSubjectFromEmail(x), getMessageBodyFromEmail(x)))
+
+    }
+
+  def getFilesFromDir(path: String): List[File] = {
+    val d = new File(path)
+    if (d.exists && d.isDirectory) {
+      //Remove the mac os basic storage file, and alternatively for unix systems "cmds"
+      d.listFiles.filter(_.isFile).toList.filter(x => !x.toString.contains(".DS_Store") && !x.toString.contains("cmds"))
+    } else {
+      List[File]()
+    }
+  }
+
+
+  def getFullEmail(file: File): String = {
+    //Note that the encoding of the example files is latin1, thus this should be passed to the from file method.
+    val source = scala.io.Source.fromFile(file)("latin1")
+    val fullEmail = source.getLines mkString "\n"
+    source.close()
+
+    fullEmail
+  }
+
+
+  def getSubjectFromEmail(email: String): String = {
+
+    //Find the index of the end of the subject line
+    val subjectIndex = email.indexOf("Subject:")
+    val endOfSubjectIndex = email.substring(subjectIndex).indexOf('\n') + subjectIndex
+
+    //Extract the subject: start of subject + 7 (length of Subject:) until the end of the line.
+    val subject = email.substring(subjectIndex + 8, endOfSubjectIndex).trim.toLowerCase
+
+    //Additionally, we check whether the email was a response and remove the 're: ' tag, to make grouping on topic easier:
+    subject.replace("re: ", "")
+  }
+
+  def getMessageBodyFromEmail(email: String): String = {
+
+    val firstLineBreak = email.indexOf("\n\n")
+    //Return the message body filtered by only text from a-z and to lower case
+    email.substring(firstLineBreak).replace("\n", " ").replaceAll("[^a-zA-Z ]", "").toLowerCase
+  }
+
+
+  def getSenderFromEmail(email: String): String = {
+    //Find the index of the From: line
+    val fromLineIndex = email.indexOf("From:")
+    val endOfLine = email.substring(fromLineIndex).indexOf('\n') + fromLineIndex
+
+    //Search for the <> tags in this line, as if they are there, the email address is contained inside these tags
+    val mailAddressStartIndex = email.substring(fromLineIndex, endOfLine).indexOf('<') + fromLineIndex + 1
+    val mailAddressEndIndex = email.substring(fromLineIndex, endOfLine).indexOf('>') + fromLineIndex
+
+    if (mailAddressStartIndex > mailAddressEndIndex) {
+
+      //The email address was not embedded in <> tags, extract the substring without extra spacing and to lower case
+      var emailString = email.substring(fromLineIndex + 5, endOfLine).trim.toLowerCase
+
+      //Remove a possible name embedded in () at the end of the line, for example in test@test.com (tester) the name would be removed here
+      val additionalNameStartIndex = emailString.indexOf('(')
+      if (additionalNameStartIndex == -1) {
+        emailString.toLowerCase
+      }
+      else {
+        emailString.substring(0, additionalNameStartIndex).trim.toLowerCase
+      }
+    }
+    else {
+      //Extract the email address from the tags. If these <> tags are there, there is no () with a name in the From: string in our data
+      email.substring(mailAddressStartIndex, mailAddressEndIndex).trim.toLowerCase
+    }
+  }
+
+  def getDateFromEmail(email: String): Date = {
+    //Find the index of the Date: line in the complete email
+    val dateLineIndex = email.indexOf("Date:")
+    val endOfDateLine = email.substring(dateLineIndex).indexOf('\n') + dateLineIndex
+
+    //All possible date patterns in the emails.
+    val datePatterns = Array("EEE MMM dd HH:mm:ss yyyy", "EEE, dd MMM yyyy HH:mm", "dd MMM yyyy HH:mm:ss", "EEE MMM dd yyyy HH:mm")
+
+    datePatterns.foreach { x =>
+      //Try to directly return a date from the formatting.when it fails on a pattern it continues with the next one until one works
+      Try(return new SimpleDateFormat(x).parse(email.substring(dateLineIndex + 5, endOfDateLine).trim.substring(0, x.length)))
+    }
+    //Finally, if all failed return null (this will not happen with our example data but without this return the code will not compile)
+    null
+  }
+}
+
+```
+
+Given this chunk of code we now have available the following properties of our example data:(full email, receiving date, sender, subject, body). This pre-processing of the data is very common and can be a real pain when your data is not standardized such as with the dates and senders of these emails. 
+
+
+
+
+
 
 ###Predicting weight based on height (using Ordinary Least Squares)
 In this section we will introduce the [Ordinary Least Squares](http://en.wikipedia.org/wiki/Ordinary_least_squares) technique which is a form of linear regression. As this technique is quite powerful, it is important to have read [regression](#regression) and the common pitfalls before starting with this example. We will cover some of these issues in this section, while others are shown in the sections [under-fitting](#under-fitting) and [overfitting](#overfitting)
