@@ -15,7 +15,7 @@ object PCA extends SimpleSwingApplication{
 
 
   def top = new MainFrame {
-    title = "Linear Regression Example"
+    title = "PCA Example"
     //Get the example data
     val basePath = "/users/mikedewaard/MachineLearning/Example Data/"
     val exampleDataPath = basePath + "PCA_Example_1.csv"
@@ -64,14 +64,14 @@ object PCA extends SimpleSwingApplication{
     val loadings = pca.getLoadings
     val points = pca.project(testData._2)
 
-    val plottableData = points.zipWithIndex.map( x=> Array(x._2.toDouble, x._1(0)))
+    val plotData = points.zipWithIndex.map( x=> Array(x._2.toDouble, x._1(0)))
 
 
 
     val center = pca.getCenter
     println("Loaded data")
 
-    val plot =   LinePlot.plot(plottableData, Line.Style.SOLID)
+    val plot =   LinePlot.plot(plotData, Line.Style.SOLID)
 
     peer.setContentPane(plot)
    size = new Dimension(400, 400)

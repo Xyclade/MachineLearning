@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="smile-1.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Downloads/smile-1.0.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/smile-data-1.0.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/smile-graph-1.0.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/smile-interpolation-1.0.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/smile-math-1.0.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/smile-plot-1.0.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/swingx-all-1.6.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
