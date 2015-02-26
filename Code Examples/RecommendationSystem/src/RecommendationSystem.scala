@@ -21,9 +21,9 @@ object RecommendationSystem extends SimpleSwingApplication {
 
     val listOfSpamFiles = getFilesFromDir(easyHamPath)
 
-    val mailBodies = listOfSpamFiles.map(x => getFullEmail(x))
+    val mailBodies = listOfSpamFiles.map(x => (x,getFullEmail(x)))
 
-    val mailInformation = mailBodies.map(x => (x, getDateFromEmail(x), getSenderFromEmail(x), getSubjectFromEmail(x), getMessageBodyFromEmail(x)))
+    val mailInformation = mailBodies.map(x => (x._2, getDateFromEmail(x._2), getSenderFromEmail(x._2), getSubjectFromEmail(x._2), getMessageBodyFromEmail(x._2), x._1.toString))
 
     val timeSortedMails = mailInformation.sortBy(x => x._2)
 
@@ -43,28 +43,51 @@ object RecommendationSystem extends SimpleSwingApplication {
     val mailGroupsWithMinMaxDates = mailsGroupedByThread.map(x => (x._1, x._2, (x._2.maxBy(x => x._2)._2.getTime - x._2.minBy(x => x._2)._2.getTime) / 1000))
     val threadGroupsWithWeights = mailGroupsWithMinMaxDates.filter(x => x._3 != 0).map(x => (x._1, x._2, x._3, 10 + Math.log10(x._2.length.toDouble / x._3)))
 
-    threadGroupsWithWeights.foreach(x => println(x._1 + "  time diff: " + x._3 + "  frequencies: " + x._2.length + "  weight: " + x._4))
+
+    threadGroupsWithWeights.toArray.sortBy(x => x._4).take(10).sortBy(x => -x._4).foreach(x => println("|" + x._1 + " | " + x._2.length + "  | " + x._3 + " | " + x._4 + " | "))
+    //threadGroupsWithWeights.foreach(x => println(x._1 + "  time diff: " + x._3 + "  frequencies: " + x._2.length + "  weight: " + x._4))
 
     val threadBarPlotData = mailsGroupedByThread.map(x => (x._1, x._2.length)).toArray.sortBy(x => x._2)
     val threadDescriptions = threadBarPlotData.map(x => x._1)
-    val threadValues = threadBarPlotData.map(x => Math.log1p(x._2.toDouble))
+    val threadValues = threadBarPlotData.map(x => Math.log1p(x._2.toDouble ))
 
     val weightedThreadBarPlotData = threadGroupsWithWeights.toArray.sortBy(x => x._4)
     val weightedThreadDescriptions = weightedThreadBarPlotData.map(x => x._1)
     val weightedThreadValues = weightedThreadBarPlotData.map(x => x._4)
 
 
-    val barPlot = BarPlot.plot("Amount of emails per sender", weightedThreadValues, weightedThreadDescriptions)
+
+
+    val StopWords = getStopWords
+    val mailTDM = new TDM()
+    //Build up the Term-Document Matrix for ham emails
+    trainingData.foreach(x => x._5.split(" ").filter(_.nonEmpty).foreach(y => mailTDM.addTermToRecord(y, x._6)))
+    //Sort the ham by total frequency for ease
+    mailTDM.SortByOccurrenceRate(trainingData.size)
+    //Filter out all stop words
+    mailTDM.records = mailTDM.records.filter(x => !StopWords.contains(x.term))
+
+
+    val barPlot = BarPlot.plot("Amount of emails per subject on log scale", weightedThreadValues, weightedThreadDescriptions)
     //Rotate the email addresses by -80 degrees such that we can read them
     barPlot.getAxis(0).setRotation(-1.3962634)
     barPlot.setAxisLabel(0, "")
-    barPlot.setAxisLabel(1, "Amount of emails received on log scale")
+    barPlot.setAxisLabel(1, "Weighted amount of mails per subject ")
     peer.setContentPane(barPlot)
 
     bounds = new Rectangle(800, 600)
 
     //   subjects.foreach(x => println(x._3))
   }
+
+
+  def getStopWords: List[String] = {
+    val source = scala.io.Source.fromFile(new File("/Users/mikedewaard/MachineLearning/Example Data/stopwords.txt"))("latin1")
+    val lines = source.mkString.split("\n")
+    source.close()
+    lines.toList
+  }
+
 
   def getFilesFromDir(path: String): List[File] = {
     val d = new File(path)

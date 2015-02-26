@@ -419,7 +419,7 @@ For this example, as usual we expect you to have created a new Scala project in 
 
 The first thing to do is to determine what features we will base our ranking on. When building your own recommendation system this is one of the hardest parts. Coming up with good features is not trivial, and when you finally selected features the data might not be directly usable for these features. 
 
-This is why we will go into detail a bit more on how we select the features and prepare the data. However before we can get to this step, its time to extract as much data as we can from our email set. Since the data is a bit tedious in it's format we provide the code to do this. The inline comments explain why things are done the way they are. Note that the application is a swing application with a GUI from the start. We do this because we will need to plot data later on using the SMILE plotting library.
+This is why we will go into detail a bit more on how we select the features and prepare the data. However before we can get to this step, its time to extract as much data as we can from our email set. Since the data is a bit tedious in it's format we provide the code to do this. The inline comments explain why things are done the way they are. Note that the application is a swing application with a GUI from the start. We do this because we will need to plot data later on using the SMILE plotting library. Also note that we directly made a split in testing and training data such that we can later on test our model.
 
 
 
@@ -440,6 +440,11 @@ object RecommendationSystem extends SimpleSwingApplication {
 
     val mailInformation = mailBodies.map(x => (x, getDateFromEmail(x), getSenderFromEmail(x), getSubjectFromEmail(x), getMessageBodyFromEmail(x)))
 
+	val timeSortedMails = mailInformation.sortBy(x => x._2)
+	val testAndTrainingSplit = timeSortedMails.splitAt(timeSortedMails.length / 2)
+	val trainingData = testAndTrainingSplit._1
+
+	val testingData = testAndTrainingSplit._2
     }
 
   def getFilesFromDir(path: String): List[File] = {
@@ -532,12 +537,128 @@ object RecommendationSystem extends SimpleSwingApplication {
 
 ```
 
-Given this chunk of code we now have available the following properties of our example data:(full email, receiving date, sender, subject, body). This pre-processing of the data is very common and can be a real pain when your data is not standardized such as with the dates and senders of these emails. 
+This pre-processing of the data is very common and can be a real pain when your data is not standardized such as with the dates and senders of these emails. However given this chunk of code we now have available the following properties of our example data:(full email, receiving date, sender, subject, body). This allows us to continue working on the actual features to use in the recommendation system. 
+
+The first recommendation feature we will make is based on the sender of the email. Those whom you receive more emails from should be ranked higher than ones you get less email from. This is a strong assumption, but instinctively you will probably agree, given the fact that spam is left out. Let's look at the distribution of senders over the complete email set.
+
+
+```scala
+
+//Add to the top body:
+
+val mailsGroupedBySender = trainingData.groupBy(x => x._3)
+    val senderBarPlotData = mailsGroupedBySender.map(x => (x._1, x._2.length)).toArray.sortBy(x => x._2)
+val senderDescriptions = senderBarPlotData.map(x => x._1)
+val senderValues = senderBarPlotData.map(x => x._2.toDouble)
+val barPlot = BarPlot.plot("Amount of emails per sender", senderValues, senderDescriptions)
+
+//Rotate the email addresses by -80 degrees such that we can read them
+barPlot.getAxis(0).setRotation(-1.3962634)
+barPlot.setAxisLabel(0, "")
+barPlot.setAxisLabel(1, "Amount of emails received ")
+peer.setContentPane(barPlot)
+
+bounds = new Rectangle(800, 600)
+
+```
+
+<img src="./Images/Mail_per_Sender_Distribution.png" width="400px" /> 
+
+Here you can see that the most frequent sender sent 45 emails, followed by 37 emails and then it goes down rapidly. Due to these huge outliers, directly using this data would result in the highest 1 or 2 senders to be rated as very important where as the rest would not be considered in the recommendation system. In order to prevent this behavior we will re-scale the data  by taking ```log1p```. The addition of 1 is to prevent trouble when taking the log value for senders who sent only 1 email. After taking the log the data looks like this.
+
+```scala
+
+//Code changes:
+val senderValues = senderBarPlotData.map(x => Math.log1p(x._2.toDouble))
+barPlot.setAxisLabel(1, "Amount of emails received on log Scale ")
+
+```
+
+<img src="./Images/Mail_per_Sender_log_Distribution.png" width="400px" />
+
+Effectively the data is still the same, however it is represented on a different scale.
+Notice here that the numeric values now range between 0.69 and 3.83. This range is much smaller, causing the outliers to not skew away the rest of the data. This data manipulation trick is very common in the field of machine learning. Finding the right scale requires some insight, so using the plotting library of smile to make serveral plots on different scales and looking at the data can help a lot when doing this.
 
 
 
 
+The next feature we will work on is the frequency and timeframe in which subjects occur. If a subject occurs more it is likely to be more important. Additionally we take into account the timespan of the thread. So the frequency of a subject will be normalized with the timespan of the emails of this subject. This makes highly active email threads come up on top. Again this is an assumption we make on which emails should be ranked higher.
 
+ 
+Let's have a look at the subjects and their occurence counts:
+
+```scala
+//Add to 'def top'  
+val mailsGroupedByThread = trainingData.groupBy(x => x._4)
+val threadBarPlotData = mailsGroupedByThread.map(x => (x._1, x._2.length)).toArray.sortBy(x => x._2)
+val threadDescriptions = threadBarPlotData.map(x => x._1)
+val threadValues = threadBarPlotData.map(x => x._2.toDouble)
+
+//Code changes in 'def top'
+val barPlot = BarPlot.plot("Amount of emails per subject", threadValues, threadDescriptions)
+barPlot.setAxisLabel(1, "Amount of emails per subject")
+
+```
+
+<img src="./Images/Mail_per_Subject_Distribution.png" width="400px" />
+
+We see a similar distribution as with the senders, so let's apply the `log1p` once more.
+
+<img src="./Images/Mail_per_Subject_log_Distribution.png" width="400px" />
+
+Here the value's now range between 0.69 and 3.41, which is a lot better than a range of 1 to 29 for the recommendation system. However we did not incorporate the time frame yet. To be able to do this, we need to get the time between the first and last thread:
+
+```scala
+
+val mailGroupsWithMinMaxDates = mailsGroupedByThread.map(x => (x._1, x._2, (x._2.maxBy(x => x._2)._2.getTime - x._2.minBy(x => x._2)._2.getTime) / 1000))
+val threadGroupsWithWeights = mailGroupsWithMinMaxDates.filter(x => x._3 != 0).map(x => (x._1, x._2, x._3, 10 + Math.log10(x._2.length.toDouble / x._3)))
+
+
+```
+
+Note how we determine the difference between the min and the max, and divide it by 1000. This is to scale the time value from MS to seconds. Additionally we compute the weights by taking the frequency of a subject  and dividing it by the time difference. Since this value is very small, we want to rescale it up a little, which is done by taking the 10log. This however causes our values to become negative, which is why we add a basic value of 10 to make every value positive. The end result of this weighting is as follows:
+
+<img src="./Images/Weighted_Subject_Distribution.png" width="400px" />
+
+Since we can't really see if this manipulation did the trick we will show you the top 10 weights versus the bottom 10 weights.
+
+
+**Top 10 weights:**
+
+| Subject 	| Frequency	| Time frame (seconds) 	| Weight |
+| :-- 		| :-- 		| :-- 			| :-- | 
+|[ilug] what howtos for soho system | 2 | 60  | 8.522878745280337 |
+|[zzzzteana] the new steve earle  | 2  | 120 | 8.221848749616356 | 
+| [ilug] looking for a file / directory in zip file | 2 | 240 | 7.920818753952375 |
+| ouch... [bebergflame]| 2 |300  | 7.823908740944319|
+| [ilug] serial number in hosts file | 2 | 420 |  7.6777807052660805 |
+| [ilug] email list management howto | 3 | 720 |  7.619788758288394 | 
+| should mplayer be build with win32 codecs?  | 2 | 660 |  7.481486060122112 |
+| [spambayes] all cap or cap word subjects  | 2 | 670 |  7.474955192963154 |
+| [zzzzteana] save the planet, kill the people  | 3 | 1020 |  7.468521082957745 |
+| [ilug] got me a crappy laptop  | 2 | 720 | 7.443697499232712 |
+
+
+**Bottom 10 weights:**
+
+| Subject 	| Frequency	| Time frame (seconds) 	| Weight |
+| :-- 		| :-- 		| :-- 			| :-- | 
+|secure sofware key | 14  | 1822200 | 4.885531993376329 | 
+|[satalk] help with postfix + spamassassin | 2  | 264480 | 4.878637159436609 | 
+|<nettime> the war prayer | 2  | 301800 | 4.82131076022441 | 
+|gecko adhesion finally sussed. | 5  | 767287 | 4.814012164243057 | 
+|the mime information you requested (last changed 3154 feb 14) | 3  | 504420 | 4.774328956918856 | 
+|use of base image / delta image for automated recovery from | 5  | 1405800 | 4.551046465355412 | 
+|sprint delivers the next big thing?? | 5  | 1415280 | 4.548127634846606 | 
+|[razor-users] collision of hashes? | 4  | 1230420 | 4.512006609524829 | 
+|[ilug] modem problems | 2  | 709500 | 4.450077595870488 | 
+|tech's major decline | 2  | 747660 | 4.427325849260936 | 
+
+
+As you can see the highest weights are given to emails which almost instantly got a follow up email response, where as the lowest weights are given to emails with very long timeframes. This allows for emails with a very low frequency to still be rated as very important based on the timeframe in which they were sent.
+
+
+As final feature we want to incorporate weighting based on the terms that are occuring with a high frequency in the 'more important' emails.
 
 ###Predicting weight based on height (using Ordinary Least Squares)
 In this section we will introduce the [Ordinary Least Squares](http://en.wikipedia.org/wiki/Ordinary_least_squares) technique which is a form of linear regression. As this technique is quite powerful, it is important to have read [regression](#regression) and the common pitfalls before starting with this example. We will cover some of these issues in this section, while others are shown in the sections [under-fitting](#under-fitting) and [overfitting](#overfitting)
