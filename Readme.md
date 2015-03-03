@@ -275,7 +275,7 @@ class TDMRecord(val term : String, var occurrences :  mutable.HashMap[String,Int
 }
 ```
 
-As you can see there are two sort methods: ```SortByTotalFrequency``` and ```SortByOccurenceRate```. In the latter one you need to pass the rate, which represents the total amount of documents that are contained in the TDM. This is done for performance reasons, since the TMD does not keep track of the amount of documents that was used to build up this TDM. Given this implementation, we can now actually make the two tables, one for spam and one for ham. We will add this code to the main class.
+As you can see there are two sort methods: ```SortByTotalFrequency``` and ```SortByOccurenceRate```. In the latter one you need to pass the rate, which represents the total amount of documents that are contained in the TDM. This is done for performance reasons, since the TDM does not keep track of the amount of documents that was used to build up this TDM. Given this implementation, we can now actually make the two tables, one for spam and one for ham. We will add this code to the main class.
 
 ```scala
 
@@ -546,12 +546,13 @@ The first recommendation feature we will make is based on the sender of the emai
 
 //Add to the top body:
 
-val mailsGroupedBySender = trainingData.groupBy(x => x._3)
-    val senderBarPlotData = mailsGroupedBySender.map(x => (x._1, x._2.length)).toArray.sortBy(x => x._2)
-val senderDescriptions = senderBarPlotData.map(x => x._1)
-val senderValues = senderBarPlotData.map(x => x._2.toDouble)
-val barPlot = BarPlot.plot("Amount of emails per sender", senderValues, senderDescriptions)
 
+val mailsGroupedBySender = trainingData.groupBy(x => x._3).map(x => (x._1, x._2.length)).toArray.sortBy(x => x._2)
+val senderDescriptions = mailsGroupedBySender.map(x => x._1)
+val senderValues = mailsGroupedBySender.map(x => x._2.toDouble)
+
+val barPlot = BarPlot.plot("", senderValues, senderDescriptions)
+   
 //Rotate the email addresses by -80 degrees such that we can read them
 barPlot.getAxis(0).setRotation(-1.3962634)
 barPlot.setAxisLabel(0, "")
@@ -569,7 +570,7 @@ Here you can see that the most frequent sender sent 45 emails, followed by 37 em
 ```scala
 
 //Code changes:
-val senderValues = senderBarPlotData.map(x => Math.log1p(x._2.toDouble))
+val mailsGroupedBySender = trainingData.groupBy(x => x._3).map(x => (x._1, Math.log1p(x._2.length)).toArray.sortBy(x => x._2)
 barPlot.setAxisLabel(1, "Amount of emails received on log Scale ")
 
 ```
@@ -577,19 +578,21 @@ barPlot.setAxisLabel(1, "Amount of emails received on log Scale ")
 <img src="./Images/Mail_per_Sender_log_Distribution.png" width="400px" />
 
 Effectively the data is still the same, however it is represented on a different scale.
-Notice here that the numeric values now range between 0.69 and 3.83. This range is much smaller, causing the outliers to not skew away the rest of the data. This data manipulation trick is very common in the field of machine learning. Finding the right scale requires some insight, so using the plotting library of smile to make serveral plots on different scales and looking at the data can help a lot when doing this.
+Notice here that the numeric values now range between 0.69 and 3.83. This range is much smaller, causing the outliers to not skew away the rest of the data. This data manipulation trick is very common in the field of machine learning. Finding the right scale requires some insight, so using the plotting library of smile to make several plots on different scales and looking at the data can help a lot when doing this.
 
 
 
 
-The next feature we will work on is the frequency and timeframe in which subjects occur. If a subject occurs more it is likely to be more important. Additionally we take into account the timespan of the thread. So the frequency of a subject will be normalized with the timespan of the emails of this subject. This makes highly active email threads come up on top. Again this is an assumption we make on which emails should be ranked higher.
+The next feature we will work on is the frequency and timeframe in which subjects occur. If a subject occurs more it is likely to be more important. Additionally we take into account the timespan of the thread. So the frequency of a subject will be normalised with the timespan of the emails of this subject. This makes highly active email threads come up on top. Again this is an assumption we make on which emails should be ranked higher.
 
  
-Let's have a look at the subjects and their occurence counts:
+Let's have a look at the subjects and their occurrence counts:
 
 ```scala
 //Add to 'def top'  
 val mailsGroupedByThread = trainingData.groupBy(x => x._4)
+
+//Create a list of tuples with (subject, list of emails)
 val threadBarPlotData = mailsGroupedByThread.map(x => (x._1, x._2.length)).toArray.sortBy(x => x._2)
 val threadDescriptions = threadBarPlotData.map(x => x._1)
 val threadValues = threadBarPlotData.map(x => x._2.toDouble)
@@ -604,14 +607,22 @@ barPlot.setAxisLabel(1, "Amount of emails per subject")
 
 We see a similar distribution as with the senders, so let's apply the `log1p` once more.
 
+```scala
+
+//Code change:
+val threadBarPlotData = mailsGroupedByThread.map(x => (x._1, Math.log1p(x._2.length)).toArray.sortBy(x => x._2)
+```
 <img src="./Images/Mail_per_Subject_log_Distribution.png" width="400px" />
 
-Here the value's now range between 0.69 and 3.41, which is a lot better than a range of 1 to 29 for the recommendation system. However we did not incorporate the time frame yet. To be able to do this, we need to get the time between the first and last thread:
+Here the value's now range between 0.69 and 3.41, which is a lot better than a range of 1 to 29 for the recommendation system. However we did not incorporate the time frame yet, thus we go back to the normal frequency and apply the transformation later on. To be able to do this, we first need to get the time between the first and last thread:
 
 ```scala
 
-val mailGroupsWithMinMaxDates = mailsGroupedByThread.map(x => (x._1, x._2, (x._2.maxBy(x => x._2)._2.getTime - x._2.minBy(x => x._2)._2.getTime) / 1000))
-val threadGroupsWithWeights = mailGroupsWithMinMaxDates.filter(x => x._3 != 0).map(x => (x._1, x._2, x._3, 10 + Math.log10(x._2.length.toDouble / x._3)))
+//Create a list of tuples with (subject, list of emails, time difference between first and last email)
+    val mailGroupsWithMinMaxDates = mailsGroupedByThread.map(x => (x._1, x._2, (x._2.maxBy(x => x._2)._2.getTime - x._2.minBy(x => x._2)._2.getTime) / 1000))
+
+ //turn into a list of tuples with (topic, list of emails, time difference, and weight) filtered that only threads occur
+    val threadGroupsWithWeights = mailGroupsWithMinMaxDates.filter(x => x._3 != 0).map(x => (x._1, x._2, x._3, 10 + Math.log10(x._2.length.toDouble / x._3)))
 
 
 ```
@@ -620,7 +631,7 @@ Note how we determine the difference between the min and the max, and divide it 
 
 <img src="./Images/Weighted_Subject_Distribution.png" width="400px" />
 
-Since we can't really see if this manipulation did the trick we will show you the top 10 weights versus the bottom 10 weights.
+Since we can't really see if this manipulation did the trick based on a plot we will look into the top 10 weights versus the bottom 10 weights.
 
 
 **Top 10 weights:**
@@ -658,7 +669,83 @@ Since we can't really see if this manipulation did the trick we will show you th
 As you can see the highest weights are given to emails which almost instantly got a follow up email response, where as the lowest weights are given to emails with very long timeframes. This allows for emails with a very low frequency to still be rated as very important based on the timeframe in which they were sent.
 
 
-As final feature we want to incorporate weighting based on the terms that are occuring with a high frequency in the 'more important' emails.
+Let's continue with another feature, as we want to base our ranking on as much features as possible. This next feature will be based on the weight ranking that we just computed. The idea is that new emails with different subjects will arrive. However, chances are that they contain keywords that are similar to earlier received important subjects. This will allow us to rank emails as important before a thread (multiple messages with the same subject) was started. For that we specify the weight of the keywords to be the weight of the subject in which the term occurred. If this term occurred in multiple threads, we take the highest weight as the leading one.
+
+There is one issue with this feature, which are stopwords. Luckily we have a stopwords file that allows us to remove (most) english stopwords for now. However, when designing your own system you should take into account that multiple languages can occur, thus you should remove stopwords for all languages that can occur in the system. The code for this feature is as follows:
+
+
+```scala
+
+val StopWords = getStopWords
+val termWeights =  threadGroupsWithWeights.toArray.sortBy(x => x._4).flatMap(x => x._1.replaceAll("[^a-zA-Z ]", "").toLowerCase.split(" ").filter(_.nonEmpty).map(y => (y,x._4)))
+val filteredTermWeights = termWeights.groupBy(x => x._1).map(x => (x._1, x._2.maxBy(y => y._2)._2)).toArray.sortBy(x => x._1).filter(x => !StopWords.contains(x._1))
+
+```
+Given this code we now have the terms with weights for the existing email subjects, which we can later use for our recommendation system. 
+
+As final feature we want to incorporate weighting based on the terms that are occurring with a high frequency in all the emails. For this we build up a TDM, but again a bit different as in the former example.
+
+```scala
+class TDM {
+
+  var records : List[TDMRecord] =  List[TDMRecord]()
+
+  def addTermToRecord(term : String)  =
+  {
+    //Find a record for the term
+    val record =   records.find( x => x.term == term)
+    if (record.nonEmpty)
+    {
+      val termRecord =  record.get
+    termRecord.frequencyInAllDocuments +=1
+    }
+    else
+    {
+      //No record yet exists for this term
+      val newRecord  = new TDMRecord(term, 1)
+      records  = newRecord :: records
+    }
+  }
+}
+class TDMRecord(val term : String, var frequencyInAllDocuments :  Int )
+{
+  def log10Frequency : Double  = Math.log10(frequencyInAllDocuments.toDouble)
+}
+
+```
+
+Given this TDM implementation we get the actual weightings for the terms as follows:
+
+```scala
+
+val mailTDM = new TDM()
+//Build up the Term-Document Matrix for the training emails
+trainingData.foreach(x => x._5.split(" ").filter(_.nonEmpty).foreach(y => mailTDM.addTermToRecord(y)))
+//Filter out all stop words
+mailTDM.records = mailTDM.records.filter(x => !StopWords.contains(x.term))
+//Filter out the stopwords and get their frequency with a log filter, such that low occurrence words are removed.
+val filteredCommonTerms=  mailTDM.records.map(x => (x.term, x.log10Frequency)).filter(x => x._2 != 0).sortBy(x => x._1)
+
+
+```
+
+Note that this feature selection is a very important process and can't be generalised easily. In other words, you should do this feature selection and extraction specifically for your own data and project, while taking into account scaling, stopwords, your data's outliers  and possible future data. 
+
+
+
+With this 4th and final feature we can start combining the features to calculate rank values for each email in the training and testing set, and to start actually predicting whether emails have a priority or not:
+
+```scala
+
+
+```
+
+
+
+
+
+
+
 
 ###Predicting weight based on height (using Ordinary Least Squares)
 In this section we will introduce the [Ordinary Least Squares](http://en.wikipedia.org/wiki/Ordinary_least_squares) technique which is a form of linear regression. As this technique is quite powerful, it is important to have read [regression](#regression) and the common pitfalls before starting with this example. We will cover some of these issues in this section, while others are shown in the sections [under-fitting](#under-fitting) and [overfitting](#overfitting)
