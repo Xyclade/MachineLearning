@@ -74,8 +74,10 @@ object RecommendationSystem extends SimpleSwingApplication {
 
     val tdm = trainingData
       .flatMap(x => x._4.split(" "))
-      .filter(x => x.nonEmpty && !stopWords.contains(x)).groupBy(x => x)
-      .map(x => (x._1, Math.log10(x._2.length + 1))).filter(x => x._2 != 0)
+      .filter(x => x.nonEmpty && !stopWords.contains(x))
+      .groupBy(x => x)
+      .map(x => (x._1, Math.log10(x._2.length + 1)))
+      .filter(x => x._2 != 0)
 
     val threadBarPlotData = mailsGroupedByThread
       .map(x => (x._1, x._2.length))

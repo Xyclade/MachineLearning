@@ -5,7 +5,7 @@ Most developers these days have heard of machine learning, but when trying to fi
 
 And then there are books such as [*Machine Learning for Hackers*](http://shop.oreilly.com/product/0636920018483.do) and [*An Introduction to Statistical Learning with Applications in R*](http://www-bcf.usc.edu/~gareth/ISL/)  who use programming language [R](http://www.r-project.org) for their examples. 
 
-However R is not really a programming language in which one writes programs for everyday use such as is done with for example Java, C#, Scala etc. This is why in this blog, Machine learning will be introduced using [Smile](https://github.com/haifengl/smile), a machine learning library that can be used both in Java and Scala,which are languages that almost every developer has worked with once during their study or career.
+However R is not really a programming language in which one writes programs for everyday use such as is done with for example Java, C#, Scala etc. This is why in this blog, Machine learning will be introduced using [Smile](https://github.com/haifengl/smile), a machine learning library that can be used both in Java and Scala. These are languages that almost every developer has worked with once during their study or career.
 
 Note that in this blog, 'new' definitions are hyperlinked such that if you want, you **can** read more regarding that specific topic, but you are not obliged to do this in order to be able to work through the examples. However the section ['The global idea of machine learning'](#the-global-idea-of-machine-learning) helps making things a lot more clear when working through the examples and is advised to be read on beforehand in case you are completely new to Machine Learning.
 
@@ -267,7 +267,7 @@ Now that we have the training data for both the ham and the spam email, we can s
                   .map(x => (x._1, x._2.map( y => (y._1, y._2.length)))).toList
 
     //Sort the words by occurrence rate  descending (amount of times the word occurs among all documents)
-    val sortedSpamTDM = spamTDM.sortBy(x =>  - (x._2.size.toDouble / spamMails.length))
+  val sortedSpamTDM = spamTDM.sortBy(x =>  - (x._2.size.toDouble / spamMails.length))
   val hamTDM  = hamMails
       .flatMap(email => email
       ._2.split(" ")
@@ -432,31 +432,27 @@ This is why we will go into detail a bit more on how we select the features and 
 
 object RecommendationSystem extends SimpleSwingApplication {
 
-
   def top = new MainFrame {
     title = "Recommendation System Example"
 
-    val emailsPath = "/Users/.../PathtoExtractedZipFolder"
+    val basePath = "/Users/mikedewaard/ML_for_Hackers/03-Classification/data"
+    val easyHamPath = basePath + "/easy_ham"
 
+    val mails = getFilesFromDir(easyHamPath).map(x => getFullEmail(x))
+    val timeSortedMails = mails
+      .map(x => (getDateFromEmail(x), getSenderFromEmail(x), getSubjectFromEmail(x), getMessageBodyFromEmail(x)))
+      .sortBy(x => x._1)
 
-    val listOfSpamFiles = getFilesFromDir(emailsPath)
-
-    val mailBodies = listOfSpamFiles.map(x => getFullEmail(x))
-
-    val mailInformation = mailBodies.map(x => (x, getDateFromEmail(x), getSenderFromEmail(x), getSubjectFromEmail(x), getMessageBodyFromEmail(x)))
-
-	val timeSortedMails = mailInformation.sortBy(x => x._2)
-	val testAndTrainingSplit = timeSortedMails.splitAt(timeSortedMails.length / 2)
-	val trainingData = testAndTrainingSplit._1
-
-	val testingData = testAndTrainingSplit._2
-    }
+    val (trainingData, testingData) = timeSortedMails
+      .splitAt(timeSortedMails.length / 2)
+      
+      }
 
   def getFilesFromDir(path: String): List[File] = {
     val d = new File(path)
     if (d.exists && d.isDirectory) {
       //Remove the mac os basic storage file, and alternatively for unix systems "cmds"
-      d.listFiles.filter(_.isFile).toList.filter(x => !x.toString.contains(".DS_Store") && !x.toString.contains("cmds"))
+      d.listFiles.filter(x => x.isFile && !x.toString.contains(".DS_Store") && !.toString.contains("cmds")).toList
     } else {
       List[File]()
     }
@@ -480,7 +476,10 @@ object RecommendationSystem extends SimpleSwingApplication {
     val endOfSubjectIndex = email.substring(subjectIndex).indexOf('\n') + subjectIndex
 
     //Extract the subject: start of subject + 7 (length of Subject:) until the end of the line.
-    val subject = email.substring(subjectIndex + 8, endOfSubjectIndex).trim.toLowerCase
+    val subject = email
+    .substring(subjectIndex + 8, endOfSubjectIndex)
+    .trim
+    .toLowerCase
 
     //Additionally, we check whether the email was a response and remove the 're: ' tag, to make grouping on topic easier:
     subject.replace("re: ", "")
@@ -490,7 +489,10 @@ object RecommendationSystem extends SimpleSwingApplication {
 
     val firstLineBreak = email.indexOf("\n\n")
     //Return the message body filtered by only text from a-z and to lower case
-    email.substring(firstLineBreak).replace("\n", " ").replaceAll("[^a-zA-Z ]", "").toLowerCase
+    email.substring(firstLineBreak)
+    .replace("\n", " ")
+    .replaceAll("[^a-zA-Z ]", "")
+    .toLowerCase
   }
 
 
@@ -500,26 +502,40 @@ object RecommendationSystem extends SimpleSwingApplication {
     val endOfLine = email.substring(fromLineIndex).indexOf('\n') + fromLineIndex
 
     //Search for the <> tags in this line, as if they are there, the email address is contained inside these tags
-    val mailAddressStartIndex = email.substring(fromLineIndex, endOfLine).indexOf('<') + fromLineIndex + 1
-    val mailAddressEndIndex = email.substring(fromLineIndex, endOfLine).indexOf('>') + fromLineIndex
+    val mailAddressStartIndex = email
+    .substring(fromLineIndex, endOfLine)
+    .indexOf('<') + fromLineIndex + 1
+    val mailAddressEndIndex = email
+    .substring(fromLineIndex, endOfLine)
+    .indexOf('>') + fromLineIndex
 
     if (mailAddressStartIndex > mailAddressEndIndex) {
 
       //The email address was not embedded in <> tags, extract the substring without extra spacing and to lower case
-      var emailString = email.substring(fromLineIndex + 5, endOfLine).trim.toLowerCase
+      var emailString = email
+      .substring(fromLineIndex + 5, endOfLine)
+      .trim
+      .toLowerCase
 
       //Remove a possible name embedded in () at the end of the line, for example in test@test.com (tester) the name would be removed here
       val additionalNameStartIndex = emailString.indexOf('(')
       if (additionalNameStartIndex == -1) {
-        emailString.toLowerCase
+        emailString
+        .toLowerCase
       }
       else {
-        emailString.substring(0, additionalNameStartIndex).trim.toLowerCase
+        emailString
+        .substring(0, additionalNameStartIndex)
+        .trim
+        .toLowerCase
       }
     }
     else {
       //Extract the email address from the tags. If these <> tags are there, there is no () with a name in the From: string in our data
-      email.substring(mailAddressStartIndex, mailAddressEndIndex).trim.toLowerCase
+      email
+      .substring(mailAddressStartIndex, mailAddressEndIndex)
+      .trim
+      .toLowerCase
     }
   }
 
@@ -554,7 +570,12 @@ The first recommendation feature we will make is based on the sender of the emai
 
 
 //First we group the emails by Sender, then we extract only the sender address and amount of emails, and finally we sort them on amounts ascending
-val mailsGroupedBySender = trainingData.groupBy(x => x._3).map(x => (x._1, x._2.length)).toArray.sortBy(x => x._2)
+val mailsGroupedBySender = trainingData
+.groupBy(x => x._3)
+.map(x => (x._1, x._2.length))
+.toArray
+.sortBy(x => x._2)
+
 //In order to plot the data we split the values from the addresses as this is how the plotting library accepts the data.
 val senderDescriptions = mailsGroupedBySender.map(x => x._1)
 val senderValues = mailsGroupedBySender.map(x => x._2.toDouble)
@@ -578,7 +599,12 @@ Here you can see that the most frequent sender sent 45 emails, followed by 37 em
 ```scala
 
 //Code changes:
-val mailsGroupedBySender = trainingData.groupBy(x => x._3).map(x => (x._1, Math.log1p(x._2.length)).toArray.sortBy(x => x._2)
+val mailsGroupedBySender = trainingData
+.groupBy(x => x._3)
+.map(x => (x._1, Math.log1p(x._2.length))
+.toArray
+.sortBy(x => x._2)
+
 barPlot.setAxisLabel(1, "Amount of emails received on log Scale ")
 
 ```
@@ -594,12 +620,19 @@ Let's have a look at the subjects and their occurrence counts:
 
 ```scala
 //Add to 'def top'  
-val mailsGroupedByThread = trainingData.groupBy(x => x._4)
+val mailsGroupedByThread = trainingData
+	.groupBy(x => x._4)
 
 //Create a list of tuples with (subject, list of emails)
-val threadBarPlotData = mailsGroupedByThread.map(x => (x._1, x._2.length)).toArray.sortBy(x => x._2)
-val threadDescriptions = threadBarPlotData.map(x => x._1)
-val threadValues = threadBarPlotData.map(x => x._2.toDouble)
+val threadBarPlotData = mailsGroupedByThread
+	.map(x => (x._1, x._2.length))
+	.toArray
+	.sortBy(x => x._2)
+	
+val threadDescriptions = threadBarPlotData
+	.map(x => x._1)
+val threadValues = threadBarPlotData
+	.map(x => x._2.toDouble)
 
 //Code changes in 'def top'
 val barPlot = BarPlot.plot("Amount of emails per subject", threadValues, threadDescriptions)
@@ -614,7 +647,10 @@ We see a similar distribution as with the senders, so let's apply the `log1p` on
 ```scala
 
 //Code change:
-val threadBarPlotData = mailsGroupedByThread.map(x => (x._1, Math.log1p(x._2.length)).toArray.sortBy(x => x._2)
+val threadBarPlotData = mailsGroupedByThread
+	.map(x => (x._1, Math.log1p(x._2.length))
+	.toArray
+	.sortBy(x => x._2)
 ```
 <img src="./Images/Mail_per_Subject_log_Distribution.png" width="400px" />
 
@@ -623,10 +659,16 @@ Here the value's now range between 0.69 and 3.41, which is a lot better than a r
 ```scala
 
 //Create a list of tuples with (subject, list of emails, time difference between first and last email)
-    val mailGroupsWithMinMaxDates = mailsGroupedByThread.map(x => (x._1, x._2, (x._2.maxBy(x => x._2)._2.getTime - x._2.minBy(x => x._2)._2.getTime) / 1000))
+    val mailGroupsWithMinMaxDates = mailsGroupedByThread
+    .map(x => (x._1, x._2, (x._2
+    							.maxBy(x => x._2)
+    							._2.getTime - x._2    												.minBy(x => x._2)    												._2.getTime
+    						) / 1000))
 
  //turn into a list of tuples with (topic, list of emails, time difference, and weight) filtered that only threads occur
-    val threadGroupsWithWeights = mailGroupsWithMinMaxDates.filter(x => x._3 != 0).map(x => (x._1, x._2, x._3, 10 + Math.log10(x._2.length.toDouble / x._3)))
+    val threadGroupsWithWeights = mailGroupsWithMinMaxDates
+    .filter(x => x._3 != 0)
+    .map(x => (x._1, x._2, x._3, 10 + Math.log10(x._2.length.toDouble / x._3)))
 
 
 ```
@@ -680,73 +722,66 @@ There is one issue with this feature, which are stopwords. Luckily we have a sto
 ```scala
 
 val StopWords = getStopWords
-val threadTermWeights =  threadGroupsWithWeights.toArray.sortBy(x => x._4).flatMap(x => x._1.replaceAll("[^a-zA-Z ]", "").toLowerCase.split(" ").filter(_.nonEmpty).map(y => (y,x._4)))
-val filteredThreadTermWeights = threadTermWeights.groupBy(x => x._1).map(x => (x._1, x._2.maxBy(y => y._2)._2)).toArray.sortBy(x => x._1).filter(x => !StopWords.contains(x._1))
+
+val threadTermWeights =  threadGroupsWithWeights
+	.toArray
+	.sortBy(x => x._4)
+	.flatMap(x => x._1
+			.replaceAll("[^a-zA-Z ]", "")
+			.toLowerCase.split(" ")
+			.filter(_.nonEmpty)
+			.map(y => (y,x._4)))
+			
+val filteredThreadTermWeights = threadTermWeights
+	.groupBy(x => x._1)
+	.map(x => (x._1, x._2.maxBy(y => y._2)._2))
+	.toArray.sortBy(x => x._1)
+	.filter(x => !StopWords.contains(x._1))
 
 ```
 Given this code we now have the terms with weights for the existing email subjects, which we can later use for our recommendation system. 
 
-As final feature we want to incorporate weighting based on the terms that are occurring with a high frequency in all the emails. For this we build up a TDM, but this time the TDM is a bit different as in the former examples, as we only log the frequency of the terms in all documents. Furthermore we defined a log10Frequency method which takes the 10log of the frequency of a given term. This allows us to scale down the term frequencies such that the results do not get affected by possible outlier values.
+As fourth feature we want to incorporate weighting based on the terms that are occurring with a high frequency in all the emails. For this we build up a [TDM](http://en.wikipedia.org/wiki/Document-term_matrix), but this time the TDM is a bit different as in the former examples, as we only log the frequency of the terms in all documents. Furthermore we take the log10 of the occurtence counts. This allows us to scale down the term frequencies such that the results do not get affected by possible outlier values.
 
 ```scala
-class TDM {
 
-  var records : List[TDMRecord] =  List[TDMRecord]()
-
-  def addTermToRecord(term : String)  =
-  {
-    //Find a record for the term
-    val record =   records.find( x => x.term == term)
-    if (record.nonEmpty)
-    {
-      val termRecord =  record.get
-    termRecord.frequencyInAllDocuments +=1
-    }
-    else
-    {
-      //No record yet exists for this term
-      val newRecord  = new TDMRecord(term, 1)
-      records  = newRecord :: records
-    }
-  }
-}
-class TDMRecord(val term : String, var frequencyInAllDocuments :  Int )
-{
-  def log10Frequency : Double  = Math.log10(frequencyInAllDocuments.toDouble)
-}
+val tdm = trainingData
+      .flatMap(x => x._4.split(" "))
+      .filter(x => x.nonEmpty && !stopWords.contains(x))
+      .groupBy(x => x)
+      .map(x => (x._1, Math.log10(x._2.length + 1)))
+      .filter(x => x._2 != 0)
 
 ```
 
-Given this TDM implementation we get the actual weightings for the terms as follows:
-
-```scala
-
-val mailTDM = new TDM()
-//Build up the Term-Document Matrix for the training emails
-trainingData.foreach(x => x._5.split(" ").filter(_.nonEmpty).foreach(y => mailTDM.addTermToRecord(y)))
-//Filter out all stop words
-mailTDM.records = mailTDM.records.filter(x => !StopWords.contains(x.term))
-//Get the term frequencies on the log10 scale and apply a filter on 0 values such that low occurrence words are removed from the word collection.
-val filteredCommonTerms=  mailTDM.records.map(x => (x.term, x.log10Frequency)).filter(x => x._2 != 0).sortBy(x => x._1)
-
-
-```
-
-With this 4th and final feature we can start combining the features to calculate rank values for each email in the training and testing set.
+With this TDM we can compute the feature for new emails as follows:
 
 
 ```scala
 
+val x = getFullEmail(new File("/PathToNewEmail"))
+val mail = (getDateFromEmail(x), getSenderFromEmail(x), getSubjectFromEmail(x), getMessageBodyFromEmail(x)
+
+val termsInMailBody = mail._4
+      .replaceAll("[^a-zA-Z ]", "")
+      .toLowerCase.split(" ")
+      .filter(x => x.nonEmpty && !stopWords.contains(x))
+
+val commonTermsWeight = if (termsInMailBody.size > 0) termsInMailBody
+                                  .map(x => {
+                                              tdm.collectFirst { case (y, z) if y == x => z + 1}
+                                                  .getOrElse(1.0)
+                                            })
+                                  .sum / termsInMailBody.length
+                              else 1.0
 
 ```
 
 
 Given the rank values we can now sort future emails based on rank rather than just on receiving time. This sorting on ranking might not be the most ideal way of sorting, thus we conclude this example with an alternative way to represent these rankings.
 
-```scala
 
-
-```
+TODO: make up my mind how the final bit of this section will be written (rank values vs classification groups)
 
 
 
@@ -1038,13 +1073,13 @@ Note that reducing the dimension from 24 to 1 causes data loss. However, because
 
 Let's start the example
 
-
+TODO: create the final code bits and write the section
 
 
 
 ###using Support Vector Machines
 
-//Todo: write
+TODO: write
 
 
 
@@ -1085,7 +1120,7 @@ With this extra power, comes great responsibility, thus in the working field of 
 
 
 ####Unsupervised Learning
-
+TODO: Introduction on Unsupervised learning
 
 #####Principal Components Analysis (PCA)
 Principal Components Analysis is a technique used in statistics to convert a set of correlated columns into a smaller set of uncorrelated columns, reducing the amount features of a problem.  This smaller set of columns are called the principal components. This technique is mostly used in exploratory data analysis as it reveals internal structure in the data that can not be found with eye-balling the data.
@@ -1102,6 +1137,8 @@ The technique of cross validation is one of the most common techniques in the fi
 
 
 #####(2 fold) Cross Validation
+TODO: explanation of 2fold cross validation
+
 
 #### Regularization
 The basic idea of regularization is preventing [overfitting](#overfitting) your [model](#model) by simplifying it. Suppose your data is a polynomial function of degree 3, but your data has noise and this would cause the model to be of a higher degree. Then the model would perform poorly on new data, where as it seems to be a good model at first. Regularization hels preventing this, by simplifying the model with a certain value *lambda*. However to find the right lambda for a model is hard when you have no idea as to when the model is overfitted or not. This is why [cross validation](#cross-validation) is often used to find the best lambda fitting your model.
