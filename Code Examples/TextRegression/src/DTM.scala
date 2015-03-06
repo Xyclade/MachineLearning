@@ -3,67 +3,53 @@ import scala.collection.mutable
 
 class DTM {
 
-  var records: List[DTMRecord] = List[DTMRecord]()
-  var wordList: List[String] = List[String]()
+  val records: mutable.MutableList[DTMRecord] = mutable.MutableList[DTMRecord]()
+  val wordList: mutable.MutableList[String] = mutable.MutableList[String]()
+  val stopWords = getStopWords
 
   def addDocumentToRecords(documentName: String, rank: Int, documentContent: String) = {
-    //Find a record for the document
-    val record = records.find(x => x.document == documentName)
-    if (record.nonEmpty) {
-      throw new Exception("Document already exists in the records")
-    }
 
-    var wordRecords = mutable.HashMap[String, Int]()
+    val wordRecords = mutable.HashMap[String, Int]()
     val individualWords = documentContent.toLowerCase.split(" ")
     individualWords.foreach { x =>
-      val wordRecord = wordRecords.find(y => y._1 == x)
-      if (wordRecord.nonEmpty) {
-        wordRecords += x -> (wordRecord.get._2 + 1)
-      }
-      else {
-        wordRecords += x -> 1
-        wordList = x :: wordList
+      if (!stopWords.contains(x)) {
+
+        val wordRecord = wordRecords.find(y => y._1 == x)
+        if (wordRecord.nonEmpty) {
+          wordRecords += x -> (wordRecord.get._2 + 1)
+        }
+        else {
+          wordRecords += x -> 1
+          wordList += x
+        }
       }
     }
-    records = new DTMRecord(documentName, rank, wordRecords) :: records
+    records += new DTMRecord(documentName, rank, wordRecords)
   }
 
   def getStopWords: List[String] = {
-    val source = scala.io.Source.fromFile(new File("/Users/../Example Data/stopwords.txt"))("latin1")
+    val source = scala.io.Source.fromFile(new File("/Users/mikedewaard/MachineLearning/Example Data/stopwords.txt"))("latin1")
     val lines = source.mkString.split("\n")
     source.close()
     lines.toList
   }
 
   def getNumericRepresentationForRecords: (Array[Array[Double]], Array[Double]) = {
-    //First filter out all stop words:
-    val StopWords = getStopWords
-    wordList = wordList.filter(x => !StopWords.contains(x))
+    val dtmNumeric = mutable.MutableList[Array[Double]]()
+    val ranks = mutable.MutableList[Double]()
 
-    var dtmNumeric = Array[Array[Double]]()
-    var ranks = Array[Double]()
-
-    records.foreach { x =>
+    records.foreach { record =>
       //Add the rank to the array of ranks
-      ranks = ranks :+ x.rank.toDouble
-
+      ranks += record.rank.toDouble
       //And create an array representing all words and their occurrences for this document:
-      var dtmNumericRecord: Array[Double] = Array()
-      wordList.foreach { y =>
+      val dtmNumericRecord = wordList
+        .map(word =>  record.occurrences
+        .collectFirst{ case (`word`,amount) => amount.toDouble}
+        .getOrElse(0.0)).toArray
 
-        val termRecord = x.occurrences.find(z => z._1 == y)
-        if (termRecord.nonEmpty) {
-          dtmNumericRecord = dtmNumericRecord :+ termRecord.get._2.toDouble
-        }
-        else {
-          dtmNumericRecord = dtmNumericRecord :+ 0.0
-        }
-      }
-      dtmNumeric = dtmNumeric :+ dtmNumericRecord
-
+        dtmNumeric += dtmNumericRecord
     }
-
-    (dtmNumeric, ranks)
+    (dtmNumeric.toArray, ranks.toArray)
   }
 }
 

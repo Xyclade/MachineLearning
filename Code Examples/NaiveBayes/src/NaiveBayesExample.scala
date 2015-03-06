@@ -6,7 +6,7 @@ object NaiveBayesExample {
 
 
   def main(args: Array[String]): Unit = {
-    val basePath = "/Users/../data"
+    val basePath = "/Users/mikedewaard/ML_for_Hackers/03-Classification/data"
     val spamPath = basePath + "/spam"
     val spam2Path = basePath + "/spam_2"
     val easyHamPath = basePath + "/easy_ham"
@@ -15,47 +15,45 @@ object NaiveBayesExample {
     val hardHam2Path = basePath + "/hard_ham_2"
 
     val amountOfSamplesPerSet = 500
-
     val amountOfFeaturesToTake = 400
 
     //First get a subset of the file names for the spam sample set (500 is the complete set in this case)
     val listOfSpamFiles = getFilesFromDir(spamPath).take(amountOfSamplesPerSet)
     //Then get the messages that are contained in these files
-    val spamMails = listOfSpamFiles.map { x => (x, getMessage(x))}
-    //Then its time for feature selection, but in order to pick good features we have to gain more insight
-    val spamTDM = new TDM()
-    //Build up the Term-Document Matrix for spam emails
-    spamMails.foreach(x => x._2.split(" ").filter(_.nonEmpty).foreach(y => spamTDM.addTermToRecord(y, x._1.getName)))
-    //Sort the spam by total frequency for ease
-    spamTDM.SortByOccurrenceRate(spamMails.size)
-    // println("SPAM with stop words")
-    // spamTDM.records.take(50).foreach({x => for (i <- 0 to (x.occurrenceRate(500) * 100).toInt) {print(x.term +" " )}; println()});
-    //Get the stop words
-    val StopWords = getStopWords
+    val spamMails = listOfSpamFiles.map(x => (x, getMessage(x)))
 
-    //Filter out all stop words
-    spamTDM.records = spamTDM.records.filter(x => !StopWords.contains(x.term))
-    //  println("SPAM without stop words")
-    //  spamTDM.records.take(50).foreach({x => for (i <- 0 to (x.occurrenceRate(500) * 100).toInt) {print(x.term +" " )}; println()});
-    //Take a subset of all non-stop words found in the spam mail, where they are sorted on highest frequency first
-    val spamFeatures = spamTDM.records.take(amountOfFeaturesToTake).map(x => x.term)
+    val stopWords = getStopWords
+    val spamTDM  = spamMails
+      .flatMap(email => email
+        ._2.split(" ")
+          .filter(word => word.nonEmpty && !stopWords.contains(word))
+            .map(word => (email._1.getName,word)))
+              .groupBy(x => x._2)
+                .map(x => (x._1, x._2.groupBy(x => x._1)))
+                  .map(x => (x._1, x._2.map( y => (y._1, y._2.length)))).toList
 
-
+    //Sort the words by occurrence rate  descending (amount of times the word occurs among all documents)
+    val sortedSpamTDM = spamTDM.sortBy(x =>  - (x._2.size.toDouble / spamMails.length))
+    val spamFeatures = sortedSpamTDM.take(amountOfFeaturesToTake).map(x => x._1)
 
     //Get a subset of the file names from the ham sample set (note that in this case it is not necessary to randomly sample as the emails are already randomly ordered)
     val listOfHamFiles = getFilesFromDir(easyHamPath).take(amountOfSamplesPerSet)
+
     //Get the messages that are contained in the ham files
-    val hamMails = listOfHamFiles.map { x => (x, getMessage(x))}
-    //Then its time for feature selection specifically for the Ham messages, but in order to pick good features we have to gain more insight
-    val hamTDM = new TDM()
-    //Build up the Term-Document Matrix for ham emails
-    hamMails.foreach(x => x._2.split(" ").filter(_.nonEmpty).foreach(y => hamTDM.addTermToRecord(y, x._1.getName)))
-    //Sort the ham by total frequency for ease
-    hamTDM.SortByOccurrenceRate(hamMails.size)
-    //Filter out all stop words
-    hamTDM.records = hamTDM.records.filter(x => !StopWords.contains(x.term))
-    //Take a subset of all non-stop words found in the ham mail, where they are sorted on highest frequency first
-    val hamFeatures = hamTDM.records.take(amountOfFeaturesToTake).map(x => x.term)
+    val hamMails = listOfHamFiles.map(x => (x, getMessage(x)))
+    //Then its time for feature selection specifically for the Ham messages
+    val hamTDM  = hamMails
+      .flatMap(email => email
+      ._2.split(" ")
+      .filter(word => word.nonEmpty && !stopWords.contains(word))
+      .map(word => (email._1.getName,word)))
+      .groupBy(x => x._2)
+      .map(x => (x._1, x._2.groupBy(x => x._1)))
+      .map(x => (x._1, x._2.map( y => (y._1, y._2.length)))).toList
+
+    //Sort the words by occurrence rate  descending (amount of times the word occurs among all documents)
+    val sortedHamTDM = hamTDM.sortBy(x =>  - (x._2.size.toDouble / spamMails.length))
+    val hamFeatures = sortedHamTDM.take(amountOfFeaturesToTake).map(x => x._1)
 
     //Now we have a set of ham and spam features, we group them and then remove the intersecting features, as these are noise.
     var data = (hamFeatures ++ spamFeatures).toSet
@@ -63,30 +61,28 @@ object NaiveBayesExample {
 
 
     //Initialize a bag of words that takes the top x features from both spam and ham and combines them
-    var bag = new Bag[String](data.toArray)
+    val bag = new Bag[String](data.toArray)
 
     //Initialize the classifier array with first a set of 0(spam) and then a set of 1(ham) values that represent the emails
-    var classifiers = Array.fill[Int](amountOfSamplesPerSet)(0) ++ Array.fill[Int](amountOfSamplesPerSet)(1)
+    val classifiers = Array.fill[Int](amountOfSamplesPerSet)(0) ++ Array.fill[Int](amountOfSamplesPerSet)(1)
 
     //Get the trainingData in the right format for the spam mails
-    var spamData = spamMails.map(x => bag.feature(x._2.split(" "))).toArray
+    val spamData = spamMails.map(x => bag.feature(x._2.split(" "))).toArray
 
     //Get the trainingData in the right format for the ham mails
-    var hamData = hamMails.map(x => bag.feature(x._2.split(" "))).toArray
+    val hamData = hamMails.map(x => bag.feature(x._2.split(" "))).toArray
 
     //Combine the training data from both categories
-    var trainingData = spamData ++ hamData
+    val trainingData = spamData ++ hamData
 
     //Create the bayes model as a multinomial with 2 classification groups and the amount of features passed in the constructor.
-    var bayes = new NaiveBayes(NaiveBayes.Model.MULTINOMIAL, 2, data.size)
+    val bayes = new NaiveBayes(NaiveBayes.Model.MULTINOMIAL, 2, data.size)
     //Now train the bayes instance with the training data, which is represented in a specific format due to the bag.feature method, and the known classifiers.
     bayes.learn(trainingData, classifiers)
 
 
 
     //Now we are ready for evaluation, for this we will use the testing sets:
-
-
     val listOfSpam2Files = getFilesFromDir(easyHam2Path)
     //Then get the messages that are contained in these files
     val spam2Mails = listOfSpam2Files.map { x => (x, getMessage(x))}
@@ -112,14 +108,14 @@ object NaiveBayesExample {
     val d = new File(path)
     if (d.exists && d.isDirectory) {
       //Remove the mac os basic storage file, and alternatively for unix systems "cmds"
-      d.listFiles.filter(_.isFile).toList.filter(x => !x.toString.contains(".DS_Store") && !x.toString.contains("cmds"))
+      d.listFiles.filter(x => x.isFile && !x.toString.contains(".DS_Store") && !x.toString.contains("cmds")).toList
     } else {
       List[File]()
     }
   }
 
   def getStopWords: List[String] = {
-    val source = scala.io.Source.fromFile(new File("/Users/../Example Data/stopwords.txt"))("latin1")
+    val source = scala.io.Source.fromFile(new File("/Users/mikedewaard/MachineLearning/Example Data/stopwords.txt"))("latin1")
     val lines = source.mkString.split("\n")
     source.close()
     lines.toList

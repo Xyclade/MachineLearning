@@ -21,31 +21,44 @@ object KNNExample extends SimpleSwingApplication {
     val validationRounds = 2
 
     val cv = new CrossValidation(testData._2.length, validationRounds)
-    //Then for each round
-    for (i <- 0 until validationRounds) {
 
-      //Generate a subset of data points and their classifiers for Training
-      val dpForTraining = testData._1.zipWithIndex.filter(x => cv.test(i).toList.contains(x._2)).map(y => y._1)
-      val classifiersForTraining = testData._2.zipWithIndex.filter(x => cv.test(i).toList.contains(x._2)).map(y => y._1)
+    val testDataWithIndices = (testData._1.zipWithIndex, testData._2.zipWithIndex)
 
-      //And the corresponding subset of data points and their classifiers for testing
-      val dpForTesting = testData._1.zipWithIndex.filter(x => !cv.test(i).contains(x._2)).map(y => y._1)
-      val classifiersForTesting = testData._2.zipWithIndex.filter(x => !cv.test(i).contains(x._2)).map(y => y._1)
+    val trainingDPSets = cv.train
+      .map(indexList => indexList
+      .map(index => testDataWithIndices
+      ._1.collectFirst { case (dp, `index`) => dp}.get))
 
-      //Then generate a Model with KNN with K = 3
-      val knn = KNN.learn(dpForTraining, classifiersForTraining, 3)
+    val trainingClassifierSets = cv.train
+      .map(indexList => indexList
+      .map(index => testDataWithIndices
+      ._2.collectFirst { case (dp, `index`) => dp}.get))
+
+    val testingDPSets = cv.test
+      .map(indexList => indexList
+      .map(index => testDataWithIndices
+      ._1.collectFirst { case (dp, `index`) => dp}.get))
+
+    val testingClassifierSets = cv.test
+      .map(indexList => indexList
+      .map(index => testDataWithIndices
+      ._2.collectFirst { case (dp, `index`) => dp}.get))
+
+
+    val validationRoundRecords = trainingDPSets
+      .zipWithIndex.map(x => (x._1, trainingClassifierSets(x._2), testingDPSets(x._2), testingClassifierSets(x._2)))
+
+    validationRoundRecords.foreach { record =>
+
+      val knn = KNN.learn(record._1, record._2, 3)
 
       //And for each test data point make a prediction with the model
-      val predictions = dpForTesting.map(x => knn.predict(x))
+      val predictions = record._3.map(x => knn.predict(x)).zipWithIndex
 
       //Finally evaluate the predictions as correct or incorrect and count the amount of wrongly classified data points.
-      var error = 0.0
-      for (j <- 0 until predictions.length) {
-        if (predictions(j) != classifiersForTesting(j)) {
-          error += 1
-        }
-      }
-      println("false prediction rate: " + error / predictions.length * 100 + "%")
+      val error = predictions.map(x => if (x._1 != record._4(x._2)) 1 else 0).sum
+
+      println("False prediction rate: " + error / predictions.length * 100 + "%")
 
 
       val unknownDataPoint = Array(5.3, 4.3)
@@ -61,7 +74,6 @@ object KNNExample extends SimpleSwingApplication {
         println("Unexpected prediction")
       }
     }
-
   }
 
 

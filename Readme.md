@@ -96,33 +96,45 @@ For this example we do [2-fold Cross Validation](http://en.wikipedia.org/wiki/Cr
     val testData = GetDataFromCSV(new File(basePath))
 
     //Define the amount of rounds, in our case 2 and initialise the cross validation
-    val validationRounds = 2;
     val cv = new CrossValidation(testData._2.length, validationRounds)
-    //Then for each round
-    for (i <- 0 to validationRounds - 1) {
 
-      //Generate a subset of data points and their classifiers for Training
-      val dpForTraining = testData._1.zipWithIndex.filter(x => cv.test(i).toList.contains(x._2)).map(y => y._1)
-      val classifiersForTraining = testData._2.zipWithIndex.filter(x => cv.test(i).toList.contains(x._2)).map(y => y._1)
+    val testDataWithIndices = (testData._1.zipWithIndex, testData._2.zipWithIndex)
 
-      //And the corresponding subset of datapoints and their classifiers for testing
-      val dpForTesting = testData._1.zipWithIndex.filter(x => !cv.test(i).contains(x._2)).map(y => y._1)
-      val classifiersForTesting = testData._2.zipWithIndex.filter(x => !cv.test(i).contains(x._2)).map(y => y._1)
+    val trainingDPSets = cv.train
+      .map(indexList => indexList
+      .map(index => testDataWithIndices
+      ._1.collectFirst { case (dp, `index`) => dp}.get))
 
-      //Then generate a Model with KNN with K = 3 
-      val knn = KNN.learn(dpForTraining, classifiersForTraining, 3)
+    val trainingClassifierSets = cv.train
+      .map(indexList => indexList
+      .map(index => testDataWithIndices
+      ._2.collectFirst { case (dp, `index`) => dp}.get))
+
+    val testingDPSets = cv.test
+      .map(indexList => indexList
+      .map(index => testDataWithIndices
+      ._1.collectFirst { case (dp, `index`) => dp}.get))
+
+    val testingClassifierSets = cv.test
+      .map(indexList => indexList
+      .map(index => testDataWithIndices
+      ._2.collectFirst { case (dp, `index`) => dp}.get))
+
+
+    val validationRoundRecords = trainingDPSets
+      .zipWithIndex.map(x => (x._1, trainingClassifierSets(x._2), testingDPSets(x._2), testingClassifierSets(x._2)))
+
+    validationRoundRecords.foreach { record =>
+
+      val knn = KNN.learn(record._1, record._2, 3)
 
       //And for each test data point make a prediction with the model
-      val predictions = dpForTesting.map(x => knn.predict(x))
+      val predictions = record._3.map(x => knn.predict(x)).zipWithIndex
 
       //Finally evaluate the predictions as correct or incorrect and count the amount of wrongly classified data points.
-      var error = 0.0;
-      for (j <- 0 to predictions.length - 1) {
-        if (predictions(j) != classifiersForTesting(j)) {
-          error += 1
-        }
-      }
-      println("false prediction rate: " +  error / predictions.length * 100 + "%")
+      val error = predictions.map(x => if (x._1 != record._4(x._2)) 1 else 0).sum
+
+      println("False prediction rate: " + error / predictions.length * 100 + "%")
     }
   }
   ```
@@ -192,7 +204,7 @@ Now we need a method that gets all the filenames for the emails, from the exampl
     val d = new File(path)
     if (d.exists && d.isDirectory) {
       //Remove the mac os basic storage file, and alternatively for unix systems "cmds"
-      d.listFiles.filter(_.isFile).toList.filter(x => ! x.toString.contains(".DS_Store") && ! x.toString.contains("cmds"))
+      d.listFiles.filter(  x => x.isFile &&  !x.toString.contains(".DS_Store") && ! x.toString.contains("cmds")).toList
     } 
     else {
       List[File]()
@@ -218,7 +230,7 @@ And finally lets define a set of paths that make it easier to load the different
     //First get a subset of the filenames for the spam sample set (500 is the complete set in this case)
     val listOfSpamFiles =   getFilesFromDir(spamPath).take(amountOfSamplesPerSet)
     //Then get the messages that are contained in these files
-    val spamMails = listOfSpamFiles.map{x => (x,getMessage(x)) }
+  	val spamMails = listOfSpamFiles.map(x => (x, getMessage(x)))
     
      //Get a subset of the filenames from the ham sampleset (note that in this case it is not necessary to randomly sample as the emails are already randomly ordered)
   	val listOfHamFiles =   getFilesFromDir(easyHamPath).take(amountOfSamplesPerSet)
@@ -230,67 +242,33 @@ And finally lets define a set of paths that make it easier to load the different
 ```
 
 
-Now that we have the training data for both the ham and the spam email, we can start building 2 [TDM's](http://en.wikipedia.org/wiki/Document-term_matrix). But before we show you the code for this, lets first explain shortly why we actually need this. The TDM will contain **ALL** words which are contained in the bodies of the training set, including frequency rate. However, since frequency might not be the best measure (as 1 email which contains 1.000.000 times the word 'pie' would mess up the complete table) we will also compute the **occurrence rate**. By this we mean, the amount of documents that contain that specific term. So lets start off with implementing the TDM.
+Now that we have the training data for both the ham and the spam email, we can start building 2 [TDM's](http://en.wikipedia.org/wiki/Document-term_matrix). But before we show you the code for this, lets first explain shortly why we actually need this. The TDM will contain **ALL** words which are contained in the bodies of the training set, including frequency rate. However, since frequency might not be the best measure (as 1 email which contains 1.000.000 times the word 'pie' would mess up the complete table) we will also compute the **occurrence rate**. By this we mean, the amount of documents that contain that specific term. So lets start off with generating the two TDM's.
 
 
 ```scala
 
-class TDM {
+ val spamTDM  = spamMails
+      .flatMap(email => email
+        ._2.split(" ")
+          .filter(word => word.nonEmpty)
+            .map(word => (email._1.getName,word)))
+              .groupBy(x => x._2)
+                .map(x => (x._1, x._2.groupBy(x => x._1)))
+                  .map(x => (x._1, x._2.map( y => (y._1, y._2.length)))).toList
 
-  var records : List[TDMRecord] =  List[TDMRecord]()
+    //Sort the words by occurrence rate  descending (amount of times the word occurs among all documents)
+    val sortedSpamTDM = spamTDM.sortBy(x =>  - (x._2.size.toDouble / spamMails.length))
+  val hamTDM  = hamMails
+      .flatMap(email => email
+      ._2.split(" ")
+      .filter(word => word.nonEmpty)
+      .map(word => (email._1.getName,word)))
+      .groupBy(x => x._2)
+      .map(x => (x._1, x._2.groupBy(x => x._1)))
+      .map(x => (x._1, x._2.map( y => (y._1, y._2.length)))).toList
 
-  def addTermToRecord(term : String, documentName : String)  =
-    {
-      //Find a record for the term
-      val record =   records.find( x => x.term == term)
-      if (record.nonEmpty)
-      {
-        val termRecord =  record.get
-        val documentRecord = termRecord.occurrences.find(x => x._1 == documentName)
-        if (documentRecord.nonEmpty)
-        {
-           termRecord.occurrences +=  documentName -> (documentRecord.get._2 + 1)
-        }
-        else
-        {
-          termRecord.occurrences +=  documentName ->  1
-        }
-      }
-      else
-      {
-        //No record yet exists for this term
-        val newRecord  = new TDMRecord(term, mutable.HashMap[String,Int](documentName ->  1))
-        records  = newRecord :: records
-      }
-    }
-  def SortByTotalFrequency = records = records.sortBy( x => -x.totalFrequency)
-  def SortByOccurrenceRate(rate : Int) = records = records.sortBy( x => -x.occurrenceRate(rate))
-}
-
-class TDMRecord(val term : String, var occurrences :  mutable.HashMap[String,Int] )
-{
-  def totalFrequency = occurrences.map(y => y._2).fold(0){ (z, i) => z + i}
-  def occurrenceRate(totalDocuments : Int) : Double  = occurrences.size.toDouble / totalDocuments
-  def densityRate(totalTerms : Int) : Double  = totalFrequency.toDouble / totalTerms;
-}
-```
-
-As you can see there are two sort methods: ```SortByTotalFrequency``` and ```SortByOccurenceRate```. In the latter one you need to pass the rate, which represents the total amount of documents that are contained in the TDM. This is done for performance reasons, since the TDM does not keep track of the amount of documents that was used to build up this TDM. Given this implementation, we can now actually make the two tables, one for spam and one for ham. We will add this code to the main class.
-
-```scala
-
-val spamTDM = new TDM();
-//Build up the Term-Document Matrix for spam emails
-spamMails.foreach(x => x._2.split(" ").filter(_.nonEmpty).foreach(y => spamTDM.addTermToRecord(y,x._1.getName))
-//Sort the spam by the occurrence rate to gain more insight
-spamTDM.SortByOccurrenceRate(hamMails.size)
- 
-val hamTDM = new TDM();
-//Build up the Term-Document Matrix for ham emails
-hamMails.foreach(x => x._2.split(" ").filter(_.nonEmpty).foreach(y => hamTDM.addTermToRecord(y,x._1.getName)))
-//Sort the ham by the occurrence rate to gain more insight
-hamTDM.SortByOccurrenceRate(spamMails.size)
-
+    //Sort the words by occurrence rate  descending (amount of times the word occurs among all documents)
+    val sortedHamTDM = hamTDM.sortBy(x =>  - (x._2.size.toDouble / spamMails.length))
 
 ```
 
@@ -311,12 +289,30 @@ As you can see, mostly stop words come forward. These stopwords are noise, which
  
 ```
 
-Now we can expand the main body with removing the stopwords from the Tables
+Now we can expand the TDM generation code with removing the stopwords from the intermediate results:
 
 ```scala
-//Filter out all stopwords
-hamTDM.records = hamTDM.records.filter(x => !StopWords.contains(x.term));
-spamTDM.records = spamTDM.records.filter(x => !StopWords.contains(x.term));
+
+val stopWords = getStopWords
+
+val spamTDM  = spamMails
+      .flatMap(email => email
+        ._2.split(" ")
+          .filter(word => word.nonEmpty && !stopWords.contains(word))
+            .map(word => (email._1.getName,word)))
+              .groupBy(x => x._2)
+                .map(x => (x._1, x._2.groupBy(x => x._1)))
+                  .map(x => (x._1, x._2.map( y => (y._1, y._2.length)))).toList
+
+
+ val hamTDM  = hamMails
+      .flatMap(email => email
+      ._2.split(" ")
+      .filter(word => word.nonEmpty && !stopWords.contains(word))
+      .map(word => (email._1.getName,word)))
+      .groupBy(x => x._2)
+      .map(x => (x._1, x._2.groupBy(x => x._1)))
+      .map(x => (x._1, x._2.map( y => (y._1, y._2.length)))).toList
 
 ```
 
@@ -413,14 +409,13 @@ Here we see that indeed, when you use only 50 features, the amount of ham that g
 We could work through the hard ham, but since the building bricks are already here, we leave this to the reader. 
 
 ###Ranking emails based on their content (Recommendation system)
-This example will be completely about building your own recommendation system. We will use a subset of the email data which we used in the example [Classifying Email as Spam or Ham](#Classifying-Email-as-Spam-or-Ham-(Naive-Bayes)). This subset can be downloaded [here](https://github.com/Xyclade/MachineLearning/raw/Master/Example%20Data/Recommendation_Example_1.zip). Note that this is a set of received emails, thus we lack 1 half of the data, namely the outgoing emails of this mailbox. However even without this information we can do some pretty accurate rankings as we will see later on.
+This example will be completely about building your own recommendation system. We will use a subset of the email data which we used in the example [Classifying Email as Spam or Ham](#Classifying-Email-as-Spam-or-Ham-(Naive-Bayes)). This subset can be downloaded [here](https://github.com/Xyclade/MachineLearning/raw/Master/Example%20Data/Recommendation_Example_1.zip). Note that this is a set of received emails, thus we lack 1 half of the data, namely the outgoing emails of this mailbox. However even without this information we can do some pretty neat ranking as we will see later on.
 
 For this example, as usual we expect you to have created a new Scala project in your favourite IDE, and downloaded and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library and its dependency [SwingX](https://java.net/downloads/swingx/releases/) to this project.
 
 The first thing to do is to determine what features we will base our ranking on. When building your own recommendation system this is one of the hardest parts. Coming up with good features is not trivial, and when you finally selected features the data might not be directly usable for these features. 
 
-This is why we will go into detail a bit more on how we select the features and prepare the data. However before we can get to this step, its time to extract as much data as we can from our email set. Since the data is a bit tedious in it's format we provide the code to do this. The inline comments explain why things are done the way they are. Note that the application is a swing application with a GUI from the start. We do this because we will need to plot data later on using the SMILE plotting library. Also note that we directly made a split in testing and training data such that we can later on test our model.
-
+This is why we will go into detail a bit more on how we select the features and prepare the data. However before we can get to this step, its time to extract as much data as we can from our email set. Since the data is a bit tedious in it's format we provide the code to do this. The inline comments explain why things are done the way they are. Note that the application is a swing application with a GUI from the start. We do this because we will need to plot data in order to gain insight later on. Also note that we directly made a split in testing and training data such that we can later on test our model.
 
 
 ```scala
@@ -431,7 +426,7 @@ object RecommendationSystem extends SimpleSwingApplication {
   def top = new MainFrame {
     title = "Recommendation System Example"
 
-    val emailsPath = "/Users/.../PathToZip"
+    val emailsPath = "/Users/.../PathtoExtractedZipFolder"
 
 
     val listOfSpamFiles = getFilesFromDir(emailsPath)
@@ -537,7 +532,7 @@ object RecommendationSystem extends SimpleSwingApplication {
 
 ```
 
-This pre-processing of the data is very common and can be a real pain when your data is not standardized such as with the dates and senders of these emails. However given this chunk of code we now have available the following properties of our example data:(full email, receiving date, sender, subject, body). This allows us to continue working on the actual features to use in the recommendation system. 
+This pre-processing of the data is very common and can be a real pain when your data is not standardised such as with the dates and senders of these emails. However given this chunk of code we now have available the following properties of our example data:(full email, receiving date, sender, subject, body). This allows us to continue working on the actual features to use in the recommendation system. 
 
 The first recommendation feature we will make is based on the sender of the email. Those whom you receive more emails from should be ranked higher than ones you get less email from. This is a strong assumption, but instinctively you will probably agree, given the fact that spam is left out. Let's look at the distribution of senders over the complete email set.
 
@@ -547,7 +542,10 @@ The first recommendation feature we will make is based on the sender of the emai
 //Add to the top body:
 
 
+
+//First we group the emails by Sender, then we extract only the sender address and amount of emails, and finally we sort them on amounts ascending
 val mailsGroupedBySender = trainingData.groupBy(x => x._3).map(x => (x._1, x._2.length)).toArray.sortBy(x => x._2)
+//In order to plot the data we split the values from the addresses as this is how the plotting library accepts the data.
 val senderDescriptions = mailsGroupedBySender.map(x => x._1)
 val senderValues = mailsGroupedBySender.map(x => x._2.toDouble)
 
@@ -565,7 +563,7 @@ bounds = new Rectangle(800, 600)
 
 <img src="./Images/Mail_per_Sender_Distribution.png" width="400px" /> 
 
-Here you can see that the most frequent sender sent 45 emails, followed by 37 emails and then it goes down rapidly. Due to these huge outliers, directly using this data would result in the highest 1 or 2 senders to be rated as very important where as the rest would not be considered in the recommendation system. In order to prevent this behavior we will re-scale the data  by taking ```log1p```. The addition of 1 is to prevent trouble when taking the log value for senders who sent only 1 email. After taking the log the data looks like this.
+Here you can see that the most frequent sender sent 45 emails, followed by 37 emails and then it goes down rapidly. Due to these huge outliers, directly using this data would result in the highest 1 or 2 senders to be rated as very important where as the rest would not be considered in the recommendation system. In order to prevent this behaviour we will re-scale the data  by taking ```log1p```. The addition of 1 is to prevent trouble when taking the log value for senders who sent only 1 email. After taking the log the data looks like this.
 
 ```scala
 
@@ -578,13 +576,9 @@ barPlot.setAxisLabel(1, "Amount of emails received on log Scale ")
 <img src="./Images/Mail_per_Sender_log_Distribution.png" width="400px" />
 
 Effectively the data is still the same, however it is represented on a different scale.
-Notice here that the numeric values now range between 0.69 and 3.83. This range is much smaller, causing the outliers to not skew away the rest of the data. This data manipulation trick is very common in the field of machine learning. Finding the right scale requires some insight, so using the plotting library of smile to make several plots on different scales and looking at the data can help a lot when doing this.
+Notice here that the numeric values now range between 0.69 and 3.83. This range is much smaller, causing the outliers to not skew away the rest of the data. This data manipulation trick is very common in the field of machine learning. Finding the right scale requires some insight. This is why using the plotting library of SMILE to make several plots on different scales can help a lot when performing this rescaling.
 
-
-
-
-The next feature we will work on is the frequency and timeframe in which subjects occur. If a subject occurs more it is likely to be more important. Additionally we take into account the timespan of the thread. So the frequency of a subject will be normalised with the timespan of the emails of this subject. This makes highly active email threads come up on top. Again this is an assumption we make on which emails should be ranked higher.
-
+The next feature we will work on is the frequency and timeframe in which subjects occur. If a subject occurs more it is likely to be of higher importance. Additionally we take into account the timespan of the thread. So the frequency of a subject will be normalised with the timespan of the emails of this subject. This makes highly active email threads come up on top. Again this is an assumption we make on which emails should be ranked higher.
  
 Let's have a look at the subjects and their occurrence counts:
 
@@ -631,8 +625,7 @@ Note how we determine the difference between the min and the max, and divide it 
 
 <img src="./Images/Weighted_Subject_Distribution.png" width="400px" />
 
-Since we can't really see if this manipulation did the trick based on a plot we will look into the top 10 weights versus the bottom 10 weights.
-
+We see our values ranging roughly between (4.4 and 8.6) which shows that outliers do not largely influence the feature anymore. Additionally we will look at the top 10 vs bottom 10 weights to get some more insight in what happened.
 
 **Top 10 weights:**
 
@@ -669,7 +662,7 @@ Since we can't really see if this manipulation did the trick based on a plot we 
 As you can see the highest weights are given to emails which almost instantly got a follow up email response, where as the lowest weights are given to emails with very long timeframes. This allows for emails with a very low frequency to still be rated as very important based on the timeframe in which they were sent.
 
 
-Let's continue with another feature, as we want to base our ranking on as much features as possible. This next feature will be based on the weight ranking that we just computed. The idea is that new emails with different subjects will arrive. However, chances are that they contain keywords that are similar to earlier received important subjects. This will allow us to rank emails as important before a thread (multiple messages with the same subject) was started. For that we specify the weight of the keywords to be the weight of the subject in which the term occurred. If this term occurred in multiple threads, we take the highest weight as the leading one.
+Let's continue with the next feature, as we want to base our ranking on as much features as possible. This next feature will be based on the weight ranking that we just computed. The idea is that new emails with different subjects will arrive. However, chances are that they contain keywords that are similar to earlier received important subjects. This will allow us to rank emails as important before a thread (multiple messages with the same subject) was started. For that we specify the weight of the keywords to be the weight of the subject in which the term occurred. If this term occurred in multiple threads, we take the highest weight as the leading one.
 
 There is one issue with this feature, which are stopwords. Luckily we have a stopwords file that allows us to remove (most) english stopwords for now. However, when designing your own system you should take into account that multiple languages can occur, thus you should remove stopwords for all languages that can occur in the system. The code for this feature is as follows:
 
@@ -677,13 +670,13 @@ There is one issue with this feature, which are stopwords. Luckily we have a sto
 ```scala
 
 val StopWords = getStopWords
-val termWeights =  threadGroupsWithWeights.toArray.sortBy(x => x._4).flatMap(x => x._1.replaceAll("[^a-zA-Z ]", "").toLowerCase.split(" ").filter(_.nonEmpty).map(y => (y,x._4)))
-val filteredTermWeights = termWeights.groupBy(x => x._1).map(x => (x._1, x._2.maxBy(y => y._2)._2)).toArray.sortBy(x => x._1).filter(x => !StopWords.contains(x._1))
+val threadTermWeights =  threadGroupsWithWeights.toArray.sortBy(x => x._4).flatMap(x => x._1.replaceAll("[^a-zA-Z ]", "").toLowerCase.split(" ").filter(_.nonEmpty).map(y => (y,x._4)))
+val filteredThreadTermWeights = threadTermWeights.groupBy(x => x._1).map(x => (x._1, x._2.maxBy(y => y._2)._2)).toArray.sortBy(x => x._1).filter(x => !StopWords.contains(x._1))
 
 ```
 Given this code we now have the terms with weights for the existing email subjects, which we can later use for our recommendation system. 
 
-As final feature we want to incorporate weighting based on the terms that are occurring with a high frequency in all the emails. For this we build up a TDM, but again a bit different as in the former example.
+As final feature we want to incorporate weighting based on the terms that are occurring with a high frequency in all the emails. For this we build up a TDM, but this time the TDM is a bit different as in the former examples, as we only log the frequency of the terms in all documents. Furthermore we defined a log10Frequency method which takes the 10log of the frequency of a given term. This allows us to scale down the term frequencies such that the results do not get affected by possible outlier values.
 
 ```scala
 class TDM {
@@ -723,17 +716,22 @@ val mailTDM = new TDM()
 trainingData.foreach(x => x._5.split(" ").filter(_.nonEmpty).foreach(y => mailTDM.addTermToRecord(y)))
 //Filter out all stop words
 mailTDM.records = mailTDM.records.filter(x => !StopWords.contains(x.term))
-//Filter out the stopwords and get their frequency with a log filter, such that low occurrence words are removed.
+//Get the term frequencies on the log10 scale and apply a filter on 0 values such that low occurrence words are removed from the word collection.
 val filteredCommonTerms=  mailTDM.records.map(x => (x.term, x.log10Frequency)).filter(x => x._2 != 0).sortBy(x => x._1)
 
 
 ```
 
-Note that this feature selection is a very important process and can't be generalised easily. In other words, you should do this feature selection and extraction specifically for your own data and project, while taking into account scaling, stopwords, your data's outliers  and possible future data. 
+With this 4th and final feature we can start combining the features to calculate rank values for each email in the training and testing set.
 
 
+```scala
 
-With this 4th and final feature we can start combining the features to calculate rank values for each email in the training and testing set, and to start actually predicting whether emails have a priority or not:
+
+```
+
+
+Given the rank values we can now sort future emails based on rank rather than just on receiving time. This sorting on ranking might not be the most ideal way of sorting, thus we conclude this example with an alternative way to represent these rankings.
 
 ```scala
 
