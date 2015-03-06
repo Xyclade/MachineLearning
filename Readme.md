@@ -18,11 +18,11 @@ In this section we present you a set of machine learning algorithms in a practic
 The following examples are available:
 
 
-* [Labeling ISP's based on their down/upload speed (KNN)](#Labeling-ISPs-based-on-their-Down/Upload-speed-(KNN-using-Smile-in-Scala))
+* [Labeling ISP's based on their down/upload speed (KNN)](#Labeling-ISPs-based-on-their-DownUpload-speed-KNN-using-Smile-in-Scala)
 * [Classifying email as Spam or Ham](#Classifying-Email-as-Spam-or-Ham-(Naive-Bayes))
-* [Ranking emails based on their content (Recommendation system)](#Ranking-emails-based-on-their-content-(Recommendation-system))
-* [Predicting weight based on height (Linear Regression OLS)](#Predicting-weight-based-on-height-(using-Ordinary-Least-Squares))
-*[Using unsupervised learning to create a market index (PCA)](#Using unsupervised-learning-to-create-a-market-index-(PCA))]
+* [Ranking emails based on their content (Recommendation system)](#Ranking-emails-based-on-their-content-Recommendation-system)
+* [Predicting weight based on height (Linear Regression OLS)](#Predicting-weight-based-on-height-using-Ordinary-Least-Squares)
+*[Using unsupervised learning to create a market index (PCA)](#Using-unsupervised-learning-to-create-a-market-index-PCA)]
 
 ###Labeling ISPs based on their Down/Upload speed (KNN using Smile in Scala)
 
@@ -96,7 +96,7 @@ Given this choice to use KNN to be a good one, lets continue with the actual Mac
 
 The drawback is that there is no golden rule for finding the correct K. However finding a K that allows for most datapoints to be classified correctly can be done by looking at the data. Additionally The K should be picked carefully to prevent undecidability by the algorithm. Say for example ```K=2```, and the problem has 2 labels, then when a point is between both labels, which one should the algorithm pick. There is a *rule of Thumb* that K should be the square root of the number of features (on other words the number of dimensions). In our example this would be ```K=1```, but this is not really a good idea since this would lead to higher false-classifications around decision boundaries. Picking ```K=2``` would result in the error regarding our two labels, thus picking ```K=3``` seems like a good fit for now.
 
-For this example we do [2-fold Cross Validation](http://en.wikipedia.org/wiki/Cross-validation_(statistics) ). In general 2-fold Cross validation is a rather weak method of model Validation, as it splits the dataset in half and only validates twice, which still allows for overfitting, but since the dataset is only 100 points, 10-fold (which is a stronger version) does not make sense, since then there would only be 10 datapoints used for testing, which would give a skewed error rate.
+For this example we do [2-fold Cross Validation](http://en.wikipedia.org/wiki/Cross-validation_(statistics)). In general 2-fold Cross validation is a rather weak method of model Validation, as it splits the dataset in half and only validates twice, which still allows for overfitting, but since the dataset is only 100 points, 10-fold (which is a stronger version) does not make sense, since then there would only be 10 datapoints used for testing, which would give a skewed error rate.
 
 ```scala
 
@@ -418,7 +418,7 @@ Here we see that indeed, when you use only 50 features, the amount of ham that g
 We could work through the hard ham, but since the building bricks are already here, we leave this to the reader. 
 
 ###Ranking emails based on their content (Recommendation system)
-This example will be completely about building your own recommendation system. We will use a subset of the email data which we used in the example [Classifying Email as Spam or Ham](#Classifying-Email-as-Spam-or-Ham-(Naive-Bayes)). This subset can be downloaded [here](https://github.com/Xyclade/MachineLearning/raw/Master/Example%20Data/Recommendation_Example_1.zip). Note that this is a set of received emails, thus we lack 1 half of the data, namely the outgoing emails of this mailbox. However even without this information we can do some pretty neat ranking as we will see later on.
+This example will be completely about building your own recommendation system. We will use a subset of the email data which we used in the example [Classifying Email as Spam or Ham](#Classifying-Email-as-Spam-or-Ham-Naive-Bayes). This subset can be downloaded [here](https://github.com/Xyclade/MachineLearning/raw/Master/Example%20Data/Recommendation_Example_1.zip). Note that this is a set of received emails, thus we lack 1 half of the data, namely the outgoing emails of this mailbox. However even without this information we can do some pretty neat ranking as we will see later on.
 
 For this example, as usual we expect you to have created a new Scala project in your favourite IDE, and downloaded and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library and its dependency [SwingX](https://java.net/downloads/swingx/releases/) to this project.
 
@@ -988,7 +988,7 @@ testData.foreach(x => documentTermMatrix.addDocumentToRecords(x._1,x._2,x._3))
 ```
 
 
-With this conversion from text to numeric value's we can open our regression toolbox. We used [Ordinary Least Squares(OLS)](http://en.wikipedia.org/wiki/Ordinary_least_squares) in the example [predicting weight based on height](###Predicting-weight-based-on-height-(using-Ordinary-Least-Squares)), however this time we will use [Least Absolute Shrinkage and Selection Operator (Lasso)](http://en.wikipedia.org/wiki/Least_squares#Lasso_method) regression. This is because we can give this regression method a certain lambda, which represents a penalty value. This penalty value allows the LASSO algorithm to select relevant features while discarding some of the other features. 
+With this conversion from text to numeric value's we can open our regression toolbox. We used [Ordinary Least Squares(OLS)](http://en.wikipedia.org/wiki/Ordinary_least_squares) in the example [predicting weight based on height](###Predicting-weight-based-on-height-using-Ordinary-Least-Squares), however this time we will use [Least Absolute Shrinkage and Selection Operator (Lasso)](http://en.wikipedia.org/wiki/Least_squares#Lasso_method) regression. This is because we can give this regression method a certain lambda, which represents a penalty value. This penalty value allows the LASSO algorithm to select relevant features while discarding some of the other features. 
 
 This feature selection that Lasso performs is very useful in our case due too the large set of words that is used in the documents descriptions. Lasso will try to come up with an ideal subset of those words as features, where as when applying the OLS, all words would be used, and the runtime would be extremely high. Additionally, the OLS implementation of SMILE detects rank deficiency. This is one of the [curses of dimensionality](#Curse-of-dimensionality)
 
@@ -1031,7 +1031,7 @@ To conclude this example, we rephrase a quote from [John Tukey](http://en.wikipe
 
 ###Using unsupervised learning to create a market index (PCA)
 
-In this example we are going to use [PCA](#Principal-Components-Analysis-(PCA)) to compute our own stock market index based on data of 24 stock prices from 2002 until 2012. This market index combines these 24 stock price columns into 1 single column. This significantly reduces the amount of data to process, and decreases the dimension of our problem, which is a big advantage if we later apply other machine learning algortihms such as regression for prediction.  ]
+In this example we are going to use [PCA](#Principal-Components-Analysis-PCA) to compute our own stock market index based on data of 24 stock prices from 2002 until 2012. This market index combines these 24 stock price columns into 1 single column. This significantly reduces the amount of data to process, and decreases the dimension of our problem, which is a big advantage if we later apply other machine learning algorithms such as regression for prediction.  ]
 
 Note that reducing the dimension from 24 to 1 causes data loss. However, because the stock prices are correlated, we accept this 'data loss'. When applying this method yourself, you should verify first whether your data is correlated.
 
@@ -1041,17 +1041,22 @@ Let's start the example
 
 
 
-###using Support Vector Machine's
+###using Support Vector Machines
 
 //Todo: write
 
+
+
 ##The global idea of machine learning
-The term 'Machine learning' is known by almost everyone, however almost no-one I spoke could really explain what it is in **_one_** or even several sentences.
+You probably have heard about Machine learning as a concept one time or another. However, if you would have to explain what machine learning to another person, how would you do this? Think about this for a second before reading the rest of this section.
 
-*Explanation of machine learning, preferably with an graphical image*
+Machine learning is explained in many ways, some more accurate than others, however there is a lot of inconsistency in its definition. Where some say machine learning is generating a static model based on historical data, which then allows you to predict for future data. Others say it's a dynamic model that keeps on changing as more data is added over time.
 
 
-In the upcoming subsections the most important notions you need to be aware off when practicing machine learning are (briefly) explained.
+We agree more with the dynamic definition however, but due certain limitations we explain the static model method in the examples. However we do explain how the dynamic principle would work in the subsection [dynamic machine learning](#Dynamic-machine-learning).
+
+The other subsections explain commonly used definitions and notions in the machine learning field. We advise you to read through these before starting the practical examples.
+
 
 ###Features
 A feature (in the field of machine learning) is a property on which a [Model](#Model) is trained. Say for example that you classify emails as spam/ham based on the frequency of the word 'Buy' and 'Money'. Then these words are features. If you would use machine learning to predict whether one is a friend of you, the amount of 'common' friends could be a feature.
@@ -1102,8 +1107,44 @@ The basic idea of regularization is preventing [overfitting](#overfitting) your 
 
 
 ##### Precision
+In the field of computer science we use the term precision to define the amount of items selected which are actually relevant.
+
+This value is computed as follows:
+
+<img src="./Images/Precision.png"/>
+
+To give an example:
+
+Say we have documents {aa,ab,bc,bd,ee} and we query for documents with a in the name. If our algorithm would be to return {aa,ab} the precision would be 100% intuitively. Let's verify it by filling in the formula:
+
+
+<img src="./Images/PrecisionFull.png"/>
+
+Indeed it is 100%. Next we shall show what happens if more results are returned:
+
+<img src="./Images/PrecisionHalf.png"/>
+
+Here the results contained the relevant results but also 2 irrelevant results. This caused the precision to decrease. However if you would calculate the [recall](#Recall) for this example it would be 100%. This is how precision and recall differ from each other.
 
 ##### Recall
+In the field of computer science we use the term recall to define the amount of relevant items that are retrieved for a query.
+
+This value is computed as follows:
+
+<img src="./Images/Recall.png"/>
+
+To give an example:
+
+Say we have documents {aa,ab,bc,bd,ee} and we query for documents with a in the name. If our algorithm would be to return {aa,ab} the recall would be 100% intuitively. Let's verify it by filling in the formula:
+
+
+<img src="./Images/RecallFull.png"/>
+
+Indeed it is 100%. Next we shall show what happens if not all relevant results are returned:
+
+<img src="./Images/RecallHalf.png"/>
+
+Here the results  only contained half of the relevant results. This caused the recall to decrease. However if you would compute the [precision](#precision) for this situation, it would result in 100% precision, because all results are relevant.
 
 ##### Prior
 The prior value that belongs to a classifier given a datapoint represents the likelihood that this datapoint belongs to this classifier. 
@@ -1169,9 +1210,17 @@ When you are turning your data into a model, but are leaving (a lot of) statisti
 <img src="./Images/Under-fitting.png" width="300px" /> 
 <img src="./Images/Good_Fit.png" width="300px" />
 
-You can prevent under fitting by plotting the data to get insights in the underlying structure, and using [validation techniques](#validation-techniques) such as [cross validation](#(2-fold)-Cross-Validation). 
+You can prevent under fitting by plotting the data to get insights in the underlying structure, and using [validation techniques](#validation-techniques) such as [cross validation](#2-fold-Cross-Validation). 
 
 ##### Curse of dimensionality
 The curse of dimensionality is a collection of problems that can occur when your data size is lower than the amount of features (dimensions) you are trying to use to create your machine learning [model](#model). An example of a dimensionality curse is matrix rank deficiency. When using [Ordinary Least Squares(OLS)](http://en.wikipedia.org/wiki/Ordinary_least_squares), the underlying algorithm solves a linear system in order to build up a model. However if you have more columns than you have rows, solving this system is not possible. If this is the case, the best solution would be to get more datapoints or reduce the feature set. 
 
 If you want to know more regarding this curse of dimensionality, [a study focussed on this issue](http://lectures.molgen.mpg.de/networkanalysis13/LDA_cancer_classif.pdf). In this study, researchers Haifeng Li, Keshu Zhang and Tao Jiang developed an algorithm that improves cancer classification with very few datapoints in comparison to [support vector machines](http://en.wikipedia.org/wiki/Support_vector_machine) and [random forests](http://en.wikipedia.org/wiki/Random_forest)
+
+
+###Dynamic machine learning
+In almost all literature you can find about machine learning, a static model is generated and validated, and then used for predictions / recommendations. However in practice, this alone would not make a very good machine learning application. This is why in this section we will explain how to turn a static model into a dynamic model. Since the (most optimal) implementation depends on the algorithm you are using, we will explain the concept rather than giving a practical example. Because explaining it in text only will not be very clear we first present you the whole system in a diagram which we will use to explain machine learning and how to make it dynamic.
+
+<img src="./Images/DynamicMachineLearning.png" />
+
+
