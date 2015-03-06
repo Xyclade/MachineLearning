@@ -14,50 +14,88 @@ object RecommendationSystem extends SimpleSwingApplication {
 
     val basePath = "/Users/mikedewaard/ML_for_Hackers/03-Classification/data"
     val easyHamPath = basePath + "/easy_ham"
-    println("Starting Getting mails:" + new Date(System.currentTimeMillis()))
-    val mailBodies = getFilesFromDir(easyHamPath).map(x => getFullEmail(x))
 
-    val timeSortedMails = mailBodies.map(x => (getDateFromEmail(x), getSenderFromEmail(x), getSubjectFromEmail(x), getMessageBodyFromEmail(x))).sortBy(x => x._1)
+    val mails = getFilesFromDir(easyHamPath).map(x => getFullEmail(x))
+    val timeSortedMails = mails
+      .map(x => (getDateFromEmail(x), getSenderFromEmail(x), getSubjectFromEmail(x), getMessageBodyFromEmail(x)))
+      .sortBy(x => x._1)
 
-    val (trainingData, testingData) = timeSortedMails.splitAt(timeSortedMails.length / 2)
-    println("Ended Getting mails:" + new Date(System.currentTimeMillis()))
-    val mailsGroupedBySender = trainingData.groupBy(x => x._2).map(x => (x._1, Math.log1p(x._2.length))).toArray.sortBy(x => x._2)
-    val senderDescriptions = mailsGroupedBySender.map(x => x._1)
-    val senderValues = mailsGroupedBySender.map(x => x._2.toDouble)
+    val (trainingData, testingData) = timeSortedMails
+      .splitAt(timeSortedMails.length / 2)
 
-    val mailsGroupedByThread = trainingData.groupBy(x => x._3)
+    val mailsGroupedBySender = trainingData
+      .groupBy(x => x._2)
+      .map(x => (x._1, Math.log1p(x._2.length)))
+
+    val senderDescriptions = mailsGroupedBySender
+      .map(x => x._1)
+
+    val senderValues = mailsGroupedBySender
+      .map(x => x._2)
+
+    val mailsGroupedByThread = trainingData
+      .groupBy(x => x._3)
 
     //Create a list of tuples with (subject, list of emails, time difference between first and last email)
-    val mailGroupsWithMinMaxDates = mailsGroupedByThread.map(x => (x._1, x._2, (x._2.maxBy(x => x._1)._1.getTime - x._2.minBy(x => x._1)._1.getTime) / 1000))
+    val mailGroupsWithMinMaxDates = mailsGroupedByThread
+      .map(x => (x._1, x._2, (x._2.maxBy(x => x._1)._1.getTime - x._2.minBy(x => x._1)._1.getTime) / 1000))
 
     //turn into a list of tuples with (topic, list of emails, time difference, and weight) filtered that only threads occur
-    val threadGroupsWithWeights = mailGroupsWithMinMaxDates.filter(x => x._2.length > 1).map(x => (x._1, x._2, x._3, 10 + Math.log10(x._2.length.toDouble / x._3)))
+    val threadGroupsWithWeights = mailGroupsWithMinMaxDates
+      .filter(x => x._2.length > 1)
+      .map(x => (x._1, x._2, x._3, 10 + Math.log10(x._2.length.toDouble / x._3)))
 
-    val sendersByThread = threadGroupsWithWeights.flatMap(x => {
-      x._2.groupBy(y => y._2).map(y => (y._1, y._2.length))
-    })
+    val sendersByThread = threadGroupsWithWeights
+      .flatMap(x => { x._2
+                          .groupBy(y => y._2)
+                          .map(y => (y._1, y._2.length))
+                    })
 
-    val groupedSenders = sendersByThread.groupBy(x => x._1).map(x => (x._1, Math.log(x._2.map(y => y._2).sum + 1) + 1))
+    val groupedSenders = sendersByThread
+        .groupBy(x => x._1)
+        .map(x => (x._1, Math.log(x._2.map(y => y._2).sum + 1) + 1))
 
     val stopWords = getStopWords
-    val threadTermWeights = threadGroupsWithWeights.toArray.sortBy(x =>  x._4).flatMap(x => x._1.replaceAll("[^a-zA-Z ]", "").toLowerCase.split(" ").filter(_.nonEmpty).map(y => (y, x._4)))
-    val filteredThreadTermWeights = threadTermWeights.groupBy(x => x._1).map(x => (x._1, x._2.maxBy(y => y._2)._2)).toArray.sortBy(x => x._1).filter(x => !stopWords.contains(x._1))
+    val threadTermWeights = threadGroupsWithWeights
+        .toArray.sortBy(x =>  x._4)
+        .flatMap(x => x._1
+                          .replaceAll("[^a-zA-Z ]", "")
+                          .toLowerCase.split(" ")
+                          .filter(_.nonEmpty)
+                          .map(y => (y, x._4))
+                )
 
-    println("Starting TDM building:" + new Date(System.currentTimeMillis()))
+    val filteredThreadTermWeights = threadTermWeights
+      .groupBy(x => x._1)
+      .map(x => (x._1, x._2.maxBy(y => y._2)._2))
+      .toArray
+      .sortBy(x => x._1)
+      .filter(x => !stopWords.contains(x._1))
+
     val tdm = trainingData
       .flatMap(x => x._4.split(" "))
       .filter(x => x.nonEmpty && !stopWords.contains(x)).groupBy(x => x)
       .map(x => (x._1, Math.log10(x._2.length + 1))).filter(x => x._2 != 0)
-    println("Finished TDM building:" + new Date(System.currentTimeMillis()))
 
+    val threadBarPlotData = mailsGroupedByThread
+      .map(x => (x._1, x._2.length))
+      .toArray
+      .sortBy(x => x._2)
 
-    val threadBarPlotData = mailsGroupedByThread.map(x => (x._1, x._2.length)).toArray.sortBy(x => x._2)
-    val threadDescriptions = threadBarPlotData.map(x => x._1)
-    val threadValues = threadBarPlotData.map(x => Math.log1p(x._2.toDouble))
+    val threadDescriptions = threadBarPlotData
+      .map(x => x._1)
+    val threadValues = threadBarPlotData
+      .map(x => Math.log1p(x._2.toDouble))
 
-    val weightedThreadBarPlotData = threadGroupsWithWeights.toArray.sortBy(x => x._4)
-    val weightedThreadDescriptions = weightedThreadBarPlotData.map(x => x._1)
-    val weightedThreadValues = weightedThreadBarPlotData.map(x => x._4)
+    val weightedThreadBarPlotData = threadGroupsWithWeights
+      .toArray
+      .sortBy(x => x._4)
+
+    val weightedThreadDescriptions = weightedThreadBarPlotData
+      .map(x => x._1)
+
+    val weightedThreadValues = weightedThreadBarPlotData
+      .map(x => x._4)
 
 
     val barPlot = BarPlot.plot("Amount of emails per subject on log scale", weightedThreadValues, weightedThreadDescriptions)
@@ -77,39 +115,57 @@ object RecommendationSystem extends SimpleSwingApplication {
     //filteredCommonTerms = list(term,weight) for email body
     println("Starting combining features:" + new Date(System.currentTimeMillis()))
 
-    val combinedFeatures = trainingData.map(mail => {
+    val combinedFeatures = testingData.map(mail => {
       //mail contains (full content, date, sender, subject, body)
 
       //Determine the weight of the sender
-      val senderWeight = mailsGroupedBySender.collectFirst { case (mail._2, x) => x}.getOrElse(1.0)
+      val senderWeight = mailsGroupedBySender
+        .collectFirst { case (mail._2, x) => x}
+        .getOrElse(1.0)
 
       //Determine the weight of the subject
-      val termsInSubject = mail._3.replaceAll("[^a-zA-Z ]", "").toLowerCase.split(" ").filter(x => x.nonEmpty && !stopWords.contains(x) )
-      val termWeight = termsInSubject.map(x => {
-        tdm.collectFirst { case (y, z) if y == x => z + 1 }.getOrElse(1.0)
-      }).sum / termsInSubject.length
+      val termsInSubject = mail._3
+        .replaceAll("[^a-zA-Z ]", "")
+        .toLowerCase.split(" ")
+        .filter(x => x.nonEmpty && !stopWords.contains(x) )
 
-     // val termWeight = if (calculatedTermWeight > 0) calculatedTermWeight else 1.0
+      val termWeight =  if (termsInSubject.size > 0) termsInSubject
+                            .map(x => {
+                                          tdm.collectFirst { case (y, z) if y == x => z + 1 }
+                                              .getOrElse(1.0)
+                                      })
+                            .sum/ termsInSubject.length
+                        else 1.0
 
       //Determine if the email is from a thread, and if it is the weight from this thread:
-      val threadGroupWeight: Double = threadGroupsWithWeights.collectFirst { case (mail._3, _, _, weight) => weight}.getOrElse(1.0)
+      val threadGroupWeight: Double = threadGroupsWithWeights
+        .collectFirst{ case (mail._3, _, _, weight) => weight}
+        .getOrElse(1.0)
 
       //Determine the commonly used terms in the email and the weight belonging to it:
-      val termsInMailBody = mail._4.replaceAll("[^a-zA-Z ]", "").toLowerCase.split(" ").filter(x => x.nonEmpty && !stopWords.contains(x))
-      val commonTermsWeight = termsInMailBody.map(x => {
-        tdm.collectFirst { case (y, z) if y == x => z + 1}.getOrElse(1.0)
-      }).sum / termsInMailBody.length
+      val termsInMailBody = mail._4
+        .replaceAll("[^a-zA-Z ]", "")
+        .toLowerCase.split(" ")
+        .filter(x => x.nonEmpty && !stopWords.contains(x))
 
-     // val commonTermsWeight = if (calculatedCommonTermWeight > 0) (calculatedCommonTermWeight +1) else 1.0
+      val commonTermsWeight = if (termsInMailBody.size > 0) termsInMailBody
+                                  .map(x => {
+                                              tdm.collectFirst { case (y, z) if y == x => z + 1}
+                                                  .getOrElse(1.0)
+                                            })
+                                  .sum / termsInMailBody.length
+                              else 1.0
 
       //Determine if the sender is from a possibly important thread, and if it is get the weight
-      val senderThreadWeight: Double = groupedSenders.collectFirst { case (mail._2, weight) => weight}.getOrElse(1.0)
+      val senderThreadWeight: Double = groupedSenders
+        .collectFirst { case (mail._2, weight) => weight}
+        .getOrElse(1.0)
 
       (mail, termWeight, threadGroupWeight, commonTermsWeight, senderWeight, senderThreadWeight, (termWeight * threadGroupWeight * commonTermsWeight * senderWeight * senderThreadWeight))
     })
+
     println("Ended combining features:" + new Date(System.currentTimeMillis()))
-   //combinedFeatures.sortBy(x => x._7).foreach(x => println("V4: " + x._7 + "\t V5: " + x._5 + "\t V6: " + x._6 + "\t V7: " + x._3 + " V8: " + x._2 + "\t V9: " + x._4 + "\t " + x._1._3 + " " + x._1._2 + x._1._1.toString))
-   val sortedRankings  =  combinedFeatures.sortBy(x => x._7)
+   val sortedRankings  =  combinedFeatures.sortBy(x => -x._7)
   //  sortedRankings.foreach(x => println("V4: " + x._7 + "\t " + x._1._3 + " " + x._1._2 + x._1._1.toString))
 
     println("Mean: " + combinedFeatures.map(x => x._7).sum / combinedFeatures.length)
@@ -118,6 +174,9 @@ object RecommendationSystem extends SimpleSwingApplication {
    // combinedFeatures.sortBy(x => x._7).foreach(x => println("V4: " + x._7 + "\t " + x._1._3 + " " + x._1._2 + x._1._1.toString))
     println("Priority rated:" + mailsInPriority.length)
     sortedRankings.foreach(x => println("Rank: " + "%.5f".format(x._7) + "\t SenderWeight: " + "%.5f".format(x._5) + "\t SenderThreadWeight: " + "%.5f".format(x._6) + "\t CommonTermsWeight: " + "%.5f".format(x._3) + " SenderWeight: " + "%.5f".format(x._2) + "\t SenderThreadWeight: " + "%.5f".format(x._4) ))//+ "\t " + x._1._3 + " " + x._1._2 + x._1._1.toString))
+
+    var strangeRecord = sortedRankings.last
+
     println("Total emails: " + combinedFeatures.length)
   }
 

@@ -13,7 +13,16 @@ Note that in this blog, 'new' definitions are hyperlinked such that if you want,
 
 ##Practical Examples
 
-The examples will start off with the most simple and intuitive [*Classification*](http://en.wikipedia.org/wiki/Statistical_classification) Machine learning Algorithm there is: [*K-Nearest Neighbours*](http://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm).
+In this section we present you a set of machine learning algorithms in a practical setting. The idea of these examples is to get you started with machine learning algorithms without an in depth explanation of the underlying algorithms.  We focus purely on the functional aspect of there algorithms, how you can verify your implementation and warn for common pitfalls.
+
+The following examples are available:
+
+
+* [Labeling ISP's based on their down/upload speed (KNN)](#Labeling-ISPs-based-on-their-Down/Upload-speed-(KNN-using-Smile-in-Scala))
+* [Classifying email as Spam or Ham](#Classifying-Email-as-Spam-or-Ham-(Naive-Bayes))
+* [Ranking emails based on their content (Recommendation system)](#Ranking-emails-based-on-their-content-(Recommendation-system))
+* [Predicting weight based on height (Linear Regression OLS)](#Predicting-weight-based-on-height-(using-Ordinary-Least-Squares))
+*[Using unsupervised learning to create a market index (PCA)](#Using unsupervised-learning-to-create-a-market-index-(PCA))]
 
 ###Labeling ISPs based on their Down/Upload speed (KNN using Smile in Scala)
 
