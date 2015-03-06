@@ -22,7 +22,7 @@ The following examples are available:
 * [Classifying email as Spam or Ham](#classifying-email-as-spam-or-ham-naive-bayes)
 * [Ranking emails based on their content (Recommendation system)](#ranking-emails-based-on-their-content-recommendation-system)
 * [Predicting weight based on height (Linear Regression OLS)](#predicting-weight-based-on-height-using-ordinary-least-squares)
-*[Using unsupervised learning to create a market index (PCA)](#using-unsupervised-learning-to-create-a-market-index-pca)
+* [Using unsupervised learning to create a market index (PCA)](#using-unsupervised-learning-to-create-a-market-index-pca)
 
 
 ###Labeling ISPs based on their Down/Upload speed (KNN using Smile in Scala)
