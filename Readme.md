@@ -235,8 +235,8 @@ And finally lets define a set of paths that make it easier to load the different
     val hardHamPath = basePath + "/hard_ham"
     val hardHam2Path = basePath + "/hard_ham_2"
 
-  	val amountOfSamplesPerSet = 500;
-    val amountOfFeaturesToTake = 100;    
+  	val amountOfSamplesPerSet = 500
+    val amountOfFeaturesToTake = 100   
     //First get a subset of the filenames for the spam sample set (500 is the complete set in this case)
     val listOfSpamFiles =   getFilesFromDir(spamPath).take(amountOfSamplesPerSet)
     //Then get the messages that are contained in these files
@@ -347,7 +347,7 @@ var data = (hamFeatures ++ spamFeatures).toSet
 hamFeatures.intersect(spamFeatures).foreach(x => data = (data - x))
 
 //Initialise a bag of words that takes the top x features from both spam and ham and combines them
-var bag = new Bag[String] (data.toArray);
+var bag = new Bag[String] (data.toArray)
 //Initialise the classifier array with first a set of 0(spam) and then a set of 1(ham) values that represent the emails
 var classifiers =  Array.fill[Int](amountOfSamplesPerSet)(0) ++  Array.fill[Int](amountOfSamplesPerSet)(1)
 
@@ -381,12 +381,12 @@ val spam2FeatureVectors = spam2Mails.map(x => bag.feature(x._2.split(" ")))
 val spam2ClassificationResults = spam2FeatureVectors.map(x => bayes.predict(x))
 
 //Correct classifications are those who resulted in a spam classification (0)
-val correctClassifications = spam2ClassificationResults.count( x=> x == 0);
+val correctClassifications = spam2ClassificationResults.count( x=> x == 0)
 println(correctClassifications + " of " + listOfSpam2Files.length + "were correctly classified")
 println(((correctClassifications.toDouble /  listOfSpam2Files.length) * 100)  + "% was correctly classified")
 
 //In case the algorithm could not decide which category the email belongs to, it gives a -1 (unknown) rather than a 0 (spam) or 1 (ham)
-val unknownClassifications = spam2ClassificationResults.count( x=> x == -1);
+val unknownClassifications = spam2ClassificationResults.count( x=> x == -1)
 println(unknownClassifications + " of " + listOfSpam2Files.length + "were unknowingly classified")
 println(((unknownClassifications.toDouble /  listOfSpam2Files.length) * 100)  + "% was unknowingly classified")
 
@@ -778,7 +778,7 @@ As always, the first thing to do is to import a dataset. For this we provide you
 
     //Split the comma separated value string into an array of strings
     val dataArray: Array[String] = dataString.split(',')
-    var person = 1.0;
+    var person = 1.0
 
     if (dataArray(0) == "\"Male\"") {
       person = 0.0
@@ -812,7 +812,7 @@ object LinearRegressionExample extends SimpleSwingApplication {
     val test_data = GetDataFromCSV(new File(basePath))
 
     val plotData = (test_data._1 zip test_data._2).map(x => Array(x._1(1) ,x._2))
-    val maleFemaleLabels = test_data._1.map( x=> x(0).toInt);
+    val maleFemaleLabels = test_data._1.map( x=> x(0).toInt)
     val plot =  ScatterPlot.plot(plotData,maleFemaleLabels,'@',Array(Color.blue, Color.green))
     plot.setTitle("Weight and heights for male and females")
     plot.setAxisLabel(0,"Heights")
