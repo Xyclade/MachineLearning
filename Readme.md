@@ -1092,8 +1092,8 @@ To see how much of the testing emails are ranked priority, we add the following 
 
 After actually running this test code, you will see that the amount of emails ranked as priority from the test set is actually  204. This is 16.32% of the test email set. To gain a bit more insight we will show the top 10 for the priority labeled emails.
 
-|Date | Sender  | Subject  | Rank |
-| :--- | : -- | :--  | :-- | 
+| Date | Sender  | Subject  | Rank |
+| :-- | :-- | :--  | :-- | 
 | Wed Sep 25 12:57:00 CEST 2002 | whit@transpect.com | [razor-users] "no razor servers available at this time" | 9.142285151868377 |
 | Tue Oct 01 06:18:00 CEST 2002 | angles@aminvestments.com | use new apt to do null to rh8 upgrade? | 9.03879575228188 |
 | Thu Oct 03 08:02:00 CEST 2002 | rssfeeds@spamassassin.taint.org | perl.  it's just a language. | 8.859240257643194 |
