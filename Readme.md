@@ -1,13 +1,225 @@
 #Machine Learning for developers 
 
 
-Most developers these days have heard of machine learning, but when trying to find an 'easy' way into this technique, most people find themselves getting scared off by the abstractness of the concept of *Machine Learning* and terms as   [*regression*](http://en.wikipedia.org/wiki/Regression_analysis), [*unsupervised learning*](http://en.wikipedia.org/wiki/Unsupervised_learning), [*Probability Density Function*](http://en.wikipedia.org/wiki/Probability_density_function) and many other definitions. 
+Most developers these days have heard of machine learning, but when trying to find an 'easy' way into this technique, most people find themselves getting scared off by the abstractness of the concept of *Machine Learning* and terms as [*regression*](http://en.wikipedia.org/wiki/Regression_analysis), [*unsupervised learning*](http://en.wikipedia.org/wiki/Unsupervised_learning), [*Probability Density Function*](http://en.wikipedia.org/wiki/Probability_density_function) and many other definitions. And then there are books such as [*An Introduction to Statistical Learning with Applications in R*](http://www-bcf.usc.edu/~gareth/ISL/) and [*Machine Learning for Hackers*](http://shop.oreilly.com/product/0636920018483.do) who use programming language [R](http://www.r-project.org) for their examples. 
 
-And then there are books such as [*Machine Learning for Hackers*](http://shop.oreilly.com/product/0636920018483.do) and [*An Introduction to Statistical Learning with Applications in R*](http://www-bcf.usc.edu/~gareth/ISL/)  who use programming language [R](http://www.r-project.org) for their examples. 
+However R is not really a programming language in which one writes programs for everyday use such as is done with for example Java, C#, Scala etc. This is why in this blog, Machine learning will be introduced using [Smile](https://github.com/haifengl/smile), a machine learning library that can be used both in Java and Scala. These are languages that almost every developer has worked with once during their study or career. 
 
-However R is not really a programming language in which one writes programs for everyday use such as is done with for example Java, C#, Scala etc. This is why in this blog, Machine learning will be introduced using [Smile](https://github.com/haifengl/smile), a machine learning library that can be used both in Java and Scala. These are languages that almost every developer has worked with once during their study or career.
+The first section ['The global idea of machine learning'](#the-global-idea-of-machine-learning) contains all important concepts and notions you need to know about to get started with the practical examples that are described in the section ['Practical Examples'](#practical-examples). The section practical examples is inspired by the examples from the book [*Machine Learning for Hackers*](http://shop.oreilly.com/product/0636920018483.do). Additionally the book [Machine Learning in Action](http://www.manning.com/pharrington/) was used for validation purposes.
 
-Note that in this blog, 'new' definitions are hyperlinked such that if you want, you **can** read more regarding that specific topic, but you are not obliged to do this in order to be able to work through the examples. However the section ['The global idea of machine learning'](#the-global-idea-of-machine-learning) helps making things a lot more clear when working through the examples and is advised to be read on beforehand in case you are completely new to Machine Learning.
+Note that in this blog, 'new' definitions are hyperlinked such that if you want, you **can** read more regarding that specific topic, but you are not obliged to do this in order to be able to work through the examples. 
+
+As final note we'd like to thank the following people:
+
+* [Haifeng Li](https://www.linkedin.com/in/haifengli) for his support and writing the awesome  and free to use library [Smile](https://github.com/haifengl/smile)
+* [Erik Meijer](https://www.linkedin.com/profile/view?id=1490860) for all suggestions and supervision of the process of writing this blog
+* [Richard van Heest](https://www.linkedin.com/profile/view?id=138460950) for his feedback and co-reading the blog
+
+
+
+##The global idea of machine learning
+You probably have heard about Machine learning as a concept one time or another. However, if you would have to explain what machine learning to another person, how would you do this? Think about this for a second before reading the rest of this section.
+
+Machine learning is explained in many ways, some more accurate than others, however there is a lot of inconsistency in its definition. Where some say machine learning is generating a static model based on historical data, which then allows you to predict for future data. Others say it's a dynamic model that keeps on changing as more data is added over time.
+
+
+We agree more with the dynamic definition however, but due certain limitations we explain the static model method in the examples. However we do explain how the dynamic principle would work in the subsection [dynamic machine learning](#dynamic-machine-learning).
+
+The other subsections explain commonly used definitions and notions in the machine learning field. We advise you to read through these before starting the practical examples.
+
+
+###Features
+A feature (in the field of machine learning) is a property on which a [model](#model) is trained. Say for example that you classify emails as spam/ham based on the frequency of the word 'Buy' and 'Money'. Then these words are features, or part of a feature if you would combine it with more words.. If you would use machine learning to predict whether one is a friend of you, the amount of 'common' friends could be a feature. Note that in the field, sometimes features are also referred to as attributes.
+
+###Model
+When one talks about machine learning, often the term *model* is mentioned. The model is the result of any machine learning method and the algorithm used within this method. This model can be used to make predictions in [supervised](#supervised-learning), or to retrieve clusterings in [unsupervised learning](#unsupervised-learning).
+
+###Learning methods
+In the field of machine learning there are two leading ways of learning, namely [Supervised learning](http://en.wikipedia.org/wiki/Supervised_learning) and  [Unsupervised learning](http://en.wikipedia.org/wiki/Unsupervised_learning). A brief introduction is necessary when you want to use Machine learning in your applications, as picking the right machine learning approach is an important but sometimes also a little tedious process.
+
+####Supervised Learning
+The principle of supervised learning can be used to solve many problem types. In this blog however we will stick to [Classification](#classification) and [Regression](#regression) as this covers most of the problems one wants to solve in their every day application.
+
+
+#####Classification
+The problem of classification within the domain of Supervised learning is relatively simple. Given a set of labels, and some data that already received the correct labels, we want to be able to *predict* labels for new data that we did not label yet. However, before thinking of your data as a classification problem, you should look at what the data looks like. If there is a clear structure in the data such that you can easily draw a regression line it might be better to use a [regression](#regression) algorithm instead. Given the data does not fit to a regression line, or when performance becomes an issue, classification is a good alternative.
+
+An example of a classification problem would be to classify emails as Ham or Spam based on their content. Given a training set in which emails are labeled Ham/Spam, a classification algorithm can be used to train a [Model](#model). This model can then be used to predict for future emails whether they are Ham or Spam. A typical example of a classification algorithm is the [K-NN algorithm](#labeling-isps-based-on-their-downupload-speed-knn-using-smile-in-scala). Another more commonly used example of a classification problem is [Classifying Email as Spam or Ham](#classifying-email-as-spam-or-ham-naive-bayes) which is also one of the examples written on this blog.
+
+#####Regression
+Regression is a lot stronger in comparison to [classification](#classification). This is because in regression you are predicting actual values, rather than labels. Let us clarify this with a short example: given a table of weights, heights, and genders, you can use [KNN](#Labeling ISPs based on their Down/Upload speed (K-NN using Smile in Scala)) to predict ones gender when given a weight and height. With this same dataset using regression, you could instead predict ones weight or height, given the gender the respective other missing parameter. 
+
+With this extra power, comes great responsibility, thus in the working field of regression one should be very careful when generating the model. Common pitfalls are [overfitting](#overfitting), [under fitting](#under-fitting) and not taking into account how the model handles  [extrapolation](http://en.wikipedia.org/wiki/Extrapolation) and [interpolation](http://en.wikipedia.org/wiki/Interpolation).
+
+
+
+####Unsupervised Learning
+TODO: Introduction on Unsupervised learning
+
+#####Principal Components Analysis (PCA)
+Principal Components Analysis is a technique used in statistics to convert a set of correlated columns into a smaller set of uncorrelated columns, reducing the amount features of a problem.  This smaller set of columns are called the principal components. This technique is mostly used in exploratory data analysis as it reveals internal structure in the data that can not be found with eye-balling the data.
+
+A big weakness of PCA however are outliers in the data. these heavily influence it's result, thus looking at the data on beforehand, eliminating large outliers can greatly improve its performance.
+
+
+###Validation techniques
+In this section we will explain some of the techniques available for model validation, and will explain some terms that are commonly used in the Machine Learning field.
+
+
+#### Cross Validation
+The technique of cross validation is one of the most common techniques in the field of machine learning. It's essence is to *ignore* part of your dataset while training your [model](#model), and then using the model to predict this *ignored data*. Comparing the predictions to the actual value then gives an indication of the performance of your model. 
+
+The most important part of this cross validation is the splitting of data. You should always use the complete dataset when performing this technique. In other words you should not randomly select X datapoints for training and then randomly select X datapoints for testing, because then some datapoints can be in both sets while others might not be used at all.
+
+
+#####(2 fold) Cross Validation
+In 2-fold cross validation you perform a split of the data into test and training for each fold (so 2 times) and train a model using the training dataset, followed by verification with the testing set. Doing so allows you to compute the error in the predictions for the test data 2 times. These error values then should not differ significantly. If they do, either something is wrong with your data or with the features you selected for model prediction. Either way you should look into the data more and find out what is happening for your specific case, as training a model based on the data might result in a overfitted model for erroneous data.
+
+
+
+#### Regularization
+The basic idea of regularization is preventing [overfitting](#overfitting) your [model](#model) by simplifying it. Suppose your data is a polynomial function of degree 3, but your data has noise and this would cause the model to be of a higher degree. Then the model would perform poorly on new data, where as it seems to be a good model at first. Regularization hels preventing this, by simplifying the model with a certain value *lambda*. However to find the right lambda for a model is hard when you have no idea as to when the model is overfitted or not. This is why [cross validation](#cross-validation) is often used to find the best lambda fitting your model.
+
+
+##### Precision
+In the field of computer science we use the term precision to define the amount of items selected which are actually relevant.
+
+This value is computed as follows:
+
+<img src="./Images/Precision.png"/>
+
+To give an example:
+
+Say we have documents {aa,ab,bc,bd,ee} and we query for documents with a in the name. If our algorithm would be to return {aa,ab} the precision would be 100% intuitively. Let's verify it by filling in the formula:
+
+
+<img src="./Images/PrecisionFull.png"/>
+
+Indeed it is 100%. Next we shall show what happens if more results are returned:
+
+<img src="./Images/PrecisionHalf.png"/>
+
+Here the results contained the relevant results but also 2 irrelevant results. This caused the precision to decrease. However if you would calculate the [recall](#recall) for this example it would be 100%. This is how precision and recall differ from each other.
+
+##### Recall
+In the field of computer science we use the term recall to define the amount of relevant items that are retrieved for a query.
+
+This value is computed as follows:
+
+<img src="./Images/Recall.png"/>
+
+To give an example:
+
+Say we have documents {aa,ab,bc,bd,ee} and we query for documents with a in the name. If our algorithm would be to return {aa,ab} the recall would be 100% intuitively. Let's verify it by filling in the formula:
+
+
+<img src="./Images/RecallFull.png"/>
+
+Indeed it is 100%. Next we shall show what happens if not all relevant results are returned:
+
+<img src="./Images/RecallHalf.png"/>
+
+Here the results  only contained half of the relevant results. This caused the recall to decrease. However if you would compute the [precision](#precision) for this situation, it would result in 100% precision, because all results are relevant.
+
+##### Prior
+The prior value that belongs to a classifier given a datapoint represents the likelihood that this datapoint belongs to this classifier. 
+
+##### Root Mean Squared Error (RMSE)
+The Root Mean Squared Error (RMSE or RMSD where D is deviation) is the square root of the variance of the differences between the actual value and predicted value.
+Suppose we have the following values:
+
+| Predicted temperature | Actual temperature |  squared difference for Model | square difference for average |
+| :--: | :--:| :--:| :--: | 
+|10 | 12 | 4 |  7.1111 |
+|20 | 17 | 9 |  5.4444 |
+|15 | 15 | 0 |  0.1111 |
+
+Then the mean of this squared difference for the model is 4.33333, and the root of this is 2.081666. So basically in average, the model predicts the values with an average error of 2.09. The lower this RMSE value is, the better the model is in its predictions. This is why in the field, when selecting features, one computes the RMSE with and without a certain feature, in order to say something about how that feature affects the performance of the model.
+
+
+Additionally, because the RMSE is an absolute value, it can be normalised in order to compare models. This results in the Normalised Root Mean Square Error (NRMSE). For computing this however, you need to know the minimum and maximum value that the system can contain. Let's suppose we can have temperatures ranging from minimum of 5 to a maximum of 25 degrees, then computing the NRMSE is as follows:
+
+<img src="./Images/Formula4.png"/>
+
+When we fill in the actual values we get the following result:
+
+<img src="./Images/Formula1.png"/>
+
+Now what is this 10.45 value?  This is the error percentage the model has in average on it's datapoints.
+
+Finally we can use RMSE to compute a value that is known in the field as **R Squared**. This value represents how good the model performs in comparison to ignoring the model and just taking the average for each value. For that you need to calculate the RMSE for the average first. This is 4.22222  (taking the mean of the values from the last column in the table), and the root is then 2.054805. The first thing you should notice is that this value is lower than that of the model. This is not a good sign, because this means the model performs **worse** than just taking the mean. However to demonstrate how to compute **R Squared** we will continue the computations.
+
+We now have the RMSE for both the model and the mean, and then computing how well the model performs in comparison to the mean is done as follows:
+
+<img src="./Images/Formula2.png"  />
+
+This results in the following computation:
+
+<img src="./Images/Formula3.png"  />
+
+Now what does this -1.307229 represent. Basically it says that the model that predicted these values performs +/- 1.31 percent worse than returning the average each time a value is to be predicted. In other words, we could better use the average function as a predictor rather than the model in this specific case.
+
+
+###Pitfalls 
+This section describes some common pitfalls in applying machine learning techniques. The idea of this section is to make you aware of of these pitfalls and help you prevent actually walking into one yourself.
+
+##### Overfitting
+
+When fitting a function on the data, there is a possibility the data contains noise (for example by measurement errors). If you fit every point from the data exactly, you incorporate this noise into the [model](#model). This causes the model to predict really well on your test data, but relatively poor on future data.
+
+The left image here below show how this overfitting would look like if you where to plot your data and the fitted functions, where as the right image would represent a *good fit* of the regression line through the datapoints.
+
+
+<img src="./Images/OverFitting.png" width="300px" /> 
+<img src="./Images/Good_Fit.png" width="300px" />
+
+Overfitting can easily happen when applying [regression](#regression) but can just as easily be introduced in [NBayes classifications](#classifying-email-as-spam-or-ham-naive-bayes). In regression it happens with rounding, bad measurements and noisy data. In naive bayes however, it could be the features that where picked. An example for this would be classifying spam or ham while keeping all stopwords.
+
+Overfitting can be detected by performing [validation techniques](#validation-techniques) and looking into your data's statistical features, and detecting and removing outliers.
+
+
+
+##### Under-fitting
+When you are turning your data into a model, but are leaving (a lot of) statistical data behind, this is called under-fitting. This can happen due to various reasons, such as using a wrong regression type on the data. If you have a non-linear structure in the data, and you apply linear regression, this would result in an under-fitted model. The left image here below represents a under-fitted regression line where as the right image shows a good fit regression line.
+
+<img src="./Images/Under-fitting.png" width="300px" /> 
+<img src="./Images/Good_Fit.png" width="300px" />
+
+You can prevent under fitting by plotting the data to get insights in the underlying structure, and using [validation techniques](#validation-techniques) such as [cross validation](#2-fold-cross-validation). 
+
+##### Curse of dimensionality
+The curse of dimensionality is a collection of problems that can occur when your data size is lower than the amount of features (dimensions) you are trying to use to create your machine learning [model](#model). An example of a dimensionality curse is matrix rank deficiency. When using [Ordinary Least Squares(OLS)](http://en.wikipedia.org/wiki/Ordinary_least_squares), the underlying algorithm solves a linear system in order to build up a model. However if you have more columns than you have rows, solving this system is not possible. If this is the case, the best solution would be to get more datapoints or reduce the feature set. 
+
+If you want to know more regarding this curse of dimensionality, [a study focussed on this issue](http://lectures.molgen.mpg.de/networkanalysis13/LDA_cancer_classif.pdf). In this study, researchers Haifeng Li, Keshu Zhang and Tao Jiang developed an algorithm that improves cancer classification with very few datapoints in comparison to [support vector machines](http://en.wikipedia.org/wiki/Support_vector_machine) and [random forests](http://en.wikipedia.org/wiki/Random_forest)
+
+
+###Dynamic machine learning
+In almost all literature you can find about machine learning, a static model is generated and validated, and then used for predictions / recommendations. However in practice, this alone would not make a very good machine learning application. This is why in this section we will explain how to turn a static model into a dynamic model. Since the (most optimal) implementation depends on the algorithm you are using, we will explain the concept rather than giving a practical example. Because explaining it in text only will not be very clear we first present you the whole system in a diagram which we will use to explain machine learning and how to make it dynamic.
+
+<img src="./Images/DynamicMachineLearning.png" />
+
+The basic idea of machine learning can be described by the following steps:
+
+1. Gather data
+2. Split the data into a testing and training set
+3. Train a model (with help of a machine learning algorithm)
+4. Validate the model with a validation method which takes the model and testing data
+5. do predictions based on the model
+
+In this process there are a few steps missing when it comes to actual applications in the field. These steps are in our opinion the most important steps to make a system actually learn.
+
+The idea behind what we call dynamic machine learning is as follows: You take your predictions, combine it with user feedback and feed it back into your system to improve your dataset and model.  But as we just said we need user feedback, so how is this gained? This is actually not that hard. Let's take friend suggestions on [Facebook](https://www.facebook.com) for example. The user is presented 2 options:  'Add Friend' or 'Remove'. Based on the decision of the user, you have direct feedback regarding that prediction. 
+
+So say you have this user feedback, then you can apply machine learning over your machine learning application to learn about the feedback that is given. This might sound a bit strange, but we will try to explain this more elaborately. However before we do this, we need to make a *disclaimer*: our description of the Facebook friend suggestion system is a 100% assumption and in no way confirmed by Facebook itself. Their systems are a secret to the outside world.
+
+Say the system predicts based on the following features:
+1. amount of common friends
+2. Same hometown
+3. Same age
+
+Then you can compute a [prior](#prior) for every person on Facebook regarding the chance that he/she is a good suggestion to be your friend. Say you store the results of all these predictions for a period of time, then analysing this data on its own with machine learning allows you to improve your system. To elaborate on this, say most of our 'removed' suggestions had a high rating on feature 2, but relatively low on 1, then we can add weights to the prediction system such that feature 1 is more important than feature 2. This will then improve the recommendation system for us. 
+
+Additionally, our dataset grows over time, so we should keep on updating our model with the new data to make the predictions more accurate. How to do this however, depends on the size and mutation rate of your data.
 
 
 
@@ -21,8 +233,9 @@ The following examples are available:
 * [Labeling ISP's based on their down/upload speed (KNN)](#labeling-isps-based-on-their-downupload-speed-knn-using-smile-in-scala)
 * [Classifying email as Spam or Ham](#classifying-email-as-spam-or-ham-naive-bayes)
 * [Ranking emails based on their content (Recommendation system)](#ranking-emails-based-on-their-content-recommendation-system)
+* [An attempt at rank prediction for top selling books using text regression](#an-attempt-at-rank-prediction-for-top-selling-books-using-text-regression)
 * [Predicting weight based on height (Linear Regression OLS)](#predicting-weight-based-on-height-using-ordinary-least-squares)
-* [Using unsupervised learning to create a market index (PCA)](#using-unsupervised-learning-to-create-a-market-index-pca)
+* [Using unsupervised learning to merge features (PCA)](#using-unsupervised-learning-to-merge-features-pca)
 
 
 ###Labeling ISPs based on their Down/Upload speed (KNN using Smile in Scala)
@@ -435,7 +648,7 @@ object RecommendationSystem extends SimpleSwingApplication {
   def top = new MainFrame {
     title = "Recommendation System Example"
 
-    val basePath = "/Users/mikedewaard/ML_for_Hackers/03-Classification/data"
+    val basePath = "/Users/../data"
     val easyHamPath = basePath + "/easy_ham"
 
     val mails = getFilesFromDir(easyHamPath).map(x => getFullEmail(x))
@@ -452,7 +665,7 @@ object RecommendationSystem extends SimpleSwingApplication {
     val d = new File(path)
     if (d.exists && d.isDirectory) {
       //Remove the mac os basic storage file, and alternatively for unix systems "cmds"
-      d.listFiles.filter(x => x.isFile && !x.toString.contains(".DS_Store") && !.toString.contains("cmds")).toList
+      d.listFiles.filter(x => x.isFile && !x.toString.contains(".DS_Store") && !x.toString.contains("cmds")).toList
     } else {
       List[File]()
     }
@@ -601,7 +814,7 @@ Here you can see that the most frequent sender sent 45 emails, followed by 37 em
 //Code changes:
 val mailsGroupedBySender = trainingData
 .groupBy(x => x._3)
-.map(x => (x._1, Math.log1p(x._2.length))
+.map(x => (x._1, Math.log1p(x._2.length)))
 .toArray
 .sortBy(x => x._2)
 
@@ -612,7 +825,7 @@ barPlot.setAxisLabel(1, "Amount of emails received on log Scale ")
 <img src="./Images/Mail_per_Sender_log_Distribution.png" width="400px" />
 
 Effectively the data is still the same, however it is represented on a different scale.
-Notice here that the numeric values now range between 0.69 and 3.83. This range is much smaller, causing the outliers to not skew away the rest of the data. This data manipulation trick is very common in the field of machine learning. Finding the right scale requires some insight. This is why using the plotting library of SMILE to make several plots on different scales can help a lot when performing this rescaling.
+Notice here that the numeric values now range between 0.69 and 3.83. This range is much smaller, causing the outliers to not skew away the rest of the data. This data manipulation trick is very common in the field of machine learning. Finding the right scale requires some insight. This is why using the plotting library of [Smile](https://github.com/haifengl/smile) to make several plots on different scales can help a lot when performing this rescaling.
 
 The next feature we will work on is the frequency and timeframe in which subjects occur. If a subject occurs more it is likely to be of higher importance. Additionally we take into account the timespan of the thread. So the frequency of a subject will be normalised with the timespan of the emails of this subject. This makes highly active email threads come up on top. Again this is an assumption we make on which emails should be ranked higher.
  
@@ -648,7 +861,7 @@ We see a similar distribution as with the senders, so let's apply the `log1p` on
 
 //Code change:
 val threadBarPlotData = mailsGroupedByThread
-	.map(x => (x._1, Math.log1p(x._2.length))
+	.map(x => (x._1, Math.log1p(x._2.length)))
 	.toArray
 	.sortBy(x => x._2)
 ```
@@ -662,7 +875,7 @@ Here the value's now range between 0.69 and 3.41, which is a lot better than a r
     val mailGroupsWithMinMaxDates = mailsGroupedByThread
     .map(x => (x._1, x._2, (x._2
     							.maxBy(x => x._2)
-    							._2.getTime - x._2    												.minBy(x => x._2)    												._2.getTime
+    							._1.getTime - x._2    												.minBy(x => x._2)    												._1.getTime
     						) / 1000))
 
  //turn into a list of tuples with (topic, list of emails, time difference, and weight) filtered that only threads occur
@@ -711,7 +924,7 @@ We see our values ranging roughly between (4.4 and 8.6) which shows that outlier
 |tech's major decline | 2  | 747660 | 4.427325849260936 | 
 
 
-As you can see the highest weights are given to emails which almost instantly got a follow up email response, where as the lowest weights are given to emails with very long timeframes. This allows for emails with a very low frequency to still be rated as very important based on the timeframe in which they were sent.
+As you can see the highest weights are given to emails which almost instantly got a follow up email response, where as the lowest weights are given to emails with very long timeframes. This allows for emails with a very low frequency to still be rated as very important based on the timeframe in which they were sent. With this we have 2 features: the amount of emails from a sender ```mailsGroupedBySender```, and the weight of emails that belong to an existing thread ```threadGroupsWithWeights```.
 
 
 Let's continue with the next feature, as we want to base our ranking on as much features as possible. This next feature will be based on the weight ranking that we just computed. The idea is that new emails with different subjects will arrive. However, chances are that they contain keywords that are similar to earlier received important subjects. This will allow us to rank emails as important before a thread (multiple messages with the same subject) was started. For that we specify the weight of the keywords to be the weight of the subject in which the term occurred. If this term occurred in multiple threads, we take the highest weight as the leading one.
@@ -721,7 +934,15 @@ There is one issue with this feature, which are stopwords. Luckily we have a sto
 
 ```scala
 
-val StopWords = getStopWords
+  def getStopWords: List[String] = {
+    val source = scala.io.Source.fromFile(new File("/Users/../stopwords.txt"))("latin1")
+    val lines = source.mkString.split("\n")
+    source.close()
+    lines.toList
+   }
+
+//Add to top:
+val stopWords = getStopWords
 
 val threadTermWeights =  threadGroupsWithWeights
 	.toArray
@@ -736,12 +957,12 @@ val filteredThreadTermWeights = threadTermWeights
 	.groupBy(x => x._1)
 	.map(x => (x._1, x._2.maxBy(y => y._2)._2))
 	.toArray.sortBy(x => x._1)
-	.filter(x => !StopWords.contains(x._1))
+	.filter(x => !stopWords.contains(x._1))
 
 ```
-Given this code we now have the terms with weights for the existing email subjects, which we can later use for our recommendation system. 
+Given this code we now have a list ```filteredThreadTermWeights``` of terms including weights that are based on existing threads. These weights can be used to compute the weight of the subject of a new email even if the email is not a response to an existing thread.
 
-As fourth feature we want to incorporate weighting based on the terms that are occurring with a high frequency in all the emails. For this we build up a [TDM](http://en.wikipedia.org/wiki/Document-term_matrix), but this time the TDM is a bit different as in the former examples, as we only log the frequency of the terms in all documents. Furthermore we take the log10 of the occurtence counts. This allows us to scale down the term frequencies such that the results do not get affected by possible outlier values.
+As fourth feature we want to incorporate weighting based on the terms that are occurring with a high frequency in all the emails. For this we build up a [TDM](http://en.wikipedia.org/wiki/Document-term_matrix), but this time the TDM is a bit different as in the former examples, as we only log the frequency of the terms in all documents. Furthermore we take the log10 of the occurrence counts. This allows us to scale down the term frequencies such that the results do not get affected by possible outlier values.
 
 ```scala
 
@@ -754,39 +975,139 @@ val tdm = trainingData
 
 ```
 
-With this TDM we can compute the feature for new emails as follows:
+This ```tdm``` list  allows us to compute an importance weight for the email body of new emails based on historical data 
+
+With these preparations for our 4 features, we can make our actual ranking calculation for the training data as follows:
 
 
 ```scala
+val trainingRanks = trainingData.map(mail => {
+      //mail contains (full content, date, sender, subject, body)
 
-val x = getFullEmail(new File("/PathToNewEmail"))
-val mail = (getDateFromEmail(x), getSenderFromEmail(x), getSubjectFromEmail(x), getMessageBodyFromEmail(x)
+      //Determine the weight of the sender
+      val senderWeight = mailsGroupedBySender
+        .collectFirst { case (mail._2, x) => x}
+        .getOrElse(1.0)
 
-val termsInMailBody = mail._4
-      .replaceAll("[^a-zA-Z ]", "")
-      .toLowerCase.split(" ")
-      .filter(x => x.nonEmpty && !stopWords.contains(x))
+      //Determine the weight of the subject
+      val termsInSubject = mail._3
+        .replaceAll("[^a-zA-Z ]", "")
+        .toLowerCase.split(" ")
+        .filter(x => x.nonEmpty && !stopWords.contains(x))
 
-val commonTermsWeight = if (termsInMailBody.size > 0) termsInMailBody
-                                  .map(x => {
-                                              tdm.collectFirst { case (y, z) if y == x => z + 1}
-                                                  .getOrElse(1.0)
-                                            })
-                                  .sum / termsInMailBody.length
-                              else 1.0
+      val termWeight = if (termsInSubject.size > 0) termsInSubject
+        .map(x => {
+        tdm.collectFirst { case (y, z) if y == x => z + 1}
+          .getOrElse(1.0)
+      })
+        .sum / termsInSubject.length
+      else 1.0
+
+      //Determine if the email is from a thread, and if it is the weight from this thread:
+      val threadGroupWeight: Double = threadGroupsWithWeights
+        .collectFirst { case (mail._3, _, _, weight) => weight}
+        .getOrElse(1.0)
+
+      //Determine the commonly used terms in the email and the weight belonging to it:
+      val termsInMailBody = mail._4
+        .replaceAll("[^a-zA-Z ]", "")
+        .toLowerCase.split(" ")
+        .filter(x => x.nonEmpty && !stopWords.contains(x))
+
+      val commonTermsWeight = if (termsInMailBody.size > 0) termsInMailBody
+        .map(x => {
+        tdm.collectFirst { case (y, z) if y == x => z + 1}
+          .getOrElse(1.0)
+      })
+        .sum / termsInMailBody.length
+      else 1.0
+
+      val rank = termWeight * threadGroupWeight * commonTermsWeight * senderWeight
+
+      (mail, rank)
+    })
+    
+    val median = sortedTrainingRanks(sortedTrainingRanks.length / 2)._2
+    val mean = sortedTrainingRanks.map(x => x._2).sum / sortedTrainingRanks.length
+```
+
+This gives us a list ```trainingRanks``` which contains all training emails and their respective ranks.  Now how is this useful, since we want to rank new emails? The idea behind this is that sorting emails purely based on rank would not be really useful, as sorting on date is a way more intuitive way for sorting email. This is why we suggest placing a flag 'important' as a more intuitive way to represent important emails. In order to compute when this flag should be set you also need the ranks from the training set, and define a decision boundary.. 
+
+For this decision boundary we choose the 'mean' of the sorted list. This might not work out well in practice, but since we cannot evaluate the actual importance of the emails as we are not the actual recipient, this is the best we can do. Usually the average might result in 50% ending up as important, but due to the structure of our data, this is not the case in this example.
+
+To see how much of the testing emails are ranked priority, we add the following code:
+
+```scala
+  val testingRanks = testingData.map(mail => {
+      //mail contains (full content, date, sender, subject, body)
+
+      //Determine the weight of the sender
+      val senderWeight = mailsGroupedBySender
+        .collectFirst { case (mail._2, x) => x}
+        .getOrElse(1.0)
+
+      //Determine the weight of the subject
+      val termsInSubject = mail._3
+        .replaceAll("[^a-zA-Z ]", "")
+        .toLowerCase.split(" ")
+        .filter(x => x.nonEmpty && !stopWords.contains(x))
+
+      val termWeight = if (termsInSubject.size > 0) termsInSubject
+        .map(x => {
+        tdm.collectFirst { case (y, z) if y == x => z + 1}
+          .getOrElse(1.0)
+      })
+        .sum / termsInSubject.length
+      else 1.0
+
+      //Determine if the email is from a thread, and if it is the weight from this thread:
+      val threadGroupWeight: Double = threadGroupsWithWeights
+        .collectFirst { case (mail._3, _, _, weight) => weight}
+        .getOrElse(1.0)
+
+      //Determine the commonly used terms in the email and the weight belonging to it:
+      val termsInMailBody = mail._4
+        .replaceAll("[^a-zA-Z ]", "")
+        .toLowerCase.split(" ")
+        .filter(x => x.nonEmpty && !stopWords.contains(x))
+
+      val commonTermsWeight = if (termsInMailBody.size > 0) termsInMailBody
+        .map(x => {
+        tdm.collectFirst { case (y, z) if y == x => z + 1}
+          .getOrElse(1.0)
+      })
+        .sum / termsInMailBody.length
+      else 1.0
+
+      val rank = termWeight * threadGroupWeight * commonTermsWeight * senderWeight
+
+      (mail, rank)
+    })
+
+    val priorityEmails = testingRanks.filter(x => x._2 >= mean)
+
+    println(priorityEmails.length + " ranked as priority")
 
 ```
 
+After actually running this test code, you will see that the amount of emails ranked as priority from the test set is actually  204. This is 16.32% of the test email set. To gain a bit more insight we will show the top 10 for the priority labeled emails.
 
-Given the rank values we can now sort future emails based on rank rather than just on receiving time. This sorting on ranking might not be the most ideal way of sorting, thus we conclude this example with an alternative way to represent these rankings.
+|Date | Sender  | Subject  | Rank |
+| :--- | : -- | :--  | :-- | 
+| Wed Sep 25 12:57:00 CEST 2002 | whit@transpect.com | [razor-users] "no razor servers available at this time" | 9.142285151868377 |
+| Tue Oct 01 06:18:00 CEST 2002 | angles@aminvestments.com | use new apt to do null to rh8 upgrade? | 9.03879575228188 |
+| Thu Oct 03 08:02:00 CEST 2002 | rssfeeds@spamassassin.taint.org | perl.  it's just a language. | 8.859240257643194 |
+| Mon Sep 30 11:11:00 CEST 2002 | axel.thimm@physik.fu-berlin.de | all set for red hat linux 8.0 | 8.844148047621394 |
+| Thu Sep 26 02:00:00 CEST 2002 | pudge@perl.org | [use perl] headlines for 2002-09-26 | 8.765830978559473 |
+| Thu Oct 03 12:33:00 CEST 2002 | whit@transpect.com | [razor-users] "no razor servers available at this time" | 8.739690791945359 |
+| Mon Oct 07 15:22:00 CEST 2002 | blue@rocinante.com | [razor-users] razor2 error: can't find "new" | 8.734496269696358 |
+| Tue Oct 01 02:00:00 CEST 2002 | pudge@perl.org | [use perl] headlines for 2002-10-01 | 8.697201448679307 |
+| Tue Oct 01 02:00:00 CEST 2002 | pudge@perl.org | [use perl] stories for 2002-10-01 | 8.596675141637018 |
+| Mon Sep 23 10:32:49 CEST 2002 | peter.peltonen@iki.fi | new testing packages | 8.596151383796718 |
 
+In this top 10, based on the subjects we can say that these emails are important, however this is no formal proof of the actual importance of these emails. Validating a ranker like this is rather hard when you have no ground truth. One of the most common ways of validating and improving it is by actually presenting it to the user and letting him/her mark correct mistakes. These corrections can then be used to improve the system.
 
-TODO: make up my mind how the final bit of this section will be written (rank values vs classification groups)
-
-
-
-
-
+This concludes the recommendation system example.
 
 
 
@@ -897,15 +1218,15 @@ If you recall from the classification algorithms, there was a [prior](#prior) va
 
 Finally smile also provides you with some statistical information regarding your model. The method ```RSquared``` gives you the [root-mean-square error (RMSE)](#root-mean-squared-error-rmse) from the model divided by the [RMSE](#root-mean-squared-error-rmse) from the mean. This value will always be between 0 and 1. If your model predicts every datapoint perfectly, RSquared will be 1, and if the model does not perform better than the mean function, the value will be 0. In the field this measure is often multiplied by 100 and then used as representation of how accurate the model is. Because this is a normalised value, it can be used to compare the performance of different models.
 
-This concludes linear regression, if you want to know more about how to apply regression on  non-linear data, feel free to work through the next example [Predicting O'Reilly top 100 selling books using text regression](#predicting-o-reilly-top-100-selling-books-using-text-regression).
+This concludes linear regression, if you want to know more about how to apply regression on  non-linear data, feel free to work through the next example [An attempt at rank prediction for top selling books using text regression](#an-attempt-at-rank-prediction-for-top-selling-books-using-text-regression).
 
 
 
-###Predicting O'Reilly top 100 selling books using text regression
+###An attempt at rank prediction for top selling books using text regression
 
-In the example of [predicting weights based on heights and gender](#predicting-weight-based-on-height-using-ordinary-least-squares) we introduced the notion of linear regression. However, sometimes one would want to apply regression on non numeric data such as Text.
+In the example of [predicting weights based on heights and gender](#predicting-weight-based-on-height-using-ordinary-least-squares) we introduced the notion of linear regression. However, sometimes one would want to apply regression on non numeric data such as Text. 
 
-In this example we will show how to do this, but this example will also show that for this particular case it does not work out to use text regression. The reason for this is that the data simply does not contain a signal for our test data. However this does not make this example useless because there might be an actual signal within the text in the data you are using in practice,which then can be detected using text regression as explained here.
+In this example we will show how text regression can be done by prediction the top 100 selling books from O'Reilly. Additionally with this example we will also show that for this particular case it does not work out to use text regression. The reason for this is that the data simply does not contain a signal for our test data. However this does not make this example useless because there might be an actual signal within the text in the data you are using in practice,which then can be detected using text regression as explained here.
 
 
 Let's start off with getting the data we need:
@@ -1065,11 +1386,11 @@ To conclude this example, we rephrase a quote from [John Tukey](http://en.wikipe
 
 
 
-###Using unsupervised learning to create a market index (PCA)
+###Using unsupervised learning to merge features (PCA)
 
-In this example we are going to use [PCA](#principal-components-analysis-pca) to compute our own stock market index based on data of 24 stock prices from 2002 until 2012. This market index combines these 24 stock price columns into 1 single column. This significantly reduces the amount of data to process, and decreases the dimension of our problem, which is a big advantage if we later apply other machine learning algorithms such as regression for prediction.  ]
+In this example we are going to use [PCA](#principal-components-analysis-pca) to merge the stock prices from 24 stocks into 1. This single value then represents a stock market index based on data of these 24 stocks. We will use data from 2002 until 2012. Merging these 24 features into 1 significantly reduces the amount of data to process, and decreases the dimension of our problem, which is a big advantage if we later apply other machine learning algorithms such as regression for prediction.
 
-Note that reducing the dimension from 24 to 1 causes data loss. However, because the stock prices are correlated, we accept this 'data loss'. When applying this method yourself, you should verify first whether your data is correlated.
+Note that reducing the dimension from 24 to 1 causes 'data loss'. However, because the stock prices are correlated, we accept this 'data loss'. When applying this method yourself, you should verify first whether your data is correlated.
 
 Let's start the example
 
@@ -1081,184 +1402,5 @@ TODO: create the final code bits and write the section
 
 TODO: write
 
-
-
-##The global idea of machine learning
-You probably have heard about Machine learning as a concept one time or another. However, if you would have to explain what machine learning to another person, how would you do this? Think about this for a second before reading the rest of this section.
-
-Machine learning is explained in many ways, some more accurate than others, however there is a lot of inconsistency in its definition. Where some say machine learning is generating a static model based on historical data, which then allows you to predict for future data. Others say it's a dynamic model that keeps on changing as more data is added over time.
-
-
-We agree more with the dynamic definition however, but due certain limitations we explain the static model method in the examples. However we do explain how the dynamic principle would work in the subsection [dynamic machine learning](#dynamic-machine-learning).
-
-The other subsections explain commonly used definitions and notions in the machine learning field. We advise you to read through these before starting the practical examples.
-
-
-###Features
-A feature (in the field of machine learning) is a property on which a [Model](#model) is trained. Say for example that you classify emails as spam/ham based on the frequency of the word 'Buy' and 'Money'. Then these words are features. If you would use machine learning to predict whether one is a friend of you, the amount of 'common' friends could be a feature.
-
-###Model
-When one talks about machine learning, often the term *model* is mentioned. The model is the result of any machine learning method and the algorithm used within this method. This model can be used to make predictions in [supervised](#supervised-learning), or to retrieve clusterings in [unsupervised learning](#unsupervised-learning).
-
-###Learning methods
-In the field of machine learning there are two leading ways of learning, namely [Supervised learning](http://en.wikipedia.org/wiki/Supervised_learning) and  [Unsupervised learning](http://en.wikipedia.org/wiki/Unsupervised_learning). A brief introduction is necessary when you want to use Machine learning in your applications, as picking the right machine learning approach is an important but sometimes also a little tedious process.
-
-####Supervised Learning
-The principle of supervised learning can be used to solve many problem types. In this blog however we will stick to [Classification](#classification) and [Regression](#regression) as this covers most of the problems one wants to solve in their every day application.
-
-
-#####Classification
-The problem of classification within the domain of Supervised learning is relatively simple. Given a set of labels, and some data that already received the correct labels, we want to be able to *predict* labels for new data that we did not label yet. However, before thinking of your data as a classification problem, you should look at what the data looks like. If there is a clear structure in the data such that you can easily draw a regression line it might be better to use a [regression](#regression) algorithm instead. Given the data does not fit to a regression line, or when performance becomes an issue, classification is a good alternative.
-
-An example of a classification problem would be to classify emails as Ham or Spam based on their content. Given a training set in which emails are labeled Ham/Spam, a classification algorithm can be used to train a [Model](#model). This model can then be used to predict for future emails whether they are Ham or Spam. A typical example of a classification algorithm is the [K-NN algorithm](#labeling-isps-based-on-their-downupload-speed-knn-using-smile-in-scala). Another more commonly used example of a classification problem is [Classifying Email as Spam or Ham](#classifying-email-as-spam-or-ham-naive-bayes) which is also one of the examples written on this blog.
-
-#####Regression
-Regression is a lot stronger in comparison to [classification](#classification). This is because in regression you are predicting actual values, rather than labels. Let us clarify this with a short example: given a table of weights, heights, and genders, you can use [KNN](#Labeling ISPs based on their Down/Upload speed (K-NN using Smile in Scala)) to predict ones gender when given a weight and height. With this same dataset using regression, you could instead predict ones weight or height, given the gender the respective other missing parameter. 
-
-With this extra power, comes great responsibility, thus in the working field of regression one should be very careful when generating the model. Common pitfalls are [overfitting](#overfitting), [under fitting](#under-fitting) and not taking into account how the model handles  [extrapolation](http://en.wikipedia.org/wiki/Extrapolation) and [interpolation](http://en.wikipedia.org/wiki/Interpolation).
-
-
-
-####Unsupervised Learning
-TODO: Introduction on Unsupervised learning
-
-#####Principal Components Analysis (PCA)
-Principal Components Analysis is a technique used in statistics to convert a set of correlated columns into a smaller set of uncorrelated columns, reducing the amount features of a problem.  This smaller set of columns are called the principal components. This technique is mostly used in exploratory data analysis as it reveals internal structure in the data that can not be found with eye-balling the data.
-
-A big weakness of PCA however are outliers in the data. these heavily influence it's result, thus looking at the data on beforehand, eliminating large outliers can greatly improve its performance.
-
-
-###Validation techniques
-In this section we will explain some of the techniques available for model validation, and will explain some terms that are commonly used in the Machine Learning field.
-
-
-#### Cross Validation
-The technique of cross validation is one of the most common techniques in the field of machine learning. It's essence is to *ignore* part of your dataset while training your [model](#model), and then using the model to predict this *ignored data*. Comparing the predictions to the actual value then gives an indication of the performance of your model.
-
-
-#####(2 fold) Cross Validation
-TODO: explanation of 2fold cross validation
-
-
-#### Regularization
-The basic idea of regularization is preventing [overfitting](#overfitting) your [model](#model) by simplifying it. Suppose your data is a polynomial function of degree 3, but your data has noise and this would cause the model to be of a higher degree. Then the model would perform poorly on new data, where as it seems to be a good model at first. Regularization hels preventing this, by simplifying the model with a certain value *lambda*. However to find the right lambda for a model is hard when you have no idea as to when the model is overfitted or not. This is why [cross validation](#cross-validation) is often used to find the best lambda fitting your model.
-
-
-##### Precision
-In the field of computer science we use the term precision to define the amount of items selected which are actually relevant.
-
-This value is computed as follows:
-
-<img src="./Images/Precision.png"/>
-
-To give an example:
-
-Say we have documents {aa,ab,bc,bd,ee} and we query for documents with a in the name. If our algorithm would be to return {aa,ab} the precision would be 100% intuitively. Let's verify it by filling in the formula:
-
-
-<img src="./Images/PrecisionFull.png"/>
-
-Indeed it is 100%. Next we shall show what happens if more results are returned:
-
-<img src="./Images/PrecisionHalf.png"/>
-
-Here the results contained the relevant results but also 2 irrelevant results. This caused the precision to decrease. However if you would calculate the [recall](#recall) for this example it would be 100%. This is how precision and recall differ from each other.
-
-##### Recall
-In the field of computer science we use the term recall to define the amount of relevant items that are retrieved for a query.
-
-This value is computed as follows:
-
-<img src="./Images/Recall.png"/>
-
-To give an example:
-
-Say we have documents {aa,ab,bc,bd,ee} and we query for documents with a in the name. If our algorithm would be to return {aa,ab} the recall would be 100% intuitively. Let's verify it by filling in the formula:
-
-
-<img src="./Images/RecallFull.png"/>
-
-Indeed it is 100%. Next we shall show what happens if not all relevant results are returned:
-
-<img src="./Images/RecallHalf.png"/>
-
-Here the results  only contained half of the relevant results. This caused the recall to decrease. However if you would compute the [precision](#precision) for this situation, it would result in 100% precision, because all results are relevant.
-
-##### Prior
-The prior value that belongs to a classifier given a datapoint represents the likelihood that this datapoint belongs to this classifier. 
-
-##### Root Mean Squared Error (RMSE)
-The Root Mean Squared Error (RMSE or RMSD where D is deviation) is the square root of the variance of the differences between the actual value and predicted value.
-Suppose we have the following values:
-
-| Predicted temperature | Actual temperature |  squared difference for Model | square difference for average |
-| :--: | :--:| :--:| :--: | 
-|10 | 12 | 4 |  7.1111 |
-|20 | 17 | 9 |  5.4444 |
-|15 | 15 | 0 |  0.1111 |
-
-Then the mean of this squared difference for the model is 4.33333, and the root of this is 2.081666. So basically in average, the model predicts the values with an average error of 2.09. The lower this RMSE value is, the better the model is in its predictions. This is why in the field, when selecting features, one computes the RMSE with and without a certain feature, in order to say something about how that feature affects the performance of the model.
-
-
-Additionally, because the RMSE is an absolute value, it can be normalised in order to compare models. This results in the Normalised Root Mean Square Error (NRMSE). For computing this however, you need to know the minimum and maximum value that the system can contain. Let's suppose we can have temperatures ranging from minimum of 5 to a maximum of 25 degrees, then computing the NRMSE is as follows:
-
-<img src="./Images/Formula4.png"/>
-
-When we fill in the actual values we get the following result:
-
-<img src="./Images/Formula1.png"/>
-
-Now what is this 10.45 value?  This is the error percentage the model has in average on it's datapoints.
-
-Finally we can use RMSE to compute a value that is known in the field as **R Squared**. This value represents how good the model performs in comparison to ignoring the model and just taking the average for each value. For that you need to calculate the RMSE for the average first. This is 4.22222  (taking the mean of the values from the last column in the table), and the root is then 2.054805. The first thing you should notice is that this value is lower than that of the model. This is not a good sign, because this means the model performs **worse** than just taking the mean. However to demonstrate how to compute **R Squared** we will continue the computations.
-
-We now have the RMSE for both the model and the mean, and then computing how well the model performs in comparison to the mean is done as follows:
-
-<img src="./Images/Formula2.png"  />
-
-This results in the following computation:
-
-<img src="./Images/Formula3.png"  />
-
-Now what does this -1.307229 represent. Basically it says that the model that predicted these values performs +/- 1.31 percent worse than returning the average each time a value is to be predicted. In other words, we could better use the average function as a predictor rather than the model in this specific case.
-
-
-###Pitfalls 
-This section describes some common pitfalls in applying machine learning techniques. The idea of this section is to make you aware of of these pitfalls and help you prevent actually walking into one yourself.
-
-##### Overfitting
-
-When fitting a function on the data, there is a possibility the data contains noise (for example by measurement errors). If you fit every point from the data exactly, you incorporate this noise into the [model](#model). This causes the model to predict really well on your test data, but relatively poor on future data.
-
-The left image here below show how this overfitting would look like if you where to plot your data and the fitted functions, where as the right image would represent a *good fit* of the regression line through the datapoints.
-
-
-<img src="./Images/OverFitting.png" width="300px" /> 
-<img src="./Images/Good_Fit.png" width="300px" />
-
-Overfitting can easily happen when applying [regression](#regression) but can just as easily be introduced in [NBayes classifications](#classifying-email-as-spam-or-ham-naive-bayes). In regression it happens with rounding, bad measurements and noisy data. In naive bayes however, it could be the features that where picked. An example for this would be classifying spam or ham while keeping all stopwords.
-
-Overfitting can be detected by performing [validation techniques](#validation-techniques) and looking into your data's statistical features, and detecting and removing outliers.
-
-
-
-##### Under-fitting
-When you are turning your data into a model, but are leaving (a lot of) statistical data behind, this is called under-fitting. This can happen due to various reasons, such as using a wrong regression type on the data. If you have a non-linear structure in the data, and you apply linear regression, this would result in an under-fitted model. The left image here below represents a under-fitted regression line where as the right image shows a good fit regression line.
-
-<img src="./Images/Under-fitting.png" width="300px" /> 
-<img src="./Images/Good_Fit.png" width="300px" />
-
-You can prevent under fitting by plotting the data to get insights in the underlying structure, and using [validation techniques](#validation-techniques) such as [cross validation](#2-fold-cross-validation). 
-
-##### Curse of dimensionality
-The curse of dimensionality is a collection of problems that can occur when your data size is lower than the amount of features (dimensions) you are trying to use to create your machine learning [model](#model). An example of a dimensionality curse is matrix rank deficiency. When using [Ordinary Least Squares(OLS)](http://en.wikipedia.org/wiki/Ordinary_least_squares), the underlying algorithm solves a linear system in order to build up a model. However if you have more columns than you have rows, solving this system is not possible. If this is the case, the best solution would be to get more datapoints or reduce the feature set. 
-
-If you want to know more regarding this curse of dimensionality, [a study focussed on this issue](http://lectures.molgen.mpg.de/networkanalysis13/LDA_cancer_classif.pdf). In this study, researchers Haifeng Li, Keshu Zhang and Tao Jiang developed an algorithm that improves cancer classification with very few datapoints in comparison to [support vector machines](http://en.wikipedia.org/wiki/Support_vector_machine) and [random forests](http://en.wikipedia.org/wiki/Random_forest)
-
-
-###Dynamic machine learning
-In almost all literature you can find about machine learning, a static model is generated and validated, and then used for predictions / recommendations. However in practice, this alone would not make a very good machine learning application. This is why in this section we will explain how to turn a static model into a dynamic model. Since the (most optimal) implementation depends on the algorithm you are using, we will explain the concept rather than giving a practical example. Because explaining it in text only will not be very clear we first present you the whole system in a diagram which we will use to explain machine learning and how to make it dynamic.
-
-<img src="./Images/DynamicMachineLearning.png" />
 
 
