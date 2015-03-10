@@ -290,9 +290,9 @@ Given the data the first thing to do next is to see what the data looks like. Fo
     title = "KNN Example"
     val basePath = "/.../KNN_Example_1.csv"
 
-    val test_data = GetDataFromCSV(new File(basePath))
+    val testData = GetDataFromCSV(new File(basePath))
 
-    val plot = ScatterPlot.plot(test_data._1, test_data._2, '@', Array(Color.red, Color.blue))
+    val plot = ScatterPlot.plot(testData._1, testData._2, '@', Array(Color.red, Color.blue))
     peer.setContentPane(plot)
     size = new Dimension(400, 400)
 
@@ -1165,10 +1165,10 @@ object LinearRegressionExample extends SimpleSwingApplication {
     title = "Linear Regression Example"
     val basePath = "/Users/.../OLS_Regression_Example_3.csv"
 
-    val test_data = GetDataFromCSV(new File(basePath))
+    val testData = GetDataFromCSV(new File(basePath))
 
-    val plotData = (test_data._1 zip test_data._2).map(x => Array(x._1(1) ,x._2))
-    val maleFemaleLabels = test_data._1.map( x=> x(0).toInt)
+    val plotData = (testData._1 zip testData._2).map(x => Array(x._1(1) ,x._2))
+    val maleFemaleLabels = testData._1.map( x=> x(0).toInt)
     val plot =  ScatterPlot.plot(plotData,maleFemaleLabels,'@',Array(Color.blue, Color.green))
     plot.setTitle("Weight and heights for male and females")
     plot.setAxisLabel(0,"Heights")
@@ -1195,7 +1195,7 @@ Finding this distinction is trivial in this example, but you might encounter dat
 Now that we have seen the data and see that indeed we can come up with a linear regression line to fit this data, it is time to train a [model](#model). Smile provides us with the [ordinary least squares](http://en.wikipedia.org/wiki/Ordinary_least_squares) algorithm which we can easily use as follows:
 
 ```scala
-val olsModel = new OLS(test_data._1,test_data._2)
+val olsModel = new OLS(testData._1,testData._2)
 ```
 
 With this olsModel we can now predict someone's weight based on length and gender as follows: 
@@ -1400,7 +1400,87 @@ TODO: create the final code bits and write the section
 
 ###using Support Vector Machines
 
-TODO: write
+In this example we will work through several small cases where a Support Vector Machine (SVM) will outperform other classifying algorithms such as [KNN](#labeling-isps-based-on-their-downupload-speed-knn-using-smile-in-scala). This approach is different from the former examples, but will help you understand how and when to use SVM's more easily. 
+
+For each sub example we will provide code, a plot, a few test runs with different parameters on the SVM and an explanation on the results. This should give you an idea on the parameters to feed into the SVM algorithm. 
+
+In the first example we will use the GaussianKernel, but there are many other kernels available in [Smile](https://github.com/haifengl/smile). The other kernels can be found [here](http://haifengl.github.io/smile/doc/smile/math/kernel/MercerKernel.html), and some of them we will use in the other examples.
 
 
+ We will use the following base for each example, with only the ```path``` and ```svm``` construction changing per example.
 
+```scala
+
+object SupportVectorMachine extends SimpleSwingApplication {
+
+
+  def top = new MainFrame {
+    title = "SVM Examples"
+    //File path (this changes per example)
+    val path =  "/users/.../Example Data/SVM_Example_1.csv"
+
+    //Loading of the test data and plot generation stays the same
+    val testData = GetDataFromCSV(new File(path))
+    val plot = ScatterPlot.plot(testData._1, testData._2, '@', Array(Color.blue, Color.green))
+    peer.setContentPane(plot)
+
+    //Here we do our SVM fine tuning with possibly different kernels
+    val svm = new SVM[Array[Double]](new GaussianKernel(0.01), 1.0,2)
+    svm.learn(testData._1, testData._2)
+    svm.finish()
+
+    //Calculate how well the SVM predicts on the training set
+    val predictions = testData._1.map(x => svm.predict(x)).zip(testData._2)
+    val falsePredictions = predictions.map(x => if (x._1 == x._2) 0 else 1 )
+
+    println(falsePredictions.sum.toDouble / predictions.length  * 100 + " % false predicted")
+
+    size = new Dimension(400, 400)
+  }
+
+
+  def GetDataFromCSV(file: File): (Array[Array[Double]], Array[Int]) = {
+    val source = scala.io.Source.fromFile(file)
+    val data = source.getLines().drop(1).map(x => GetDataFromString(x)).toArray
+    source.close()
+    val dataPoints = data.map(x => x._1)
+    val classifierArray = data.map(x => x._2)
+    return (dataPoints, classifierArray)
+  }
+
+  def GetDataFromString(dataString: String): (Array[Double], Int) = {
+    //Split the comma separated value string into an array of strings
+    val dataArray: Array[String] = dataString.split(',')
+
+    //Extract the values from the strings
+    val coordinates  = Array( dataArray(0).toDouble, dataArray(1).toDouble)
+    val classifier: Int = dataArray(2).toInt
+
+    //And return the result in a format that can later easily be used to feed to Smile
+    return (coordinates, classifier)
+  }
+  
+```
+
+So now to start with the first example. If we load the first example we get to see the following data plot:
+
+<img src="./Images/SVM_Datapoints.png" width="400px" />
+
+It is clear from this plot that a linear regression line would not work. Instead we will use a SVM to make predictions. In the first code we gave, the GaussianKernel with a sigma of 0.01, a margin penalty of 1.0 and the amount of classes of 2 is passed to SVM. Now what does this all mean?
+
+Lets start with the  ```GaussianKernel```. This kernel represents the way in which the SVM will calculate the similarity over pairs of datapoints in the system. For the gaussianKernel the variance in the euclidian distance is used. The reason for picking the GaussianKernel specifically is because the data does not contain a clear structure such as a linear, polynomial or hyperbolic function. Instead the data is clustered in 3 groups. 
+
+The parameter we pass in the constructor of the ```GaussianKernel``` is the sigma. This sigma value represents a smoothness value of the kernel. We will show what changing this parameter has for effect in the predictions.  As margin penalty we pass 1. This parameter defines the margin of the vectors in the system, thus making this value lower results in more bounded vectors. Again we will show with runs what kind of effect this has in practice:
+
+| | s: 0.001 | s: 0.01 | s: 0.1 | s: 0.2 | s: 0.5 | s: 1.0 | s: 2.0 | s: 3.0 | s: 10.0 | s: 100.0 |
+| :-- | :--: | :--: | :--: | :--: | :--: | :--: | :--: | 
+| **c: 0.001** | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% |
+| **c: 0.01** | 48.4% | 48.4% | 40% | 43.8% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% |
+| **c: 0.1** | 48.4% | 48.4% | 12.4% | 14.2% | 17.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% |
+| **c: 0.2** | 48.4% | 45.6% | 9.1% | 10.1% | 12.3% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% |
+| **c: 0.5** | 47.5% | 3.4% | 6.3% | 7.2% | 7% | 8.9% | 48.4% | 48.4% | 48.4% | 48.4% |
+| **c: 1.0** | 0% | 1.6% | 5.1% | 5.7% | 5.6% | 5.6% | 48.4% | 48.4% | 48.4% | 48.4% |
+| **c: 2.0** | 0% | 1% | 5.2% | 5% | 5.4% | 5.7% | 13.1% | 48.4% | 51.6% | 48.4% |
+| **c: 3.0** | 0% | 1.2% | 6.4% | 5.8% | 5.7% | 7.4% | 18% | 51.6% | 51.6% | 51.6% |
+| **c: 10.0** | 0% | 1.5% | 7.5% | 6.4% | 7.7% | 12.9% | 26.2% | 51.6% | 51.6% | 51.6% |
+| **c: 100.0** | 0% | 1.5% | 10.1% | 12.8% | 14.6% | 18.3% | 41.6% | 51.6% | 51.6% | 51.6% |

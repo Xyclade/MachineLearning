@@ -72,6 +72,11 @@ object PCA extends SimpleSwingApplication{
     println("Loaded data")
 
     val plot =   LinePlot.plot(plotData, Line.Style.SOLID)
+    plot.add( LinePlot.plot(Array(Array(10.0,20.0),Array(11.0,45.0)),Line.Style.DASH))
+    val plotData2 = points.zipWithIndex.map( x=> Array(x._2.toDouble + 10, x._1(0) + 10))
+    val plot2 =   LinePlot.plot(plotData2, Line.Style.SOLID)
+
+
 
     peer.setContentPane(plot)
    size = new Dimension(400, 400)
