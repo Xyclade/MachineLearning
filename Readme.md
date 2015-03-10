@@ -1473,7 +1473,7 @@ Lets start with the  ```GaussianKernel```. This kernel represents the way in whi
 The parameter we pass in the constructor of the ```GaussianKernel``` is the sigma. This sigma value represents a smoothness value of the kernel. We will show what changing this parameter has for effect in the predictions.  As margin penalty we pass 1. This parameter defines the margin of the vectors in the system, thus making this value lower results in more bounded vectors. Again we will show with runs what kind of effect this has in practice:
 
 | | s: 0.001 | s: 0.01 | s: 0.1 | s: 0.2 | s: 0.5 | s: 1.0 | s: 2.0 | s: 3.0 | s: 10.0 | s: 100.0 |
-| :-- | :--: | :--: | :--: | :--: | :--: | :--: | :--: | 
+| :-- | :--: | :--: | :--: | :--: | :--: | :--: | :--: |  :--: |  :--: |  :--: | 
 | **c: 0.001** | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% |
 | **c: 0.01** | 48.4% | 48.4% | 40% | 43.8% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% |
 | **c: 0.1** | 48.4% | 48.4% | 12.4% | 14.2% | 17.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% |
