@@ -25,8 +25,32 @@ object SupportVectorMachine extends SimpleSwingApplication {
     //val svm = new SVM[Array[Double]](new GaussianKernel(0.01), 10.0,2)
     val printlist = mutable.MutableList[(Double,Double,Double)]()
 
-    val sigmas = Array(0.001,0.01,0.1,0.2,0.5,1.0,2.0,3.0,10.0,100)
+
+
+    val avgYSquared = Math.pow(testData._1.map(x => x(1)).sum / testData._1.length, 2)
+    val avgSquaredY = testData._1.map(x => Math.pow(x(1),2)).sum / testData._1.length
+
+    val varianceY = avgSquaredY - avgYSquared
+    val sigmaY = Math.sqrt(varianceY)
+    println("VarianceY: " + varianceY)
+    println("sigmaY: " + sigmaY)
+
+    val avgXSquared = Math.pow(testData._1.map(x => x(0)).sum / testData._1.length, 2)
+    val avgSquaredX = testData._1.map(x => Math.pow(x(0),2)).sum / testData._1.length
+
+    val varianceX = avgSquaredX - avgXSquared
+    val sigmaX = Math.sqrt(varianceX)
+    println("VarianceX: " + varianceX)
+    println("sigmaX: " + sigmaX)
+
+    val sigmaXY = sigmaX + sigmaY
+    val sigmaXYAVG =  sigmaXY/2
+
+    val sigmas = Array(0.001,0.01,0.1,0.2,0.5,1.0,2.0,3.0,10.0,100, sigmaX, sigmaY,sigmaXY,sigmaXYAVG)
     val marginPenalties = Array(0.001,0.01,0.1,0.2,0.5,1.0,2.0,3.0,10.0,100)
+
+
+
     sigmas.foreach( sigma =>
       marginPenalties.foreach(marginPenalty => {
       val svm = new SVM[Array[Double]](new GaussianKernel(sigma), marginPenalty, 2)
@@ -40,6 +64,7 @@ object SupportVectorMachine extends SimpleSwingApplication {
 
       val result = (sigma ,marginPenalty , (falsePredictions.sum.toDouble / predictions.length * 100))
       printlist += result
+        println("sigma: " + sigma + " margin: " + marginPenalty + " error: " + result._3)
     }
     )
     )

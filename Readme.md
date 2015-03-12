@@ -23,7 +23,7 @@ You probably have heard about Machine learning as a concept one time or another.
 Machine learning is explained in many ways, some more accurate than others, however there is a lot of inconsistency in its definition. Where some say machine learning is generating a static model based on historical data, which then allows you to predict for future data. Others say it's a dynamic model that keeps on changing as more data is added over time.
 
 
-We agree more with the dynamic definition however, but due certain limitations we explain the static model method in the examples. However we do explain how the dynamic principle would work in the subsection [dynamic machine learning](#dynamic-machine-learning).
+We agree more with the dynamic definition but due certain limitations we explain the static model method in the examples. However we do explain how the dynamic principle would work in the subsection [dynamic machine learning](#dynamic-machine-learning).
 
 The other subsections explain commonly used definitions and notions in the machine learning field. We advise you to read through these before starting the practical examples.
 
@@ -60,6 +60,16 @@ TODO: Introduction on Unsupervised learning
 Principal Components Analysis is a technique used in statistics to convert a set of correlated columns into a smaller set of uncorrelated columns, reducing the amount features of a problem.  This smaller set of columns are called the principal components. This technique is mostly used in exploratory data analysis as it reveals internal structure in the data that can not be found with eye-balling the data.
 
 A big weakness of PCA however are outliers in the data. these heavily influence it's result, thus looking at the data on beforehand, eliminating large outliers can greatly improve its performance.
+
+To give a clear idea of what PCA does, we show the plots of a dataset of points with 2 dimensions in comparison to the same dataset plotted after PCA is applied.
+
+<img src="./Images/PCA_Explanatory_Data.png" width="350px"/>
+<img src="./Images/PCA_Reduced_Dimension.png" width="330px" />
+
+On the left plot the original data is shown, where each color represents a different class. It is clear that from the 2 dimensions (X and Y) you could reduce to 1 dimension and still classify properly. This is where PCA comes in place. with PCA a new value is calculated for each datapoint, based on its original dimensions. 
+
+In the plot on the right you see the result of applying PCA to this data. Note that there is a y value on 0.0, but this is purely to be able to plot the data and show it to you, as only the X values are returned by the PCA algorithm. Also note that the values for X in the right plot do not correspond to the values in the left plot, this shows that PCA not 'just drops' a dimension.
+
 
 
 ###Validation techniques
@@ -1388,13 +1398,171 @@ To conclude this example, we rephrase a quote from [John Tukey](http://en.wikipe
 
 ###Using unsupervised learning to merge features (PCA)
 
-In this example we are going to use [PCA](#principal-components-analysis-pca) to merge the stock prices from 24 stocks into 1. This single value then represents a stock market index based on data of these 24 stocks. We will use data from 2002 until 2012. Merging these 24 features into 1 significantly reduces the amount of data to process, and decreases the dimension of our problem, which is a big advantage if we later apply other machine learning algorithms such as regression for prediction.
+In this example we are going to use [PCA](#principal-components-analysis-pca) to merge stock prices from 24 stocks into 1 over a time period of 2002 - 2012. This single value (over time) then represents a stock market index based on data of these 24 stocks.Merging these 24 stock prices into 1 significantly reduces the amount of data to process, and decreases the dimension of our problem, which is a big advantage if we later apply other machine learning algorithms such as regression for prediction. In order to see the performance of our feature reduction of 24 to 1, we will compare our result to the Dow Jones Index over that same time period. 
 
-Note that reducing the dimension from 24 to 1 causes 'data loss'. However, because the stock prices are correlated, we accept this 'data loss'. When applying this method yourself, you should verify first whether your data is correlated.
+As first step of our example we should load the data.
 
-Let's start the example
 
-TODO: create the final code bits and write the section
+```scala
+object PCA extends SimpleSwingApplication{
+
+
+  def top = new MainFrame {
+    title = "PCA Example"
+    //Get the example data
+    val basePath = "/users/mikedewaard/MachineLearning/Example Data/"
+    val exampleDataPath = basePath + "PCA_Example_1.csv"
+    val trainData = GetStockDataFromCSV(new File(exampleDataPath))
+    
+    }
+  def GetStockDataFromCSV(file: File): (Array[Date],Array[Array[Double]]) = {
+    val source = scala.io.Source.fromFile(file)
+    //Get all the records (minus the header)
+    val data = source.getLines().drop(1).map(x => GetStockDataFromString(x)).toArray
+    source.close()
+    //group all records by date, and sort the groups on date ascending
+    val groupedByDate = data.groupBy(x => x._1).toArray.sortBy(x => x._1)
+    //extract the values from the 3-tuple and turn them into an array of tuples: Array[(Date, Array[Double)]
+    val dateArrayTuples = groupedByDate.map(x => (x._1, x._2.sortBy(x => x._2).map(y => y._3)))
+
+    //turn the tuples into two separate arrays for easier use later on
+    val dateArray = dateArrayTuples.map(x => x._1).toArray
+    val doubleArray = dateArrayTuples.map(x => x._2).toArray
+
+
+    (dateArray,doubleArray)
+  }
+
+  def GetStockDataFromString(dataString: String): (Date,String,Double) = {
+
+    //Split the comma separated value string into an array of strings
+    val dataArray: Array[String] = dataString.split(',')
+
+    val format = new SimpleDateFormat("yyyy-MM-dd")
+    //Extract the values from the strings
+
+    val date = format.parse(dataArray(0))
+    val stock: String = dataArray(1)
+    val close: Double = dataArray(2).toDouble
+
+    //And return the result in a format that can later easily be used to feed to Smile
+    (date,stock,close)
+  }
+}
+```
+
+With this training data, and the fact that we already know that we want to merge the 24 features into 1 single feature, we can do the PCA and retrieve the values for the datapoints as follows.
+
+```scala
+//Add to `def top`
+val pca = new PCA(trainData._2)
+pca.setProjection(1)
+val points = pca.project(trainData._2)
+val plotData = points.zipWithIndex.map(x => Array(x._2.toDouble, -x._1(0) ))
+val canvas: PlotCanvas = LinePlot.plot("Merged Features Index", plotData, Line.Style.DASH, Color.RED);
+
+peer.setContentPane(canvas)
+size = new Dimension(400, 400)
+```
+
+This code not only does the PCA but also plots the results, with the feature value on the y axis and the individual days on the x axis.
+
+<img src="./Images/Unscaled_PCA_Index.png" width="400px" />
+
+If we now add the Dow Jones index to the plot by adjusting the code as follows.
+
+```scala
+//Add to `def top` 
+ //Verification against DJI
+    val verificationDataPath = basePath + "PCA_Example_2.csv"
+    val verificationData = GetDJIFromFile(new File(verificationDataPath))
+    val DJIIndex = GetDJIFromFile(new File(verificationDataPath))
+    canvas.line("Dow Jones Index", DJIIndex._2, Line.Style.DOT_DASH, Color.BLUE)
+
+
+```
+
+```scala
+//added methods
+
+  def GetDJIRecordFromString(dataString: String): (Date,Double) = {
+
+    //Split the comma separated value string into an array of strings
+    val dataArray: Array[String] = dataString.split(',')
+
+    val format = new SimpleDateFormat("yyyy-MM-dd")
+    //Extract the values from the strings
+
+    val date = format.parse(dataArray(0))
+    val close: Double = dataArray(4).toDouble
+
+    //And return the result in a format that can later easily be used to feed to Smile
+    (date,close)
+  }
+
+
+  def GetDJIFromFile(file: File): (Array[Date],Array[Double]) = {
+    val source = scala.io.Source.fromFile(file)
+    //Get all the records (minus the header)
+    val data = source.getLines().drop(1).map(x => GetDJIRecordFromString(x)).toArray
+    source.close()
+
+    //turn the tuples into two separate arrays for easier use later on
+    val sortedData = data.sortBy(x => x._1)
+    val dates = sortedData.map(x => x._1)
+    val doubles = sortedData.map(x =>   x._2 )
+
+    (dates, doubles)
+  }
+
+```
+
+When we execute this code, the result plot is rather useless.
+
+<img src="./Images/Unscaled_DJI_PCA_Index.png" width="400px" />
+
+As you can see, the ranges of the DJI and our computed feature are far off. This is why we will now normalise the data. The idea is that we scale the data base on its range, such that both datasets are on the same scale.
+
+Replace the ```GetDJIFromFile``` method with the following:
+
+```scala
+
+
+def GetDJIFromFile(file: File): (Array[Date],Array[Double]) = {
+    val source = scala.io.Source.fromFile(file)
+    //Get all the records (minus the header)
+    val data = source.getLines().drop(1).map(x => GetDJIRecordFromString(x)).toArray
+    source.close()
+
+    //turn the tuples into two separate arrays for easier use later on
+    val sortedData = data.sortBy(x => x._1)
+    val dates = sortedData.map(x => x._1)
+    val maxDouble = sortedData.maxBy(x => x._2)._2
+    val minDouble = sortedData.minBy(x => x._2)._2
+    val rangeValue = maxDouble - minDouble
+    val doubles = sortedData.map(x =>   x._2 / rangeValue )
+
+
+
+    (dates, doubles)
+  }
+  
+ 
+```
+and replace the `plotData`  val in def top and replace with
+
+```scala
+val maxDataValue = points.maxBy(x => x(0))
+val minDataValue = points.minBy(x => x(0))
+val rangeValue = maxDataValue(0) - minDataValue(0)
+val plotData = points.zipWithIndex.map(x => Array(x._2.toDouble, -x._1(0) / rangeValue))
+```
+
+
+
+<img src="./Images/PCA_Normalised.png" width="400px" />
+
+We see  now that the data of the DJI ranges between 0.8 and 1.8 where as our new feature ranges between -0.5 and 0.5, and that the lines themselves correspond quite well. This shows indirectly that PCA can be a very strong method in reducing features but still can give very accurate results.
 
 
 
@@ -1470,9 +1638,10 @@ It is clear from this plot that a linear regression line would not work. Instead
 
 Lets start with the  ```GaussianKernel```. This kernel represents the way in which the SVM will calculate the similarity over pairs of datapoints in the system. For the gaussianKernel the variance in the euclidian distance is used. The reason for picking the GaussianKernel specifically is because the data does not contain a clear structure such as a linear, polynomial or hyperbolic function. Instead the data is clustered in 3 groups. 
 
-The parameter we pass in the constructor of the ```GaussianKernel``` is the sigma. This sigma value represents a smoothness value of the kernel. We will show what changing this parameter has for effect in the predictions.  As margin penalty we pass 1. This parameter defines the margin of the vectors in the system, thus making this value lower results in more bounded vectors. Again we will show with runs what kind of effect this has in practice:
+The parameter we pass in the constructor of the ```GaussianKernel``` is the sigma. This sigma value represents a smoothness value of the kernel. We will show what changing this parameter has for effect in the predictions.  As margin penalty we pass 1. This parameter defines the margin of the vectors in the system, thus making this value lower results in more bounded vectors. We will show with  a set of runs and their results what kind of effect this has in practice. Note that the `s:` stands for sigma, and the `c:` stands for the correction penalty. The percentages represent the error rate in the prediction, which is simply the percentage of false predictions on the same dataset after training.
 
-| | s: 0.001 | s: 0.01 | s: 0.1 | s: 0.2 | s: 0.5 | s: 1.0 | s: 2.0 | s: 3.0 | s: 10.0 | s: 100.0 |
+
+| % false predictions| s: 0.001 | s: 0.01 | s: 0.1 | s: 0.2 | s: 0.5 | s: 1.0 | s: 2.0 | s: 3.0 | s: 10.0 | s: 100.0 |
 | :-- | :--: | :--: | :--: | :--: | :--: | :--: | :--: |  :--: |  :--: |  :--: | 
 | **c: 0.001** | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% |
 | **c: 0.01** | 48.4% | 48.4% | 40% | 43.8% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% |
@@ -1484,3 +1653,5 @@ The parameter we pass in the constructor of the ```GaussianKernel``` is the sigm
 | **c: 3.0** | 0% | 1.2% | 6.4% | 5.8% | 5.7% | 7.4% | 18% | 51.6% | 51.6% | 51.6% |
 | **c: 10.0** | 0% | 1.5% | 7.5% | 6.4% | 7.7% | 12.9% | 26.2% | 51.6% | 51.6% | 51.6% |
 | **c: 100.0** | 0% | 1.5% | 10.1% | 12.8% | 14.6% | 18.3% | 41.6% | 51.6% | 51.6% | 51.6% |
+
+For the correction rate, we see that the performance holds best between 0.5 and 2. In order to explain this we need  to go a little in depth on the theory behind SVMs. The basic SVM is a binary classifier that divides a dataset into 2 parts by picking a hyperplane that represents the largest separation between the datapoints. If there is no perfect split, the correction rate allows for picking a hyperplane that still splits as well as possible within that error rate. In other words, we cannot provide a golden rule for this correction rate, as it is 100% dependent on your data. However when there is no overlap in the data, lower values should perform better than higher values. This is also what we find in the table.

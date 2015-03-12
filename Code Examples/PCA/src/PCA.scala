@@ -1,87 +1,52 @@
 import java.awt.{Dimension, Color}
-import java.io.File
-import java.text.{DateFormat, SimpleDateFormat}
+import java.io.{PrintWriter, File}
+import java.text.{DecimalFormat, DateFormat, SimpleDateFormat}
 import java.util.{Locale, Date}
 
 import smile.math.distance.CorrelationDistance
-import smile.plot.{LinePlot, ScatterPlot}
+import smile.plot.{PlotCanvas, LinePlot, ScatterPlot, Line}
 import smile.projection.PCA
-import smile.plot.Line
 
 import scala.swing.{MainFrame, SimpleSwingApplication}
+import scala.util.Random
 
 
 object PCA extends SimpleSwingApplication{
 
 
   def top = new MainFrame {
-    title = "PCA Example"
+
+     title = "PCA Example"
     //Get the example data
     val basePath = "/users/mikedewaard/MachineLearning/Example Data/"
     val exampleDataPath = basePath + "PCA_Example_1.csv"
-    val verificationDataPath = basePath + "PCA_Example_2.csv"
+    val trainData = GetStockDataFromCSV(new File(exampleDataPath))
 
-    val testData = GetStockDataFromCSV(new File(exampleDataPath))
+    val pca = new PCA(trainData._2)
 
-    val verificationData = GetDJIFromFile(new File(verificationDataPath))
-
-
-    val pca  = new PCA(testData._2)
-
-    val correlationComputer = new CorrelationDistance()
-
-    var CorrelationsBetweenColumns : Array[(Int,Int,Double)]= Array()
-    //For each column in the matrix
-    for (i <-0 until testData._2(0).length)
-    {
-
-      //Get the complete column
-      val firstColumn = testData._2.map(x => x(i))
-
-      //And loop through the not yet computed columns
-      for (j <- i + 1 until testData._2(0).length)
-      {
-        val secondColumn = testData._2.map(x => x(j))
-        CorrelationsBetweenColumns =  CorrelationsBetweenColumns :+  (i,j, -correlationComputer.d(firstColumn, secondColumn) + 1)
-      }
-
-    }
-    CorrelationsBetweenColumns = CorrelationsBetweenColumns.sortBy(x => x._3)
- //   CorrelationsBetweenColumns.zipWithIndex.foreach(x => println(x._2 + ": " + x._1))
-
-
-    val rSquareds = CorrelationsBetweenColumns.map(x => (x._1,x._2, Math.pow(x._3,2))).sortBy(x => x._3)
-
-    rSquareds.foreach(x => println(x._1 + ";" + x._2 + " = " + x._3))
-
-
-
-
+    //We want to merge into 1 feature
     pca.setProjection(1)
-    val projection = pca.getProjection
-    val variances = pca.getVariance
-    val cumValProportion = pca.getCumulativeVarianceProportion
-    val loadings = pca.getLoadings
-    val points = pca.project(testData._2)
+    val points = pca.project(trainData._2)
 
-    val plotData = points.zipWithIndex.map( x=> Array(x._2.toDouble, x._1(0)))
-
-
-
-    val center = pca.getCenter
-    println("Loaded data")
-
-    val plot =   LinePlot.plot(plotData, Line.Style.SOLID)
-    plot.add( LinePlot.plot(Array(Array(10.0,20.0),Array(11.0,45.0)),Line.Style.DASH))
-    val plotData2 = points.zipWithIndex.map( x=> Array(x._2.toDouble + 10, x._1(0) + 10))
-    val plot2 =   LinePlot.plot(plotData2, Line.Style.SOLID)
+   val maxDataValue = points.maxBy(x => x(0))
+   val minDataValue = points.minBy(x => x(0))
+    val rangeValue = maxDataValue(0) - minDataValue(0)
+    val plotData = points.zipWithIndex.map(x => Array(x._2.toDouble, -x._1(0) / rangeValue))
+   // val plotData = points.zipWithIndex.map(x => Array(x._2.toDouble, x._1(0) ))
+    val canvas: PlotCanvas = LinePlot.plot("Merged Features Index", plotData, Line.Style.DASH, Color.RED);
 
 
+    //Verification against DJI
+    val verificationDataPath = basePath + "PCA_Example_2.csv"
+    val verificationData = GetDJIFromFile(new File(verificationDataPath))
+    val DJIIndex = GetDJIFromFile(new File(verificationDataPath))
+    canvas.line("Dow Jones Index", DJIIndex._2, Line.Style.DOT_DASH, Color.BLUE)
 
-    peer.setContentPane(plot)
-   size = new Dimension(400, 400)
+
+    peer.setContentPane(canvas)
+    size = new Dimension(400, 400)
+
   }
-
 
 
   def GetStockDataFromCSV(file: File): (Array[Date],Array[Array[Double]]) = {
@@ -145,7 +110,11 @@ object PCA extends SimpleSwingApplication{
     //turn the tuples into two separate arrays for easier use later on
     val sortedData = data.sortBy(x => x._1)
     val dates = sortedData.map(x => x._1)
-    val doubles = sortedData.map(x => x._2)
+    val maxDouble = sortedData.maxBy(x => x._2)._2
+    val minDouble = sortedData.minBy(x => x._2)._2
+    val rangeValue = maxDouble - minDouble
+    val doubles = sortedData.map(x =>   x._2 / rangeValue )
+
 
 
     (dates, doubles)

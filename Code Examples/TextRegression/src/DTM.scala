@@ -4,25 +4,18 @@ import scala.collection.mutable
 class DTM {
 
   val records: mutable.MutableList[DTMRecord] = mutable.MutableList[DTMRecord]()
-  val wordList: mutable.MutableList[String] = mutable.MutableList[String]()
+  val wordList: mutable.Set[String] = mutable.Set[String]()
   val stopWords = getStopWords
 
   def addDocumentToRecords(documentName: String, rank: Int, documentContent: String) = {
 
     val wordRecords = mutable.HashMap[String, Int]()
-    val individualWords = documentContent.toLowerCase.split(" ")
-    individualWords.foreach { x =>
-      if (!stopWords.contains(x)) {
+    val filteredDocumentWords  = documentContent.toLowerCase.split(" ").filter(x => !stopWords.contains(x))
 
-        val wordRecord = wordRecords.find(y => y._1 == x)
-        if (wordRecord.nonEmpty) {
-          wordRecords += x -> (wordRecord.get._2 + 1)
-        }
-        else {
-          wordRecords += x -> 1
+    filteredDocumentWords.foreach { x =>
+        val wordRecord = wordRecords.collectFirst( {case (`x`,amount) => (x,amount + 1) }).getOrElse(x -> 1)
+          wordRecords += wordRecord
           wordList += x
-        }
-      }
     }
     records += new DTMRecord(documentName, rank, wordRecords)
   }
