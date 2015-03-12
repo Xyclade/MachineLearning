@@ -1562,7 +1562,7 @@ val plotData = points.zipWithIndex.map(x => Array(x._2.toDouble, -x._1(0) / rang
 
 <img src="./Images/PCA_Normalised.png" width="400px" />
 
-We see  now that the data of the DJI ranges between 0.8 and 1.8 where as our new feature ranges between -0.5 and 0.5, and that the lines themselves correspond quite well. This shows indirectly that PCA can be a very strong method in reducing features but still can give very accurate results.
+We see now that even though the data of the DJI ranges between 0.8 and 1.8 where as our new feature ranges between -0.5 and 0.5, the trend lines correspond quite well. With this example, and the explanation of [PCA](#principal-components-analysis-pca) in the general section you should now be able to use PCA and apply it your own data.
 
 
 
@@ -1572,10 +1572,12 @@ In this example we will work through several small cases where a Support Vector 
 
 For each sub example we will provide code, a plot, a few test runs with different parameters on the SVM and an explanation on the results. This should give you an idea on the parameters to feed into the SVM algorithm. 
 
+
+
 In the first example we will use the GaussianKernel, but there are many other kernels available in [Smile](https://github.com/haifengl/smile). The other kernels can be found [here](http://haifengl.github.io/smile/doc/smile/math/kernel/MercerKernel.html), and some of them we will use in the other examples.
 
 
- We will use the following base for each example, with only the ```path``` and ```svm``` construction changing per example.
+ We will use the following base for each example, with only the  filePaths and ```svm``` construction changing per example.
 
 ```scala
 
@@ -1585,20 +1587,22 @@ object SupportVectorMachine extends SimpleSwingApplication {
   def top = new MainFrame {
     title = "SVM Examples"
     //File path (this changes per example)
-    val path =  "/users/.../Example Data/SVM_Example_1.csv"
-
+    val trainingPath =  "/users/.../Example Data/SVM_Example_1.csv"
+	val testingPath =  "/users/.../Example Data/SVM_Example_1.csv"
     //Loading of the test data and plot generation stays the same
-    val testData = GetDataFromCSV(new File(path))
-    val plot = ScatterPlot.plot(testData._1, testData._2, '@', Array(Color.blue, Color.green))
+    val trainingData = GetDataFromCSV(new File(path))
+    val testingData = GetDataFromCSV(new File(path))
+    
+    val plot = ScatterPlot.plot(trainingData._1, trainingData._2, '@', Array(Color.blue, Color.green))
     peer.setContentPane(plot)
 
     //Here we do our SVM fine tuning with possibly different kernels
     val svm = new SVM[Array[Double]](new GaussianKernel(0.01), 1.0,2)
-    svm.learn(testData._1, testData._2)
+    svm.learn(trainingData._1, trainingData._2)
     svm.finish()
 
     //Calculate how well the SVM predicts on the training set
-    val predictions = testData._1.map(x => svm.predict(x)).zip(testData._2)
+    val predictions = testingData._1.map(x => svm.predict(x)).zip(testingData._2)
     val falsePredictions = predictions.map(x => if (x._1 == x._2) 0 else 1 )
 
     println(falsePredictions.sum.toDouble / predictions.length  * 100 + " % false predicted")
@@ -1629,8 +1633,8 @@ object SupportVectorMachine extends SimpleSwingApplication {
   }
   
 ```
-
-So now to start with the first example. If we load the first example we get to see the following data plot:
+####Example 1 (Gaussian Kernel)
+In this example we present the most commonly used kernel for SVMs, namely the Gaussian Kernel. The idea behind this example is to help finding good input parameters on this kernel.
 
 <img src="./Images/SVM_Datapoints.png" width="400px" />
 
@@ -1641,7 +1645,7 @@ Lets start with the  ```GaussianKernel```. This kernel represents the way in whi
 The parameter we pass in the constructor of the ```GaussianKernel``` is the sigma. This sigma value represents a smoothness value of the kernel. We will show what changing this parameter has for effect in the predictions.  As margin penalty we pass 1. This parameter defines the margin of the vectors in the system, thus making this value lower results in more bounded vectors. We will show with  a set of runs and their results what kind of effect this has in practice. Note that the `s:` stands for sigma, and the `c:` stands for the correction penalty. The percentages represent the error rate in the prediction, which is simply the percentage of false predictions on the same dataset after training.
 
 
-| % false predictions| s: 0.001 | s: 0.01 | s: 0.1 | s: 0.2 | s: 0.5 | s: 1.0 | s: 2.0 | s: 3.0 | s: 10.0 | s: 100.0 |
+| | s: 0.001 | s: 0.01 | s: 0.1 | s: 0.2 | s: 0.5 | s: 1.0 | s: 2.0 | s: 3.0 | s: 10.0 | s: 100.0 |
 | :-- | :--: | :--: | :--: | :--: | :--: | :--: | :--: |  :--: |  :--: |  :--: | 
 | **c: 0.001** | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% |
 | **c: 0.01** | 48.4% | 48.4% | 40% | 43.8% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% |
@@ -1654,4 +1658,70 @@ The parameter we pass in the constructor of the ```GaussianKernel``` is the sigm
 | **c: 10.0** | 0% | 1.5% | 7.5% | 6.4% | 7.7% | 12.9% | 26.2% | 51.6% | 51.6% | 51.6% |
 | **c: 100.0** | 0% | 1.5% | 10.1% | 12.8% | 14.6% | 18.3% | 41.6% | 51.6% | 51.6% | 51.6% |
 
-For the correction rate, we see that the performance holds best between 0.5 and 2. In order to explain this we need  to go a little in depth on the theory behind SVMs. The basic SVM is a binary classifier that divides a dataset into 2 parts by picking a hyperplane that represents the largest separation between the datapoints. If there is no perfect split, the correction rate allows for picking a hyperplane that still splits as well as possible within that error rate. In other words, we cannot provide a golden rule for this correction rate, as it is 100% dependent on your data. However when there is no overlap in the data, lower values should perform better than higher values. This is also what we find in the table.
+Unfortunately there is no golden rule for finding the right sigma for every dataset. Possibly one of the best approaches is to calculate the sigma for your data, which is the `√(variance)`  and then take steps around that value to see which sigma performs well. Since the variance in this data was between 0.2 and 0.5 we took this as center and explored several values at each side of this center to see the performance of the SVM with the gaussian kernel in our case.
+ 
+In order to determine a good correction rate you should understand a little bit of the theory behind an SVM. The basic SVM is a binary classifier that divides a dataset into 2 parts by picking a hyperplane that represents the largest separation between the datapoints. If there is no perfect split, the correction rate allows for picking a hyperplane that still splits as well as possible within that error rate. Thus the correction rate allows the hyperplane to be fit even when there are some points in the way. This means that we cannot come up with a 'standard' correction rate for every case.However when there is no overlap in the data, lower values should perform better than higher values. As for a start, we took the correction rate identical to the sigma values.
+
+When we look at the results table and their false prediction percentages, it shows that the best performance is with a very low sigma  (0.001) and a correction rate of 1.0 and up. However if we would use this model in practice with new data, it might be [overfitted](#overfitting). This is why you should always be careful when testing the model against its own training data. A better approach would be to perform [cross validation](#cross-validation), or verify against future data.
+
+
+####Example 2 (Polynomial Kernel)
+
+The gaussian kernel is not always the best choice, even though it is the most commonly picked kernel when using SVM's. This is why in this example we will show a case in which a polynomial kernel outperforms the gaussian kernel. Note that even though the example data for this case is constructed, similar data can be found in the field.
+
+For the example data we created 2 classes with a polynomial degree of 3, and generated a testing and training data file. The training data contains the first 500 points on the x axis, where as the testing data contains the points from 500 to 1000 on the x axis.
+
+Given the base code at the start of this practical example we do the following replacements:
+
+```scala
+val trainingPath =  "/users/.../Example Data/SVM_Example_2.csv"
+val testingPath = "/users/.../Example Data/SVM_Example_2_Test_data.csv"
+
+```
+
+If we then run the code to see the performance with the gaussian kernel we get the following results:
+
+| | s: 0.001 | s: 0.01 | s: 0.1 | s: 0.2 | s: 0.5 | s: 1.0 | s: 2.0 | s: 3.0 | s: 10.0 | s: 100.0 |
+| :-- | :--: | :--: | :--: | :--: | :--: | :--: | :--: | 
+| **c: 0.001** | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 50% |
+| **c: 0.01** | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 39.8% |
+| **c: 0.1** | 50% | 50% | 50% | 50% | 50% | 50% | 49.4% | 49.1% | 47.5% | 35.4% |
+| **c: 0.2** | 50% | 50% | 50% | 50% | 50% | 49.4% | 49.2% | 48.8% | 47.1% | 34.3% |
+| **c: 0.5** | 50% | 50% | 49.9% | 49.8% | 49.5% | 49.3% | 48.9% | 48.6% | 46.8% | 33.1% |
+| **c: 1.0** | 50% | 50% | 49.8% | 49.7% | 49.4% | 49.4% | 48.9% | 48.6% | 46.2% | 50% |
+| **c: 2.0** | 50% | 50% | 49.8% | 49.7% | 49.4% | 49.3% | 49.2% | 48.8% | 45.7% | 31.7% |
+| **c: 3.0** | 50% | 50% | 49.8% | 49.7% | 49.8% | 49.5% | 49% | 48.8% | 46.2% | 27.4% |
+| **c: 10.0** | 50% | 50% | 49.8% | 49.7% | 49.4% | 49.3% | 49% | 48.4% | 46.7% | 33.2% |
+| **c: 100.0** | 50% | 50% | 49.8% | 49.7% | 49.4% | 49.3% | 49.1% | 48.6% | 46.7% | 32.2% |
+
+
+We see that even in the best case, 27.4% of the testing data is falsely classified. This is interesting as when we look at the plots, a very clear distinction can be found between both classes. We could fine tune the sigma and correction rate, but when prediction points very far away (say x is 100000) the sigma and correction rate would be way to high for it to do a good performance (time wise and prediction wise).
+
+So if we now change the kernel from gaussian to a polynomial one as follows
+
+```scala
+
+  val svm = new SVM[Array[Double]](new PolynomialKernel(2), 1.0,2)
+  
+```
+
+And if we then perform the runs not only for degree 2, but for degrees of 2,3,4,5 and for the correction rates differing again from 0.001 up to 100, we get the following results:
+
+| | degree: 2 | degree: 3 | degree: 4 | degree: 5 |
+| :-- | :--: | :--: | :--: | :--: | :--: | :--: | :--: | 
+| **c: 0.001** | 49.7% | 0% | 49.8% | 0% |
+| **c: 0.01** | 49.8% | 0% | 49.8% | 0% |
+| **c: 0.1** | 49.8% | 0% | 49.8% | 0% |
+| **c: 0.2** | 49.8% | 0% | 49.8% | 0% |
+| **c: 0.5** | 49.8% | 0% | 50% | 0% |
+| **c: 1.0** | 49.9% | 0% | 50% | 0% |
+| **c: 2.0** | 50% | 0% | 47.9% | 0% |
+| **c: 3.0** | 38.4% | 0% | 50% | 0% |
+| **c: 10.0** | 49.5% | 0% | 49.5% | 0% |
+| **c: 100.0** | 49.5% | 0% | 49.5% | 0% |
+
+Here we see that the testing data, which did not contain 1 single overlapping point with the training data, gets 100% accuracy for degrees 3 and 5. This is an amazing performance in comparison to the gaussian kernel with 27.4% in it's best case. Do note that this example data is constructed, thus did not contain a lot of noise. This is why the error rate is 0% for all 'correction rates'. If you would add noise, fine-tuning of this correction rate would be needed.
+
+
+
+
