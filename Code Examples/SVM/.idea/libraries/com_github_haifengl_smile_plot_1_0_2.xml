@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="com.github.haifengl:smile-plot:1.0.2" type="repository">
+    <properties maven-id="com.github.haifengl:smile-plot:1.0.2" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/haifengl/smile-plot/1.0.2/smile-plot-1.0.2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/haifengl/smile-math/1.0.2/smile-math-1.0.2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/haifengl/smile-core/1.0.2/smile-core-1.0.2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/haifengl/smile-data/1.0.1/smile-data-1.0.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/haifengl/smile-graph/1.0.1/smile-graph-1.0.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/swinglabs/swingx/swingx-all/1.6.4/swingx-all-1.6.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
