@@ -1607,8 +1607,8 @@ The gaussian kernel is not always the best choice, even though it is the most co
 
 For the example data we created 2 classes with a polynomial degree of 3, and generated a testing and training data file. The training data contains the first 500 points on the x axis, where as the testing data contains the points from 500 to 1000 on the x axis. In order to see why a polynomial kernel would work, we plot the data. The left plot is the training data, and the right one the testing data.
 
-<img src="./Images/SVM_TrainData.png" width="375px" />
-<img src="./Images/SVM_TestData.png" width="375px" />
+<img src="./Images/SVM_TrainData.png" width="325px" />
+<img src="./Images/SVM_TestData.png" width="325px" />
 
 Given the base code at the start of this practical example we do the following replacements:
 
