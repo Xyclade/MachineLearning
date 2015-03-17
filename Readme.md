@@ -2,7 +2,7 @@
 
 Most developers these days have heard of machine learning, but when trying to find an 'easy' way into this technique, most people find themselves getting scared off by the abstractness of the concept of *Machine Learning* and terms as [*regression*](http://en.wikipedia.org/wiki/Regression_analysis), [*unsupervised learning*](http://en.wikipedia.org/wiki/Unsupervised_learning), [*Probability Density Function*](http://en.wikipedia.org/wiki/Probability_density_function) and many other definitions. If one switches to books there are books such as [*An Introduction to Statistical Learning with Applications in R*](http://www-bcf.usc.edu/~gareth/ISL/) and [*Machine Learning for Hackers*](http://shop.oreilly.com/product/0636920018483.do) who use programming language [R](http://www.r-project.org) for their examples.
 
-However R is not really a programming language in which one writes programs for everyday use such as is done with for example Java, C#, Scala etc. This is why in this blog, Machine learning will be introduced using [Smile](https://github.com/haifengl/smile), a machine learning library that can be used both in Java and Scala. These are languages that most  developers have seen at least once during their study or career. 
+However R is not really a programming language in which one writes programs for everyday use such as is done with for example Java, C#, Scala etc. This is why in this blog, Machine learning will be introduced using [Smile](https://github.com/haifengl/smile), a machine learning library that can be used both in Java and Scala. These are languages that most developers have seen at least once during their study or career. 
 
 The first section **['The global idea of machine learning'](#the-global-idea-of-machine-learning)** contains all important concepts and notions you need to know about to get started with the practical examples that are described in the section ['Practical Examples'](#practical-examples). The section practical examples is inspired by the examples from the book [*Machine Learning for Hackers*](http://shop.oreilly.com/product/0636920018483.do). Additionally the book [Machine Learning in Action](http://www.manning.com/pharrington/) was used for validation purposes.
 
@@ -12,7 +12,7 @@ Note that in this blog, 'new' definitions are hyperlinked such that if you want,
 
 As final note I'd like to thank the following people:
 
-* [Haifeng Li](https://www.linkedin.com/in/haifengli) for his support and writing the awesome  and free to use library [Smile](https://github.com/haifengl/smile).
+* [Haifeng Li](https://www.linkedin.com/in/haifengli) for his support and writing the awesome and free to use library [Smile](https://github.com/haifengl/smile).
 * [Erik Meijer](https://www.linkedin.com/profile/view?id=1490860) for all suggestions and supervision of the process of writing this blog.
 * [Richard van Heest](https://www.linkedin.com/profile/view?id=138460950) for his feedback and co-reading the blog.
 
@@ -32,10 +32,10 @@ A *feature* is a property on which a [model](#model) is trained. Say for example
 When one talks about machine learning, often the term *model* is mentioned. The model is the result of any machine learning method and the algorithm used within this method. This model can be used to make predictions in [supervised](#supervised-learning), or to retrieve clusterings in [unsupervised learning](#unsupervised-learning). Chances are high that you will encounter the terms **online** and **offline** training of a model in the field. The idea behind online training is that you add training data to an already existing model, where as with offline training you generate a new model from scratch. For performance reasons, online training would be the most preferable method. However for some algorithms this is not possible.
 
 ###Learning methods
-In the field of machine learning there are two leading ways of learning, namely [Supervised learning](http://en.wikipedia.org/wiki/Supervised_learning) and [Unsupervised learning](http://en.wikipedia.org/wiki/Unsupervised_learning). A brief introduction is necessary when you want to use Machine learning in your applications, as picking the right machine learning approach and algorithm is an important but sometimes also a little tedious process.
+In the field of machine learning there are two leading ways of learning, namely [Supervised learning](#supervised-learning) and [Unsupervised learning](#unsupervised-learning). A brief introduction is necessary when you want to use Machine learning in your applications, as picking the right machine learning approach and algorithm is an important but sometimes also a little tedious process.
 
 ####Supervised Learning
-In the field of machine learning there is supervised and [unsupervised](#unsupervised-learning). In supervised learning you define explicitly what features you want to use, and what output you expect. An example is predicting gender based on height and weight, which is known as a [Classification](#classification) problem. Additionally you can also predict absolute values with [Regression](#regression). An example of regression with the same data would be predicting ones length based on gender and weight. Some supervised algorithms can only be used for either classification or regression, such as K-NN. However there also exists algorithms such as [Support Vector Machines](#using-support-vector-machines) which can be used for both purposes.
+In the field of machine learning there is [supervised](http://en.wikipedia.org/wiki/Supervised_learning) and [unsupervised](#unsupervised-learning). In supervised learning you define explicitly what features you want to use, and what output you expect. An example is predicting gender based on height and weight, which is known as a [Classification](#classification) problem. Additionally you can also predict absolute values with [Regression](#regression). An example of regression with the same data would be predicting ones length based on gender and weight. Some supervised algorithms can only be used for either classification or regression, such as K-NN. However there also exists algorithms such as [Support Vector Machines](#using-support-vector-machines) which can be used for both purposes. 
 
 #####Classification
 The problem of classification within the domain of Supervised learning is relatively simple. Given a set of labels, and some data that already received the correct labels, we want to be able to *predict* labels for new data that we did not label yet. However, before thinking of your data as a classification problem, you should look at what the data looks like. If there is a clear structure in the data such that you can easily draw a regression line it might be better to use a [regression](#regression) algorithm instead. Given the data does not fit to a regression line, or when performance becomes an issue, classification is a good alternative.
@@ -48,10 +48,10 @@ Regression is a lot stronger in comparison to [classification](#classification).
 With this extra power, comes great responsibility, thus in the working field of regression one should be very careful when generating the model. Common pitfalls are [overfitting](#overfitting), [under fitting](#under-fitting) and not taking into account how the model handles [extrapolation](http://en.wikipedia.org/wiki/Extrapolation) and [interpolation](http://en.wikipedia.org/wiki/Interpolation).
 
 ####Unsupervised Learning
-In contrast to [supervised](#supervised-learning), with unsupervised learning you do not exactly know the output on beforehand. The idea when applying unsupervised learning is to find  hidden underlying structure in a dataset. An example would be [PCA](#principal-components-analysis-pca) with which you can reduce the amount of features by combining features. This combining is done based on the possibly hidden correlation between these features. Another example of unsupervised learning is [K-means clustering](#http://en.wikipedia.org/wiki/K-means_clustering). The idea behind K-means clustering is to find groups within a dataset, such that these groups can later on be used for purposes such as [supervised learning](#supervised-learning).
+In contrast to [supervised](#supervised-learning), with [unsupervised](http://en.wikipedia.org/wiki/Unsupervised_learning) learning you do not exactly know the output on beforehand. The idea when applying unsupervised learning is to find hidden underlying structure in a dataset. An example would be [PCA](#principal-components-analysis-pca) with which you can reduce the amount of features by combining features. This combining is done based on the possibly hidden correlation between these features. Another example of unsupervised learning is [K-means clustering](#http://en.wikipedia.org/wiki/K-means_clustering). The idea behind K-means clustering is to find groups within a dataset, such that these groups can later on be used for purposes such as [supervised learning](#supervised-learning).
 
 #####Principal Components Analysis (PCA)
-Principal Components Analysis is a technique used in statistics to convert a set of correlated columns into a smaller set of uncorrelated columns, reducing the amount features of a problem.  This smaller set of columns are called the principal components. This technique is mostly used in exploratory data analysis as it reveals internal structure in the data that can not be found with eye-balling the data.
+Principal Components Analysis is a technique used in statistics to convert a set of correlated columns into a smaller set of uncorrelated columns, reducing the amount features of a problem. This smaller set of columns are called the principal components. This technique is mostly used in exploratory data analysis as it reveals internal structure in the data that can not be found with eye-balling the data.
 
 A big weakness of PCA however are outliers in the data. these heavily influence its result, thus looking at the data on beforehand, eliminating large outliers can greatly improve its performance.
 
@@ -63,7 +63,6 @@ To give a clear idea of what PCA does, we show the plots of a dataset of points 
 On the left plot the original data is shown, where each color represents a different class. It is clear that from the 2 dimensions (X and Y) you could reduce to 1 dimension and still classify properly. This is where PCA comes in place. with PCA a new value is calculated for each datapoint, based on its original dimensions. 
 
 In the plot on the right you see the result of applying PCA to this data. Note that there is a y value on 0.0, but this is purely to be able to plot the data and show it to you, as only the X values are returned by the PCA algorithm. Also note that the values for X in the right plot do not correspond to the values in the left plot, this shows that PCA not 'just drops' a dimension.
-
 
 ###Validation techniques
 In this section we will explain some of the techniques available for model validation, and will explain some terms that are commonly used in the Machine Learning field.
@@ -88,7 +87,7 @@ This value is computed as follows:
 
 To give an example:
 
-Say we have documents {aa,ab,bc,bd,ee} and we query for documents with a in the name. If our algorithm would be to return {aa,ab} the precision would be 100% intuitively. Let's verify it by filling in the formula:
+Say we have documents {aa, ab, bc, bd, ee} and we query for documents with a in the name. If our algorithm would be to return {aa, ab} the precision would be 100% intuitively. Let's verify it by filling in the formula:
 
 <img src="./Images/PrecisionFull.png"/>
 
@@ -115,7 +114,7 @@ Indeed it is 100%. Next we shall show what happens if not all relevant results a
 
 <img src="./Images/RecallHalf.png"/>
 
-Here the results  only contained half of the relevant results. This caused the recall to decrease. However if you would compute the [precision](#precision) for this situation, it would result in 100% precision, because all results are relevant.
+Here the results only contained half of the relevant results. This caused the recall to decrease. However if you would compute the [precision](#precision) for this situation, it would result in 100% precision, because all results are relevant.
 
 ##### Prior
 The prior value that belongs to a classifier given a datapoint represents the likelihood that this datapoint belongs to this classifier. 
@@ -124,11 +123,11 @@ The prior value that belongs to a classifier given a datapoint represents the li
 The Root Mean Squared Error (RMSE or RMSD where D stands for deviation) is the square root of the variance of the differences between the actual value and predicted value.
 Suppose we have the following values:
 
-| Predicted temperature | Actual temperature |  squared difference for Model | square difference for average |
+| Predicted temperature | Actual temperature | squared difference for Model | square difference for average |
 | :--: | :--:| :--:| :--: | 
-|10 | 12 | 4 |  7.1111 |
-|20 | 17 | 9 |  5.4444 |
-|15 | 15 | 0 |  0.1111 |
+|10 | 12 | 4 | 7.1111 |
+|20 | 17 | 9 | 5.4444 |
+|15 | 15 | 0 | 0.1111 |
 
 The mean of this squared difference for the model is 4.33333, and the root of this is 2.081666. So in average, the model predicts the values with an error of 2.09. The lower this RMSE value is, the better the model is in its predictions. This is why in the field, when selecting features, one computes the RMSE with and without a certain feature, in order to say something about how that feature affects the performance of the model. With this information one can then decide whether the additional computation time for this feature is worth it in comparison to the improvement rate on the model.
 
@@ -140,17 +139,17 @@ When we fill in the actual values we get the following result:
 
 <img src="./Images/Formula1.png"/>
 
-Now what is this 10.45 value?  This is the error percentage the model has in average on its datapoints.
+Now what is this 10.45 value? This is the error percentage the model has in average on its datapoints.
 
-Finally we can use RMSE to compute a value that is known in the field as **R Squared**. This value represents how good the model performs in comparison to ignoring the model and just taking the average for each value. For that you need to calculate the RMSE for the average first. This is 4.22222  (taking the mean of the values from the last column in the table), and the root is then 2.054805. The first thing you should notice is that this value is lower than that of the model. This is not a good sign, because this means the model performs **worse** than just taking the mean. However to demonstrate how to compute **R Squared** we will continue the computations.
+Finally we can use RMSE to compute a value that is known in the field as **R Squared**. This value represents how good the model performs in comparison to ignoring the model and just taking the average for each value. For that you need to calculate the RMSE for the average first. This is 4.22222 (taking the mean of the values from the last column in the table), and the root is then 2.054805. The first thing you should notice is that this value is lower than that of the model. This is not a good sign, because this means the model performs **worse** than just taking the mean. However to demonstrate how to compute **R Squared** we will continue the computations.
 
 We now have the RMSE for both the model and the mean, and then computing how well the model performs in comparison to the mean is done as follows:
 
-<img src="./Images/Formula2.png"  />
+<img src="./Images/Formula2.png" />
 
 This results in the following computation:
 
-<img src="./Images/Formula3.png"  />
+<img src="./Images/Formula3.png" />
 
 Now what does this -1.307229 represent. Basically it says that the model that predicted these values performs +/- 1.31 percent worse than returning the average each time a value is to be predicted. In other words, we could better use the average function as a predictor rather than the model in this specific case.
 
@@ -182,7 +181,6 @@ The curse of dimensionality is a collection of problems that can occur when your
 
 If you want to know more regarding this curse of dimensionality, [a study focussed on this issue](http://lectures.molgen.mpg.de/networkanalysis13/LDA_cancer_classif.pdf). In this study, researchers Haifeng Li, Keshu Zhang and Tao Jiang developed an algorithm that improves cancer classification with very few datapoints in comparison to [support vector machines](http://en.wikipedia.org/wiki/Support_vector_machine) and [random forests](http://en.wikipedia.org/wiki/Random_forest)
 
-
 ###Dynamic machine learning
 In almost all literature you can find about machine learning, a static model is generated and validated, and then used for predictions / recommendations. However in practice, this alone would not make a very good machine learning application. This is why in this section we will explain how to turn a static model into a dynamic model. Since the (most optimal) implementation depends on the algorithm you are using, we will explain the concept rather than giving a practical example. Because explaining it in text only will not be very clear we first present you the whole system in a diagram which we will use to explain machine learning and how to make it dynamic.
 
@@ -212,10 +210,9 @@ Then you can compute a [prior](#prior) for every person on Facebook regarding th
 Additionally, our dataset grows over time, so we should keep on updating our model with the new data to make the predictions more accurate. How to do this however, depends on the size and mutation rate of your data. 
 
 ##Practical Examples
-In this section we present you a set of machine learning algorithms in a practical setting. The idea of these examples is to get you started with machine learning algorithms without an in depth explanation of the underlying algorithms.  We focus purely on the functional aspect of there algorithms, how you can verify your implementation and warn for common pitfalls.
+In this section we present you a set of machine learning algorithms in a practical setting. The idea of these examples is to get you started with machine learning algorithms without an in depth explanation of the underlying algorithms. We focus purely on the functional aspect of there algorithms, how you can verify your implementation and warn for common pitfalls.
 
 The following examples are available:
-
 
 * [Labeling ISP's based on their down/upload speed (KNN)](#labeling-isps-based-on-their-downupload-speed-knn-using-smile-in-scala)
 * [Classifying email as Spam or Ham](#classifying-email-as-spam-or-ham-naive-bayes)
@@ -224,22 +221,21 @@ The following examples are available:
 * [Predicting weight based on height (Linear Regression OLS)](#predicting-weight-based-on-height-using-ordinary-least-squares)
 * [Using unsupervised learning to merge features (PCA)](#using-unsupervised-learning-to-merge-features-pca)
 
-For each of these examples we used  the[Smile Machine Learning](https://github.com/haifengl/smile/releases) library. This library is now available from Maven in 2 parts: 'com.github.haifengl:smile-core:1.0.2'  and 'com.github.haifengl:smile-plot:1.0.2'.
-
+For each of these examples we used the[Smile Machine Learning](https://github.com/haifengl/smile/releases) library. This library is now available from Maven in 2 parts: 'com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2'.
 
 
 ###Labeling ISPs based on their Down/Upload speed (KNN using Smile in Scala)
 
-The goal of this section is to use the K-NN implementation from Smile in Scala to classify download/upload speed pairs as [ISP](http://en.wikipedia.org/wiki/Internet_service_provider) Alpha (represented by 0) or Beta (represented by 1).  
+The goal of this section is to use the K-NN implementation from Smile in Scala to classify download/upload speed pairs as [ISP](http://en.wikipedia.org/wiki/Internet_service_provider) Alpha (represented by 0) or Beta (represented by 1). 
 
-To start with this example I assume you created a new Scala project in your favourite IDE, and  and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2'  and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars. As final assumption you also downloaded the [example data](./Example%20Data/KNN_Example_1.csv).
+To start with this example I assume you created a new Scala project in your favourite IDE, and and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars. As final assumption you also downloaded the [example data](./Example%20Data/KNN_Example_1.csv).
 
 The first step is to load the CSV data file. As this is no rocket science, I provide the code for this without further explanation:
 
 ```scala
 
 object KNNExample {
-    def main(args: Array[String]): Unit = {
+   def main(args: Array[String]): Unit = {
     val basePath = "/.../KNN_Example_1.csv"
     val testData = GetDataFromCSV(new File(basePath))    
     }
@@ -529,7 +525,7 @@ If we once again look at the top 50 words for spam and ham, we see that most of 
 
 With this insight in what 'spammy' words and what typical 'ham-words' are, we can decide on building a feature-set which we can then use in the Naive Bayes algorithm for creating the classifier. Note: it is always better to include **more** features, however performance might become an issue when having all words as features. This is why in the field, developers tend to drop features that do not have a significant impact, purely for performance reasons. Alternatively machine learning is done running complete [Hadoop](http://hadoop.apache.org/) clusters, but explaining this would be outside the scope of this blog.
 
-For now we will select the top 100 spammy words based on occurrence(thus not frequency) and do the same for ham words and combine this into 1 set of words which we can feed into the bayes algorithm. Finally we also convert the training data to fit the input of the Bayes algorithm. Note that the final feature set thus is 200 - (#intersecting words *2). Feel free to experiment with higher and lower feature counts.
+For now we will select the top 100 spammy words based on occurrence(thus not frequency) and do the same for ham words and combine this into 1 set of words which we can feed into the Bayes algorithm. Finally we also convert the training data to fit the input of the Bayes algorithm. Note that the final feature set thus is 200 - (#intersecting words *2). Feel free to experiment with higher and lower feature counts.
 
 ```scala
 
@@ -595,7 +591,7 @@ If we run this code several times with different feature amounts we get the foll
 | 200     					| 1197 (85.68%)	| 16 (1.15%)	| 184 (13.17%)|
 | 400     					| 1219 (87.26%)	| 13 (0.93%)	| 165 (11.81%)|
 
-Interestingly enough, the algorithm works best with only 50 features. However, if you recall that there were still *stop words* in the top 50 classification terms which could explain this result.  If you look at how the values change as the amount of features increase (starting at 100), you can see that with more features, the overall result increases. Note that there are a group of unknown emails. For these emails the [prior](#prior) was equal for both classes. Note that this also is the case if there are no feature words for ham nor spam in the email, because then the algorithm would classify it 50% ham 50% spam.
+Interestingly enough, the algorithm works best with only 50 features. However, if you recall that there were still *stop words* in the top 50 classification terms which could explain this result. If you look at how the values change as the amount of features increase (starting at 100), you can see that with more features, the overall result increases. Note that there are a group of unknown emails. For these emails the [prior](#prior) was equal for both classes. Note that this also is the case if there are no feature words for ham nor spam in the email, because then the algorithm would classify it 50% ham 50% spam.
 
 If we change the path to ```easyHam2Path``` and rerun the code for we get the following results:
 
@@ -606,9 +602,9 @@ If we change the path to ```easyHam2Path``` and rerun the code for we get the fo
 | 200 						| 36 (2.57%)	| 7 (0.5%)	| 1357 (96.93%)	|
 | 400     					| 24 (1.71%)	| 7 (0.5%)	| 1369 (97.79%) |
 
-Here we see that indeed, when you use only 50 features, the amount of ham that gets classified correctly is significantly lower in comparison to the correct classifications when using 100 features.
+Here we see that indeed, when you use only 50 features, the amount of ham that gets classified correctly is significantly lower in comparison to the correct classifications when using 100 features. 
 
-We could work through the hard ham, but since the building bricks are already here, we leave this to the reader. 
+With this we have shown how you can use Naive Bayes to classify email has ham or spam. We could work through the hard ham from the corpus website, but since the building bricks are already here, we leave this to the reader.
 
 ###Ranking emails based on their content (Recommendation system)
 This example will be completely about building your own recommendation system. We will use a subset of the email data which we used in the example [Classifying Email as Spam or Ham](#classifying-email-as-spam-or-ham-naive-bayes). This subset can be downloaded [here](http://spamassassin.apache.org/publiccorpus/20030228_easy_ham.tar.bz2). Additionally you need the [stop words file](./Example%20Data/stopwords.txt). Note that the data is a set of received emails, thus we lack 1 half of the data, namely the outgoing emails of this mailbox. However even without this information we can do some pretty neat ranking as we will see later on.
@@ -800,7 +796,7 @@ Effectively the data is still the same, however it is represented on a different
 Notice here that the numeric values now range between 0.69 and 3.83. This range is much smaller, causing the outliers to not skew away the rest of the data. This data manipulation trick is very common in the field of machine learning. Finding the right scale requires some insight. This is why using the plotting library of [Smile](https://github.com/haifengl/smile) to make several plots on different scales can help a lot when performing this rescaling.
 
 The next feature we will work on is the frequency and timeframe in which subjects occur. If a subject occurs more it is likely to be of higher importance. Additionally we take into account the timespan of the thread. So the frequency of a subject will be normalised with the timespan of the emails of this subject. This makes highly active email threads come up on top. Again this is an assumption we make on which emails should be ranked higher.
- 
+
 Let's have a look at the subjects and their occurrence counts:
 
 ```scala
@@ -842,7 +838,6 @@ val threadBarPlotData = mailsGroupedByThread
 Here the value's now range between 0.69 and 3.41, which is a lot better than a range of 1 to 29 for the recommendation system. However we did not incorporate the time frame yet, thus we go back to the normal frequency and apply the transformation later on. To be able to do this, we first need to get the time between the first and last thread:
 
 ```scala
-
 //Create a list of tuples with (subject, list of emails, time difference between first and last email)
     val mailGroupsWithMinMaxDates = mailsGroupedByThread
     .map(x => (x._1, x._2, (x._2
@@ -850,7 +845,7 @@ Here the value's now range between 0.69 and 3.41, which is a lot better than a r
     							._1.getTime - x._2    												.minBy(x => x._2)    												._1.getTime
     						) / 1000))
 
- //turn into a list of tuples with (topic, list of emails, time difference, and weight) filtered that only threads occur
+//turn into a list of tuples with (topic, list of emails, time difference, and weight) filtered that only threads occur
     val threadGroupsWithWeights = mailGroupsWithMinMaxDates
     .filter(x => x._3 != 0)
     .map(x => (x._1, x._2, x._3, 10 + Math.log10(x._2.length.toDouble / x._3)))
@@ -877,7 +872,6 @@ We see our values ranging roughly between (4.4 and 8.6) which shows that outlier
 | [spambayes] all cap or cap word subjects  | 2 | 670 |  7.474955192963154 |
 | [zzzzteana] save the planet, kill the people  | 3 | 1020 |  7.468521082957745 |
 | [ilug] got me a crappy laptop  | 2 | 720 | 7.443697499232712 |
-
 
 **Bottom 10 weights:**
 
@@ -999,7 +993,7 @@ val trainingRanks = trainingData.map(mail => {
     val mean = sortedTrainingRanks.map(x => x._2).sum / sortedTrainingRanks.length
 ```
 
-This gives us a list ```trainingRanks``` which contains all training emails and their respective ranks.  Now how is this useful, since we want to rank new emails? The idea behind this is that sorting emails purely based on rank would not be really useful, as sorting on date is a way more intuitive way for sorting email. This is why we suggest placing a flag 'important' as a more intuitive way to represent important emails. In order to compute when this flag should be set you also need the ranks from the training set, and define a decision boundary.. 
+This gives us a list ```trainingRanks``` which contains all training emails and their respective ranks.  Now how is this useful, since we want to rank new emails? The idea behind this is that sorting emails purely based on rank would not be really useful, as sorting on date is a way more intuitive way for sorting email. This is why we suggest placing a flag 'important' as a more intuitive way to represent important emails. In order to compute when this flag should be set you also need the ranks from the training set, and define a decision boundary.
 
 For this decision boundary we choose the 'mean' of the sorted list. This might not work out well in practice, but since we cannot evaluate the actual importance of the emails as we are not the actual recipient, this is the best we can do. Usually the average might result in 50% ending up as important, but due to the structure of our data, this is not the case in this example.
 
@@ -1077,14 +1071,12 @@ In this top 10, based on the subjects we can say that these emails are important
 
 This concludes the recommendation system example.
 
-
-
 ###Predicting weight based on height (using Ordinary Least Squares)
 In this section we will introduce the [Ordinary Least Squares](http://en.wikipedia.org/wiki/Ordinary_least_squares) technique which is a form of linear regression. As this technique is quite powerful, it is important to have read [regression](#regression) and the common pitfalls before starting with this example. We will cover some of these issues in this section, while others are shown in the sections [under-fitting](#under-fitting) and [overfitting](#overfitting)
 
+To start with this example I assume you created a new Scala project in your favourite IDE, and  and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars
 
-As always, the first thing to do is to import a dataset. For this we provide you with the following [csv file](./Example%20Data/OLS_Regression_Example_3.csv) and code for reading this file:
-
+As always, the first thing to do when the project is set-up is to import a dataset. For this we provide you with the following [csv file](./Example%20Data/OLS_Regression_Example_3.csv) and code for reading this file:
 
 ```scala
 
@@ -1119,12 +1111,11 @@ As always, the first thing to do is to import a dataset. For this we provide you
 
 ```
 
-Note that the data reader converts the values from the [Imperial system](http://en.wikipedia.org/wiki/Imperial_units) into the [Metric] system(http://en.wikipedia.org/wiki/Metric_system). This has no big effects on the OLS implementation, but since the metric system is more commonly used, we prefer to present the data in that system.
+Note that the data reader converts the values from the [Imperial system](http://en.wikipedia.org/wiki/Imperial_units) into the [Metric system](http://en.wikipedia.org/wiki/Metric_system). This has no big effects on the OLS implementation, but since the metric system is [more commonly used](http://www.realclearscience.com/blog/map%20metric%20jpg), we prefer to present the data in that system.
 
 With these methods we get the data as an ```Array[Array[Double]]``` which represents the datapoints and an ```Array[Double]``` which represents the classifications as male or female. These formats are good for both plotting the data, and for feeding into the machine learning algorithm.
 
 Let's first see what the data looks like. For this we plot the data using the following code.
-
 
 ```scala
 
@@ -1142,8 +1133,6 @@ object LinearRegressionExample extends SimpleSwingApplication {
     plot.setAxisLabel(0,"Heights")
     plot.setAxisLabel(1,"Weights")
 
-
-
     peer.setContentPane(plot)
     size = new Dimension(400, 400)
   }
@@ -1154,7 +1143,6 @@ If you execute the code here above, a window will pop up which shows the **right
 
 <img src="./Images/HumanDataPoints.png" width="275px" />
 <img src="./Images/MaleFemalePlot.png" width="275px" />
-
 
 In this plot, given that green is female, and blue is male, you can see that there is a big overlap in their weights and heights. So if we where to ignore the difference between male and female it would still look like there was a linear function in the data (which can be seen in the **left** plot). However when ignoring this difference, the function would be not as accurate as it would be when we incorporate the information regarding males and females. 
 
@@ -1188,18 +1176,18 @@ Finally smile also provides you with some statistical information regarding your
 
 This concludes linear regression, if you want to know more about how to apply regression on  non-linear data, feel free to work through the next example [An attempt at rank prediction for top selling books using text regression](#an-attempt-at-rank-prediction-for-top-selling-books-using-text-regression).
 
-
-
 ###An attempt at rank prediction for top selling books using text regression
 
 In the example of [predicting weights based on heights and gender](#predicting-weight-based-on-height-using-ordinary-least-squares) we introduced the notion of linear regression. However, sometimes one would want to apply regression on non numeric data such as Text. 
 
 In this example we will show how text regression can be done by prediction the top 100 selling books from O'Reilly. Additionally with this example we will also show that for this particular case it does not work out to use text regression. The reason for this is that the data simply does not contain a signal for our test data. However this does not make this example useless because there might be an actual signal within the text in the data you are using in practice,which then can be detected using text regression as explained here.
 
+To start with this example I assume you created a new Scala project in your favourite IDE, and  and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars
 
-Let's start off with getting the data we need:
+The data file we used in this example can be downloaded [here](./Example%20Data/TextRegression_Example_1.csv). Let's start off with getting the data we need:
 
 ```scala
+
 object TextRegression  {
 
   def main(args: Array[String]): Unit = {
@@ -1296,7 +1284,6 @@ class DTM {
 
 class DTMRecord(val document : String, val rank : Int, var occurrences :  mutable.HashMap[String,Int] )
 
-
 ```
 
 If you look at this implementation you'll notice that there is a method called  ```def getNumericRepresentationForRecords(): (Array[Array[Double]], Array[Double])```. This method returns a tuple with as first parameter a matrix in which each row represents a document, and each column represents one of the words from the complete vocabulary of the DTM's documents. Note that the doubles in the first table represent the # of occurrences of the words.
@@ -1311,7 +1298,6 @@ val documentTermMatrix  = new DTM()
 testData.foreach(x => documentTermMatrix.addDocumentToRecords(x._1,x._2,x._3))
 
 ```
-
 
 With this conversion from text to numeric value's we can open our regression toolbox. We used [Ordinary Least Squares(OLS)](http://en.wikipedia.org/wiki/Ordinary_least_squares) in the example [predicting weight based on height](#predicting-weight-based-on-height-using-ordinary-least-squares), however this time we will use [Least Absolute Shrinkage and Selection Operator (Lasso)](http://en.wikipedia.org/wiki/Least_squares#Lasso_method) regression. This is because we can give this regression method a certain lambda, which represents a penalty value. This penalty value allows the LASSO algorithm to select relevant features while discarding some of the other features. 
 
@@ -1352,14 +1338,13 @@ Running this code multiple times gives an RMSE varying between 36 and 51. This m
 To conclude this example, we rephrase a quote from [John Tukey](http://en.wikipedia.org/wiki/John_Tukey): 
 >The data may not contain the answer. The combination of some data and an aching desire for an answer does not ensure that a reasonable answer can be extracted from a given body of data.
 
-
-
 ###Using unsupervised learning to merge features (PCA)
 
-In this example we are going to use [PCA](#principal-components-analysis-pca) to merge stock prices from 24 stocks into 1 over a time period of 2002 - 2012. This single value (over time) then represents a stock market index based on data of these 24 stocks.Merging these 24 stock prices into 1 significantly reduces the amount of data to process, and decreases the dimension of our problem, which is a big advantage if we later apply other machine learning algorithms such as regression for prediction. In order to see the performance of our feature reduction of 24 to 1, we will compare our result to the Dow Jones Index over that same time period. 
+In this example we are going to use [PCA](#principal-components-analysis-pca) to merge stock prices from 24 stocks into 1 over a time period of 2002 - 2012. This single value (over time) then represents a stock market index based on data of these 24 stocks. Merging these 24 stock prices into 1 significantly reduces the amount of data to process, and decreases the dimension of our problem, which is a big advantage if we later apply other machine learning algorithms such as regression for prediction. In order to see the performance of our feature reduction of 24 to 1, we will compare our result to the Dow Jones Index over that same time period. 
 
-As first step of our example we should load the data.
+To start with this example I assume you created a new Scala project in your favourite IDE, and  and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars
 
+With the project set-up the next step is to load the data. For this we provide you with 2 files: [Data file 1](./Example%20Data/PCA_Example_1.csv) and [Data file 2](./Example%20Data/PCA_Example_2.csv).
 
 ```scala
 object PCA extends SimpleSwingApplication{
@@ -1368,7 +1353,7 @@ object PCA extends SimpleSwingApplication{
   def top = new MainFrame {
     title = "PCA Example"
     //Get the example data
-    val basePath = "/users/mikedewaard/MachineLearning/Example Data/"
+    val basePath = "/users/.../Example Data/"
     val exampleDataPath = basePath + "PCA_Example_1.csv"
     val trainData = GetStockDataFromCSV(new File(exampleDataPath))
     
@@ -1412,6 +1397,7 @@ object PCA extends SimpleSwingApplication{
 With this training data, and the fact that we already know that we want to merge the 24 features into 1 single feature, we can do the PCA and retrieve the values for the datapoints as follows.
 
 ```scala
+
 //Add to `def top`
 val pca = new PCA(trainData._2)
 pca.setProjection(1)
@@ -1421,6 +1407,7 @@ val canvas: PlotCanvas = LinePlot.plot("Merged Features Index", plotData, Line.S
 
 peer.setContentPane(canvas)
 size = new Dimension(400, 400)
+
 ```
 
 This code not only does the PCA but also plots the results, with the feature value on the y axis and the individual days on the x axis.
@@ -1430,6 +1417,7 @@ This code not only does the PCA but also plots the results, with the feature val
 If we now add the Dow Jones index to the plot by adjusting the code as follows.
 
 ```scala
+
 //Add to `def top` 
  //Verification against DJI
     val verificationDataPath = basePath + "PCA_Example_2.csv"
@@ -1437,10 +1425,10 @@ If we now add the Dow Jones index to the plot by adjusting the code as follows.
     val DJIIndex = GetDJIFromFile(new File(verificationDataPath))
     canvas.line("Dow Jones Index", DJIIndex._2, Line.Style.DOT_DASH, Color.BLUE)
 
-
 ```
 
 ```scala
+
 //added methods
 
   def GetDJIRecordFromString(dataString: String): (Date,Double) = {
@@ -1457,7 +1445,6 @@ If we now add the Dow Jones index to the plot by adjusting the code as follows.
     //And return the result in a format that can later easily be used to feed to Smile
     (date,close)
   }
-
 
   def GetDJIFromFile(file: File): (Array[Date],Array[Double]) = {
     val source = scala.io.Source.fromFile(file)
@@ -1485,7 +1472,6 @@ Replace the ```GetDJIFromFile``` method with the following:
 
 ```scala
 
-
 def GetDJIFromFile(file: File): (Array[Date],Array[Double]) = {
     val source = scala.io.Source.fromFile(file)
     //Get all the records (minus the header)
@@ -1500,12 +1486,9 @@ def GetDJIFromFile(file: File): (Array[Date],Array[Double]) = {
     val rangeValue = maxDouble - minDouble
     val doubles = sortedData.map(x =>   x._2 / rangeValue )
 
-
-
     (dates, doubles)
   }
   
- 
 ```
 and replace the `plotData`  val in def top and replace with
 
@@ -1516,13 +1499,9 @@ val rangeValue = maxDataValue(0) - minDataValue(0)
 val plotData = points.zipWithIndex.map(x => Array(x._2.toDouble, -x._1(0) / rangeValue))
 ```
 
-
-
 <img src="./Images/PCA_Normalised.png" width="400px" />
 
 We see now that even though the data of the DJI ranges between 0.8 and 1.8 where as our new feature ranges between -0.5 and 0.5, the trend lines correspond quite well. With this example, and the explanation of [PCA](#principal-components-analysis-pca) in the general section you should now be able to use PCA and apply it your own data.
-
-
 
 ###Using Support Vector Machines
 
@@ -1531,11 +1510,9 @@ In this example we will work through several small cases where a Support Vector 
 For each sub example we will provide code, a plot, a few test runs with different parameters on the SVM and an explanation on the results. This should give you an idea on the parameters to feed into the SVM algorithm. 
 
 
-
 In the first example we will use the GaussianKernel, but there are many other kernels available in [Smile](https://github.com/haifengl/smile). The other kernels can be found [here](http://haifengl.github.io/smile/doc/smile/math/kernel/MercerKernel.html), and some of them we will use in the other examples.
 
-
- We will use the following base for each example, with only the  filePaths and ```svm``` construction changing per example.
+We will use the following base for each example, with only the  filePaths and ```svm``` construction changing per example.
 
 ```scala
 
@@ -1591,56 +1568,60 @@ object SupportVectorMachine extends SimpleSwingApplication {
   }
   
 ```
+
+Note that also in this example I assume you created a new Scala project in your favourite IDE, and  and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars
+
 ####Example 1 (Gaussian Kernel)
-In this example we present the most commonly used kernel for SVMs, namely the Gaussian Kernel. The idea behind this example is to help finding good input parameters on this kernel.
+In this example we present the most commonly used kernel for SVMs, namely the Gaussian Kernel. The idea behind this example is to help finding good input parameters on this kernel. The data we used for this example can be download [here](./Example%20Data/SVM_Example_1.csv).
 
 <img src="./Images/SVM_Datapoints.png" width="400px" />
 
 It is clear from this plot that a linear regression line would not work. Instead we will use a SVM to make predictions. In the first code we gave, the GaussianKernel with a sigma of 0.01, a margin penalty of 1.0 and the amount of classes of 2 is passed to SVM. Now what does this all mean?
 
-Lets start with the  ```GaussianKernel```. This kernel represents the way in which the SVM will calculate the similarity over pairs of datapoints in the system. For the gaussianKernel the variance in the euclidian distance is used. The reason for picking the GaussianKernel specifically is because the data does not contain a clear structure such as a linear, polynomial or hyperbolic function. Instead the data is clustered in 3 groups. 
+Lets start with the ```GaussianKernel```. This kernel represents the way in which the SVM will calculate the similarity over pairs of datapoints in the system. For the gaussianKernel the variance in the euclidian distance is used. The reason for picking the GaussianKernel specifically is because the data does not contain a clear structure such as a linear, polynomial or hyperbolic function. Instead the data is clustered in 3 groups. 
 
-The parameter we pass in the constructor of the ```GaussianKernel``` is the sigma. This sigma value represents a smoothness value of the kernel. We will show what changing this parameter has for effect in the predictions.  As margin penalty we pass 1. This parameter defines the margin of the vectors in the system, thus making this value lower results in more bounded vectors. We will show with  a set of runs and their results what kind of effect this has in practice. Note that the `s:` stands for sigma, and the `c:` stands for the correction penalty. The percentages represent the error rate in the prediction, which is simply the percentage of false predictions on the same dataset after training.
+The parameter we pass in the constructor of the ```GaussianKernel``` is the sigma. This sigma value represents a smoothness value of the kernel. We will show what changing this parameter has for effect in the predictions. As margin penalty we pass 1. This parameter defines the margin of the vectors in the system, thus making this value lower results in more bounded vectors. We will show with a set of runs and their results what kind of effect this has in practice. Note that the `s:` stands for sigma, and the `c:` stands for the correction penalty. The percentages represent the error rate in the prediction, which is simply the percentage of false predictions on the same dataset after training.
 
+| | s: 0.001 | s: 0.01 | s: 0.1 | s: 0.2 | s: 0.5 | s: 1.0 | s: 2.0 | s: 3.0 | s: 10.0 |
+| :-- | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: |
+| **c: 0.001** | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 
+|**c: 0.01** | 48.4% | 48.4% | 40% | 43.8% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% |
+| **c: 0.1** | 48.4% | 48.4% | 12.4% | 14.2% | 17.4% | 48.4% | 48.4% | 48.4% | 48.4% | 
+| **c: 0.2** | 48.4% | 45.6% | 9.1% | 10.1% | 12.3% | 48.4% | 48.4% | 48.4% | 48.4% |
+| **c: 0.5** | 47.5% | 3.4% | 6.3% | 7.2% | 7% | 8.9% | 48.4% | 48.4% | 48.4% | 
+| **c: 1.0** | 0% | 1.6% | 5.1% | 5.7% | 5.6% | 5.6% | 48.4% | 48.4% | 48.4% |
+| **c: 2.0** | 0% | 1% | 5.2% | 5% | 5.4% | 5.7% | 13.1% | 48.4% | 51.6% | |
+| **c: 3.0** | 0% | 1.2% | 6.4% | 5.8% | 5.7% | 7.4% | 18% | 51.6% | 51.6% |
+| **c: 10.0** | 0% | 1.5% | 7.5% | 6.4% | 7.7% | 12.9% | 26.2% | 51.6% | 51.6% |
+| **c: 100.0** | 0% | 1.5% | 10.1% | 12.8% | 14.6% | 18.3% | 41.6% | 51.6% | 51.6% |
 
-| | s: 0.001 | s: 0.01 | s: 0.1 | s: 0.2 | s: 0.5 | s: 1.0 | s: 2.0 | s: 3.0 | s: 10.0 | s: 100.0 |
-| :-- | :--: | :--: | :--: | :--: | :--: | :--: | :--: |  :--: |  :--: |  :--: | 
-| **c: 0.001** | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% |
-| **c: 0.01** | 48.4% | 48.4% | 40% | 43.8% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% |
-| **c: 0.1** | 48.4% | 48.4% | 12.4% | 14.2% | 17.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% |
-| **c: 0.2** | 48.4% | 45.6% | 9.1% | 10.1% | 12.3% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% |
-| **c: 0.5** | 47.5% | 3.4% | 6.3% | 7.2% | 7% | 8.9% | 48.4% | 48.4% | 48.4% | 48.4% |
-| **c: 1.0** | 0% | 1.6% | 5.1% | 5.7% | 5.6% | 5.6% | 48.4% | 48.4% | 48.4% | 48.4% |
-| **c: 2.0** | 0% | 1% | 5.2% | 5% | 5.4% | 5.7% | 13.1% | 48.4% | 51.6% | 48.4% |
-| **c: 3.0** | 0% | 1.2% | 6.4% | 5.8% | 5.7% | 7.4% | 18% | 51.6% | 51.6% | 51.6% |
-| **c: 10.0** | 0% | 1.5% | 7.5% | 6.4% | 7.7% | 12.9% | 26.2% | 51.6% | 51.6% | 51.6% |
-| **c: 100.0** | 0% | 1.5% | 10.1% | 12.8% | 14.6% | 18.3% | 41.6% | 51.6% | 51.6% | 51.6% |
-
-Unfortunately there is no golden rule for finding the right sigma for every dataset. Possibly one of the best approaches is to calculate the sigma for your data, which is the `√(variance)`  and then take steps around that value to see which sigma performs well. Since the variance in this data was between 0.2 and 0.5 we took this as center and explored several values at each side of this center to see the performance of the SVM with the gaussian kernel in our case.
+Unfortunately there is no golden rule for finding the right sigma for every dataset. Possibly one of the best approaches is to calculate the sigma for your data, which is the `√(variance)` and then take steps around that value to see which sigma performs well. Since the variance in this data was between 0.2 and 0.5 we took this as center and explored several values at each side of this center to see the performance of the SVM with the gaussian kernel in our case.
  
 In order to determine a good correction rate you should understand a little bit of the theory behind an SVM. The basic SVM is a binary classifier that divides a dataset into 2 parts by picking a hyperplane that represents the largest separation between the datapoints. If there is no perfect split, the correction rate allows for picking a hyperplane that still splits as well as possible within that error rate. Thus the correction rate allows the hyperplane to be fit even when there are some points in the way. This means that we cannot come up with a 'standard' correction rate for every case.However when there is no overlap in the data, lower values should perform better than higher values. As for a start, we took the correction rate identical to the sigma values.
 
-When we look at the results table and their false prediction percentages, it shows that the best performance is with a very low sigma  (0.001) and a correction rate of 1.0 and up. However if we would use this model in practice with new data, it might be [overfitted](#overfitting). This is why you should always be careful when testing the model against its own training data. A better approach would be to perform [cross validation](#cross-validation), or verify against future data.
-
+When we look at the results table and their false prediction percentages, it shows that the best performance is with a very low sigma (0.001) and a correction rate of 1.0 and up. However if we would use this model in practice with new data, it might be [overfitted](#overfitting). This is why you should always be careful when testing the model against its own training data. A better approach would be to perform [cross validation](#cross-validation), or verify against future data.
 
 ####Example 2 (Polynomial Kernel)
 
-The gaussian kernel is not always the best choice, even though it is the most commonly picked kernel when using SVM's. This is why in this example we will show a case in which a polynomial kernel outperforms the gaussian kernel. Note that even though the example data for this case is constructed, similar data can be found in the field.
+The gaussian kernel is not always the best choice, even though it is the most commonly picked kernel when using SVM's. This is why in this example we will show a case in which a polynomial kernel outperforms the gaussian kernel. Note that even though the example data for this case is constructed, similar data can be found in the field. The training data we used for this example can be download [here](./Example%20Data/SVM_Example_2.csv), and the testing data [here](./Example%20Data/SVM_Example_2_Test_data.csv)
 
-For the example data we created 2 classes with a polynomial degree of 3, and generated a testing and training data file. The training data contains the first 500 points on the x axis, where as the testing data contains the points from 500 to 1000 on the x axis.
+For the example data we created 2 classes with a polynomial degree of 3, and generated a testing and training data file. The training data contains the first 500 points on the x axis, where as the testing data contains the points from 500 to 1000 on the x axis. In order to see why a polynomial kernel would work, we plot the data. The left plot is the training data, and the right one the testing data.
+
+<img src="./Images/SVM_TrainData.png" width="400px" />
+<img src="./Images/SVM_TestData.png" width="400px" />
 
 Given the base code at the start of this practical example we do the following replacements:
 
 ```scala
-val trainingPath =  "/users/.../Example Data/SVM_Example_2.csv"
+val trainingPath = "/users/.../Example Data/SVM_Example_2.csv"
 val testingPath = "/users/.../Example Data/SVM_Example_2_Test_data.csv"
 
 ```
 
 If we then run the code to see the performance with the gaussian kernel we get the following results:
 
-| |  s: 0.01 | s: 0.1 | s: 0.2 | s: 0.5 | s: 1.0 | s: 2.0 | s: 3.0 | s: 10.0 | s: 100.0 |
-| :-- |  :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: |  
+| | s: 0.01 | s: 0.1 | s: 0.2 | s: 0.5 | s: 1.0 | s: 2.0 | s: 3.0 | s: 10.0 | s: 100.0 |
+| :-- | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | 
 | **c: 0.001** | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 50% |
 | **c: 0.01** | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 39.8% |
 | **c: 0.1** | 50% | 50% | 50% | 50% | 50% | 49.4% | 49.1% | 47.5% | 35.4% |
@@ -1652,15 +1633,14 @@ If we then run the code to see the performance with the gaussian kernel we get t
 | **c: 10.0** | 50% | 49.8% | 49.7% | 49.4% | 49.3% | 49% | 48.4% | 46.7% | 33.2% |
 | **c: 100.0** | 50% | 49.8% | 49.7% | 49.4% | 49.3% | 49.1% | 48.6% | 46.7% | 32.2% |
 
-
 We see that even in the best case, 27.4% of the testing data is falsely classified. This is interesting as when we look at the plots, a very clear distinction can be found between both classes. We could fine tune the sigma and correction rate, but when prediction points very far away (say x is 100000) the sigma and correction rate would be way to high for it to do a good performance (time wise and prediction wise).
 
 So if we now change the kernel from gaussian to a polynomial one as follows
 
 ```scala
 
-  val svm = new SVM[Array[Double]](new PolynomialKernel(2), 1.0,2)
-  
+ val svm = new SVM[Array[Double]](new PolynomialKernel(2), 1.0,2)
+ 
 ```
 
 And if we then perform the runs not only for degree 2, but for degrees of 2,3,4,5 and for the correction rates differing again from 0.001 up to 100, we get the following results:
@@ -1679,7 +1659,3 @@ And if we then perform the runs not only for degree 2, but for degrees of 2,3,4,
 | **c: 100.0** | 49.5% | 0% | 49.5% | 0% |
 
 Here we see that the testing data, which did not contain 1 single overlapping point with the training data, gets 100% accuracy for degrees 3 and 5. This is an amazing performance in comparison to the gaussian kernel with 27.4% in its best case. Do note that this example data is constructed, thus did not contain a lot of noise. This is why the error rate is 0% for all 'correction rates'. If you would add noise, fine-tuning of this correction rate would be needed.
-
-
-
-
