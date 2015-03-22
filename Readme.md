@@ -15,6 +15,7 @@ As final note I'd like to thank the following people:
 * [Haifeng Li](https://www.linkedin.com/in/haifengli) for his support and writing the awesome and free to use library [Smile](https://github.com/haifengl/smile).
 * [Erik Meijer](https://www.linkedin.com/profile/view?id=1490860) for all suggestions and supervision of the process of writing this blog.
 * [Richard van Heest](https://www.linkedin.com/profile/view?id=138460950) for his feedback and co-reading the blog.
+* [Lars Willems](https://www.linkedin.com/profile/view?id=355522383) for his feedback and co-reading the blog.
 
 ##The global idea of machine learning
 You probably have heard about Machine learning as a concept one time or another. However, if you would have to explain what machine learning to another person, how would you do this? Think about this for a second before reading the rest of this section.
@@ -23,7 +24,7 @@ Machine learning is explained in many ways, some more accurate than others, howe
 
 I agree more with the dynamic definition but due to certain limitations we explain the static model method in the examples. However, we do explain how the dynamic principle would work in the subsection [Dynamic machine learning](#dynamic-machine-learning).
 
-The other subsections explain commonly used definitions and notions in the machine learning field. We advise you to read through these before starting the practical examples.
+The upcoming subsections explain commonly used definitions and notions in the machine learning field. We advise you to read through these before starting the practical examples.
 
 ###Features
 A *feature* is a property on which a [model](#model) is trained. Say for example that you classify emails as spam/ham based on the frequency of the word 'Buy' and 'Money'. Then these words are features, or part of a feature if you would combine it with more words. If you would use machine learning to predict whether one is a friend of you, the amount of 'common' friends could be a feature. Note that in the field, sometimes features are also referred to as *attributes*.
@@ -177,12 +178,12 @@ When you are turning your data into a model, but are leaving (a lot of) statisti
 You can prevent underfitting by plotting the data to get insights in the underlying structure, and using [validation techniques](#validation-techniques) such as [cross validation](#2-fold-cross-validation). 
 
 #####Curse of dimensionality
-The curse of dimensionality is a collection of problems that can occur when your data size is lower than the amount of features (dimensions) you are trying to use to create your machine learning [model](#model). An example of a dimensionality curse is matrix rank deficiency. When using [Ordinary Least Squares(OLS)](http://en.wikipedia.org/wiki/Ordinary_least_squares), the underlying algorithm solves a linear system in order to build up a model. However if you have more columns than you have rows, solving this system is not possible. If this is the case, the best solution would be to get more datapoints or reduce the feature set. 
+The curse of dimensionality is a collection of problems that can occur when your data size is lower than the amount of features (dimensions) you are trying to use to create your machine learning [model](#model). An example of a dimensionality curse is matrix rank deficiency. When using [Ordinary Least Squares(OLS)](http://en.wikipedia.org/wiki/Ordinary_least_squares), the underlying algorithm solves a linear system in order to build up a model. However if you have more columns than you have rows, coming up with a single solution for this system is not possible. If this is the case, the best solution would be to get more datapoints or reduce the feature set. 
 
-If you want to know more regarding this curse of dimensionality, [a study focussed on this issue](http://lectures.molgen.mpg.de/networkanalysis13/LDA_cancer_classif.pdf). In this study, researchers Haifeng Li, Keshu Zhang and Tao Jiang developed an algorithm that improves cancer classification with very few datapoints in comparison to [support vector machines](http://en.wikipedia.org/wiki/Support_vector_machine) and [random forests](http://en.wikipedia.org/wiki/Random_forest).
+If you want to know more regarding this curse of dimensionality, [a study focussed on this issue](http://lectures.molgen.mpg.de/networkanalysis13/LDA_cancer_classif.pdf). In this study, researchers Haifeng Li, Keshu Zhang and Tao Jiang developed an algorithm that improves cancer classification with very few datapoints. They compared their algorithm with [support vector machines](http://en.wikipedia.org/wiki/Support_vector_machine) and [random forests](http://en.wikipedia.org/wiki/Random_forest).
 
 ###Dynamic machine learning
-In almost all literature you can find about machine learning, a static model is generated and validated, and then used for predictions or recommendations. However in practice, this alone would not make a very good machine learning application. This is why in this section we will explain how to turn a static model into a dynamic model. Since the (most optimal) implementation depends on the algorithm you are using, we will explain the concept rather than giving a practical example. Because explaining it in text only will not be very clear we first present you the whole system in a diagram which we will use to explain machine learning and how to make it dynamic.
+In almost all literature you can find about machine learning, a static model is generated and validated, and then used for predictions or recommendations. However in practice, this alone would not make a very good machine learning application. This is why in this section we will explain how to turn a static model into a dynamic model. Since the (most optimal) implementation depends on the algorithm you are using, we will explain the concept rather than giving a practical example. Because explaining it in text only will not be very clear we first present you the whole system in a diagram. We will then use this diagram to  explain machine learning and how to make the system dynamic.
 
 <img src="./Images/DynamicMachineLearning.png" />
 
@@ -196,21 +197,22 @@ The basic idea of machine learning can be described by the following steps:
 
 In this process there are a few steps missing when it comes to actual applications in the field. These steps are in my opinion the most important steps to make a system actually learn.
 
-The idea behind what we call dynamic machine learning is as follows: You take your predictions, combine it with user feedback and feed it back into your system to improve your dataset and model. As we just said we need user feedback, so how is this gained? This is actually not that hard. Let's take friend suggestions on [Facebook](https://www.facebook.com) for example. The user is presented 2 options: 'Add Friend' or 'Remove'. Based on the decision of the user, you have direct feedback regarding that prediction. 
+The idea behind what we call dynamic machine learning is as follows: You take your predictions, combine it with user feedback and feed it back into your system to improve your dataset and model. As we just said we need user feedback, so how is this gained? Let's take friend suggestions on [Facebook](https://www.facebook.com) for example. The user is presented 2 options: 'Add Friend' or 'Remove'. Based on the decision of the user, you have direct feedback regarding that prediction. 
 
 So say you have this user feedback, then you can apply machine learning over your machine learning application to learn about the feedback that is given. This might sound a bit strange, but we will try to explain this more elaborately. However before we do this, we need to make a *disclaimer*: our description of the Facebook friend suggestion system is a 100% assumption and in no way confirmed by Facebook itself. Their systems are a secret to the outside world as far as we know.
 
 Say the system predicts based on the following features:
+
 1. amount of common friends
 2. Same hometown
 3. Same age
 
 Then you can compute a [prior](#prior) for every person on Facebook regarding the chance that he/she is a good suggestion to be your friend. Say you store the results of all these predictions for a period of time, then analysing this data on its own with machine learning allows you to improve your system. To elaborate on this, say most of our 'removed' suggestions had a high rating on feature 2, but relatively low on 1, then we can add weights to the prediction system such that feature 1 is more important than feature 2. This will then improve the recommendation system for us. 
 
-Additionally, our dataset grows over time, so we should keep on updating our model with the new data to make the predictions more accurate. How to do this however, depends on the size and mutation rate of your data. 
+Additionally, the dataset grows over time, so we should keep on updating our model with the new data to make the predictions more accurate. How to do this however, depends on the size and mutation rate of your data. 
 
 ##Practical examples
-In this section we present you a set of machine learning algorithms in a practical setting. The idea of these examples is to get you started with machine learning algorithms without an in depth explanation of the underlying algorithms. We focus purely on the functional aspect of there algorithms, how you can verify your implementation and warn for [common pitfalls](#common-pitfalls).
+In this section we present you a set of machine learning algorithms in a practical setting. The idea of these examples is to get you started with machine learning algorithms without an in depth explanation of the underlying algorithms. We focus purely on the functional aspect of there algorithms, how you can verify your implementation and finally try to make you aware of [common pitfalls](#common-pitfalls).
 
 The following examples are available:
 
@@ -221,14 +223,14 @@ The following examples are available:
 * [Predicting weight based on height (Linear Regression OLS)](#predicting-weight-based-on-height-using-ordinary-least-squares)
 * [Using unsupervised learning to merge features (PCA)](#using-unsupervised-learning-to-merge-features-pca)
 
-For each of these examples we used the[Smile Machine Learning](https://github.com/haifengl/smile/releases) library. This library is now available from Maven in 2 parts: 'com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2'.
+For each of these examples we used the [Smile Machine Learning](https://github.com/haifengl/smile/releases) library. This library is now available from Maven in 2 parts: 'com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2'.
 
 
 ###Labeling ISPs based on their down/upload speed (K-NN using Smile in Scala)
 
 The goal of this section is to use the K-NN implementation from Smile in Scala to classify download/upload speed pairs as [ISP](http://en.wikipedia.org/wiki/Internet_service_provider) Alpha (represented by 0) or Beta (represented by 1). 
 
-To start with this example I assume you created a new Scala project in your favourite IDE, and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars. As final assumption you also downloaded the [example data](./Example%20Data/KNN_Example_1.csv).
+To start this example I assume you created a new Scala project in your favourite IDE, added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars. Finally you also downloaded the [example data](./Example%20Data/KNN_Example_1.csv).
 
 The first step is to load the CSV data file. As this is no rocket science, I provide the code for this without further explanation:
 
