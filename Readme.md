@@ -130,7 +130,7 @@ Suppose we have the following values:
 |20 | 17 | 9 | 5.4444 |
 |15 | 15 | 0 | 0.1111 |
 
-The mean of this squared difference for the model is 4.33333, and the root of this is 2.081666. So in average, the model predicts the values with an error of 2.09. The lower this RMSE value is, the better the model is in its predictions. This is why in the field, when selecting features, one computes the RMSE with and without a certain feature, in order to say something about how that feature affects the performance of the model. With this information one can then decide whether the additional computation time for this feature is worth it in comparison to the improvement rate on the model.
+The mean of this squared difference for the model is 4.33333, and the root of this is 2.081666. So in average, the model predicts the values with an error of 2.08. The lower this RMSE value is, the better the model is in its predictions. This is why in the field, when selecting features, one computes the RMSE with and without a certain feature, in order to say something about how that feature affects the performance of the model. With this information one can then decide whether the additional computation time for this feature is worth it in comparison to the improvement rate on the model.
 
 Additionally, because the RMSE is an absolute value, it can be normalised in order to compare models. This results in the Normalised Root Mean Square Error (NRMSE). For computing this however, you need to know the minimum and maximum value that the system can contain. Let's suppose we can have temperatures ranging from minimum of 5 to a maximum of 25 degrees, then computing the NRMSE is as follows:
 
@@ -228,7 +228,7 @@ For each of these examples we used the [Smile Machine Learning](https://github.c
 
 ###Labeling ISPs based on their down/upload speed (K-NN using Smile in Scala)
 
-The goal of this section is to use the K-NN implementation from Smile in Scala to classify download/upload speed pairs as [ISP](http://en.wikipedia.org/wiki/Internet_service_provider) Alpha (represented by 0) or Beta (represented by 1). 
+The goal of this section is to use the K-Nearest Neighbours(K-NN) Algorithm to classify download/upload speed pairs as [ISP](http://en.wikipedia.org/wiki/Internet_service_provider) Alpha (represented by 0) or Beta (represented by 1). The idea behind K-NN is that you classify unknown datapoints based on the classifications of that points surroundings. Thus given a set of points that are classified, you can classify the new point by looking at its K neighbours.
 
 To start this example I assume you created a new Scala project in your favourite IDE, added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars. Finally you also downloaded the [example data](./Example%20Data/KNN_Example_1.csv).
 
@@ -267,7 +267,7 @@ object KNNExample {
 }
 ```
 
-First thing you might wonder now is *why the frick is the data formatted that way*. Well, the separation between dataPoints and their label values is for easy splitting between testing and training data, and because the API expects the data this way for both executing the K-NN algorithm and plotting the data. Secondly the datapoints stored as an ```Array[Array[Double]]``` is done to support datapoints in more than just 2 dimensions.
+First thing you might wonder now is *why is the data formatted this way*. Well, the separation between dataPoints and their label values is for easy splitting between testing and training data, and because the API expects the data this way for both executing the K-NN algorithm and plotting the data. Secondly the datapoints stored as an ```Array[Array[Double]]``` is done to support datapoints in more than just 2 dimensions.
 
 Given the data the first thing to do next is to see what the data looks like. For this Smile provides a nice plotting library. In order to use this however, the application should be changed to a Swing application. Additionally the data should be fed to the plotting library to get a JPane with the actual plot. After changing your code it should like this:
 
@@ -337,7 +337,7 @@ For this example we do [2-fold Cross Validation](http://en.wikipedia.org/wiki/Cr
 
     validationRoundRecords.foreach { record =>
 
-      val knn = KNN.learn(record._1, record._2, 3)
+      val knn = KNN.learn(testData._1, testData._2, 3)
 
       //And for each test data point make a prediction with the model
       val predictions = record._3.map(x => knn.predict(x)).zipWithIndex
@@ -354,10 +354,10 @@ If you execute this code several times you might notice the false prediction rat
 
 Unfortunately I cannot provide you with a golden rule to when your model was trained with the best possible training set. One would say that the model with the least error rate is always the best, but when you recall the term [overfitting](#overfitting), picking this particular model might perform really bad on future data. This is why having a large enough and representative dataset is key to a good Machine Learning application. However, when aware of this issue, you could implement manners to keep updating your model based on new data and known correct classifications.
 
-Let's suppose you implement the K-NN into your application, then you should have gone through the following steps. First you took care of getting the training and testing data. Next up you generated and validated several models and picked the model which gave the best results. After these steps you can finally do predictions using your ML implementations:
+Let's suppose you implement the K-NN into your application, then you should have gone through the following steps. First you took care of getting the training and testing data. Next up you generated and validated several models and picked the model which gave the best results. After these steps you can finally do predictions using your ML implementation:
 
 ```scala
- h
+val knn = KNN.learn(record._1, record._2, 3)
 val unknownDataPoint = Array(5.3, 4.3)
 val result = knn.predict(unknownDatapoint)
 if (result == 0)
@@ -392,7 +392,7 @@ We will start off with writing the functions for loading the example data. This 
 
 def getMessage(file : File)  : String  =
   {
-    //Note that the encoding of the example files is latin1, thus this should be passed to the from file method.
+    //Note that the encoding of the example files is latin1, thus this should be passed to the fromFile method.
     val source = scala.io.Source.fromFile(file)("latin1")
     val lines = source.getLines mkString "\n"
     source.close()
@@ -419,7 +419,7 @@ Now we need a method that gets all the filenames for the emails, from the exampl
   }
 ```
 
-And finally let's define a set of paths that make it easier to load the different datasets from the example data. Together with this we also directly define a sample size of 500, as this is the complete amount of training emails are available for the spam set. We take the same amount of ham emails as the training set should be balanced for these two classification groups.
+And finally let's define a set of paths that make it easier to load the different datasets from the example data. Together with this we also directly define a sample size of 500, as this is the complete amount of training emails  available for the spam set. We take the same amount of ham emails as the training set should be balanced for these two classification groups.
 
 ```scala
   
@@ -476,12 +476,13 @@ Now that we have the training data for both the ham and the spam email, we can s
 
 ```
 
-Given the tables, lets take a look at the top 50 words for each table. Note that the red words are from the spam table and the green words are from the ham table. Additionally, the size of the words represents the occurrence rate. Thus the larger the word, the more documents contained that word at least once.
+Given the tables, I've generated images using a [wordcloud](http://www.wordle.net/) for some more insight. Lets take a look at the top 50 words for each table as represented in these images. Note that the red words are from the spam table and the green words are from the ham table. Additionally, the size of the words represents the occurrence rate. Thus the larger the word, the more documents contained that word at least once.
 
 <img src="./Images/Ham_Stopwords.png" width="400px" height="200px" />
 <img src="./Images/Spam_Stopwords.png" width="400px" height="200px" />
 
-As you can see, mostly stop words come forward. These stop words are noise, which we should not use in our feature selection, this we should remove these from the tables before selecting the features. We've included a list of stop words in the example dataset. Lets first define the code to get these stop words.
+As you can see, mostly stop words come forward. These stop words are noise, which we should prevent as much as possible in our feature selection. Thus we should remove these from the tables before selecting the features. We've included a list of stop words in the example dataset. Lets first define the code to get these stop words.
+
 ```scala
   def getStopWords() : List[String] =
   {
@@ -593,9 +594,9 @@ If we run this code several times with different feature amounts, we get the fol
 | 200     					| 1197 (85.68%)	| 16 (1.15%)	| 184 (13.17%)|
 | 400     					| 1219 (87.26%)	| 13 (0.93%)	| 165 (11.81%)|
 
-Interestingly enough, the algorithm works best with only 50 features. However, if you recall that there were still *stop words* in the top 50 classification terms which could explain this result. If you look at how the values change as the amount of features increase (starting at 100), you can see that with more features, the overall result increases. Note that there is a group of unknown emails. For these emails the [prior](#prior) was equal for both classes. Note that this also is the case if there are no feature words for ham nor spam in the email, because then the algorithm would classify it 50% ham and 50% spam.
+Interestingly enough, the algorithm works best for classifying spam with only 50 features. However, if you recall that there were still *stop words* in the top 50 classification terms which could explain this result. If you look at how the values change as the amount of features increase (starting at 100), you can see that with more features, the overall result increases. Note that there is a group of unknown emails. For these emails the [prior](#prior) was equal for both classes. Note that this also is the case if there are no feature words for ham nor spam in the email, because then the algorithm would classify it 50% ham and 50% spam.
 
-If we change the path to ```easyHam2Path``` and rerun the code for we get the following results:
+If we change the path from the variable ```listOfSpam2Files``` to ```easyHam2Path``` and rerun the code we get the following results:
 
 | amountOfFeaturesToTake	| Spam | Unknown| Ham  (Correct) | 
 | ---------------------		|:-------------	| :----- |:----|
@@ -854,7 +855,7 @@ Here the value's now range between 0.69 and 3.41, which is a lot better than a r
 
 ```
 
-Note how we determine the difference between the min and the max, and divide it by 1000. This is to scale the time value from MS to seconds. Additionally we compute the weights by taking the frequency of a subject  and dividing it by the time difference. Since this value is very small, we want to rescale it up a little, which is done by taking the 10log. This however causes our values to become negative, which is why we add a basic value of 10 to make every value positive. The end result of this weighting is as follows:
+Note how we determine the difference between the min and the max, and divide it by 1000. This is to scale the time value from milliseconds to seconds. Additionally we compute the weights by taking the frequency of a subject  and dividing it by the time difference. Since this value is very small, we want to rescale it up a little, which is done by taking the 10log. This however causes our values to become negative, which is why we add a basic value of 10 to make every value positive. The end result of this weighting is as follows:
 
 <img src="./Images/Weighted_Subject_Distribution.png" width="400px" />
 
@@ -864,37 +865,37 @@ We see our values ranging roughly between (4.4 and 8.6) which shows that outlier
 
 | Subject 	| Frequency	| Time frame (seconds) 	| Weight |
 | :-- 		| :-- 		| :-- 			| :-- | 
-|[ilug] what howtos for soho system | 2 | 60  | 8.522878745280337 |
-|[zzzzteana] the new steve earle  | 2  | 120 | 8.221848749616356 | 
-| [ilug] looking for a file / directory in zip file | 2 | 240 | 7.920818753952375 |
-| ouch... [bebergflame]| 2 |300  | 7.823908740944319|
-| [ilug] serial number in hosts file | 2 | 420 |  7.6777807052660805 |
-| [ilug] email list management howto | 3 | 720 |  7.619788758288394 | 
-| should mplayer be build with win32 codecs?  | 2 | 660 |  7.481486060122112 |
-| [spambayes] all cap or cap word subjects  | 2 | 670 |  7.474955192963154 |
-| [zzzzteana] save the planet, kill the people  | 3 | 1020 |  7.468521082957745 |
-| [ilug] got me a crappy laptop  | 2 | 720 | 7.443697499232712 |
+|[ilug] what howtos for soho system | 2 | 60  | 8.52 |
+|[zzzzteana] the new steve earle  | 2  | 120 | 8.22 | 
+| [ilug] looking for a file / directory in zip file | 2 | 240 | 7.92 |
+| ouch... [bebergflame]| 2 |300  | 7.82|
+| [ilug] serial number in hosts file | 2 | 420 |  7.685 |
+| [ilug] email list management howto | 3 | 720 |  7.62 | 
+| should mplayer be build with win32 codecs?  | 2 | 660 |  7.482 |
+| [spambayes] all cap or cap word subjects  | 2 | 670 |  7.48 |
+| [zzzzteana] save the planet, kill the people  | 3 | 1020 |  7.47 |
+| [ilug] got me a crappy laptop  | 2 | 720 | 7.44 |
 
 **Bottom 10 weights:**
 
 | Subject 	| Frequency	| Time frame (seconds) 	| Weight |
 | :-- 		| :-- 		| :-- 			| :-- | 
-|secure sofware key | 14  | 1822200 | 4.885531993376329 | 
-|[satalk] help with postfix + spamassassin | 2  | 264480 | 4.878637159436609 | 
-|<nettime> the war prayer | 2  | 301800 | 4.82131076022441 | 
-|gecko adhesion finally sussed. | 5  | 767287 | 4.814012164243057 | 
-|the mime information you requested (last changed 3154 feb 14) | 3  | 504420 | 4.774328956918856 | 
-|use of base image / delta image for automated recovery from | 5  | 1405800 | 4.551046465355412 | 
-|sprint delivers the next big thing?? | 5  | 1415280 | 4.548127634846606 | 
-|[razor-users] collision of hashes? | 4  | 1230420 | 4.512006609524829 | 
-|[ilug] modem problems | 2  | 709500 | 4.450077595870488 | 
-|tech's major decline | 2  | 747660 | 4.427325849260936 | 
+|secure sofware key | 14  | 1822200 | 4.89 | 
+|[satalk] help with postfix + spamassassin | 2  | 264480 | 4.88 | 
+|<nettime> the war prayer | 2  | 301800 | 4.82 | 
+|gecko adhesion finally sussed. | 5  | 767287 | 4.81 | 
+|the mime information you requested (last changed 3154 feb 14) | 3  | 504420 | 4.776 | 
+|use of base image / delta image for automated recovery from | 5  | 1405800 | 4.55 | 
+|sprint delivers the next big thing?? | 5  | 1415280 | 4.55 | 
+|[razor-users] collision of hashes? | 4  | 1230420 | 4.51 | 
+|[ilug] modem problems | 2  | 709500 | 4.45 | 
+|tech's major decline | 2  | 747660 | 4.43 | 
 
 As you can see the highest weights are given to emails which almost instantly got a follow up email response, whereas the lowest weights are given to emails with very long timeframes. This allows for emails with a very low frequency to still be rated as very important based on the timeframe in which they were sent. With this we have 2 features: the amount of emails from a sender ```mailsGroupedBySender```, and the weight of emails that belong to an existing thread ```threadGroupsWithWeights```.
 
 Let's continue with the next feature, as we want to base our ranking on as much features as possible. This next feature will be based on the weight ranking that we just computed. The idea is that new emails with different subjects will arrive. However, chances are that they contain keywords that are similar to earlier received important subjects. This will allow us to rank emails as important before a thread (multiple messages with the same subject) was started. For that we specify the weight of the keywords to be the weight of the subject in which the term occurred. If this term occurred in multiple threads, we take the highest weight as the leading one.
 
-There is one issue with this feature, which are stop words. Luckily we have a stop words file that allows us to remove (most) english stop words for now. However, when designing your own system you should take into account that multiple languages can occur, thus you should remove stop words for all languages that can occur in the system. The code for this feature is as follows:
+There is one issue with this feature, which are stop words. Luckily we have a stop words file that allows us to remove (most) english stop words for now. However, when designing your own system you should take into account that multiple languages can occur, thus you should remove stop words for all languages that can occur in the system. Additionally you might need to be carefull with removing stop words from different languages, as some words may have different meanings among the different languages. As for now we stick with removing English stop words. The code for this feature is as follows:
 
 ```scala
 
