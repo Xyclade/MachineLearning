@@ -36,7 +36,7 @@ When one talks about machine learning, often the term *model* is mentioned. The 
 In the field of machine learning there are two leading ways of learning, namely [Supervised learning](#supervised-learning) and [Unsupervised learning](#unsupervised-learning). A brief introduction is necessary when you want to use Machine learning in your applications, as picking the right machine learning approach and algorithm is an important but sometimes also a little tedious process.
 
 ####Supervised learning
-In the field of machine learning there is [supervised](http://en.wikipedia.org/wiki/Supervised_learning) and [unsupervised](#unsupervised-learning). In supervised learning you define explicitly what features you want to use, and what output you expect. An example is predicting gender based on height and weight, which is known as a [Classification](#classification) problem. Additionally you can also predict absolute values with [Regression](#regression). An example of regression with the same data would be predicting ones length based on gender and weight. Some supervised algorithms can only be used for either classification or regression, such as [K-NN](#labeling-isps-based-on-their-downupload-speed-knn-using-smile-in-scala). However there also exists algorithms such as [Support Vector Machines](#using-support-vector-machines) which can be used for both purposes. 
+In supervised learning you define explicitly what features you want to use, and what output you expect. An example is predicting gender based on height and weight, which is known as a [Classification](#classification) problem. Additionally you can also predict absolute values with [Regression](#regression). An example of regression with the same data would be predicting ones length based on gender and weight. Some supervised algorithms can only be used for either classification or regression, such as [K-NN](#labeling-isps-based-on-their-downupload-speed-knn-using-smile-in-scala). However there also exists algorithms such as [Support Vector Machines](#using-support-vector-machines) which can be used for both purposes. 
 
 #####Classification
 The problem of classification within the domain of Supervised learning is relatively simple. Given a set of labels, and some data that already received the correct labels, we want to be able to *predict* labels for new data that we did not label yet. However, before thinking of your data as a classification problem, you should look at what the data looks like. If there is a clear structure in the data such that you can easily draw a regression line it might be better to use a [regression](#regression) algorithm instead. Given the data does not fit to a regression line, or when performance becomes an issue, classification is a good alternative.
@@ -63,10 +63,10 @@ To give a clear idea of what PCA does, we show the plots of a dataset of points 
 
 On the left plot the original data is shown, where each color represents a different class. It is clear that from the 2 dimensions (X and Y) you could reduce to 1 dimension and still classify properly. This is where PCA comes in place. With PCA a new value is calculated for each datapoint, based on its original dimensions. 
 
-In the plot on the right you see the result of applying PCA to this data. Note that there is a y value on 0.0, but this is purely to be able to plot the data and show it to you, as only the X values are returned by the PCA algorithm. Also note that the values for X in the right plot do not correspond to the values in the left plot, this shows that PCA not 'just drops' a dimension.
+In the plot on the right you see the result of applying PCA to this data. Note that there is a y value, but this is purely to be able to plot the data and show it to you. This Y value is 0 for all values as only the X values are returned by the PCA algorithm. Also note that the values for X in the right plot do not correspond to the values in the left plot, this shows that PCA not 'just drops' a dimension.
 
 ###Validation techniques
-In this section we will explain some of the techniques available for model validation, and will explain some terms that are commonly used in the Machine Learning field.
+In this section we will explain some of the techniques available for model validation, and some terms that are commonly used in the Machine Learning field within the scope of validation techniques.
 
 ####Cross validation
 The technique of cross validation is one of the most common techniques in the field of machine learning. Its essence is to *ignore* part of your dataset while training your [model](#model), and then using the model to predict this *ignored data*. Comparing the predictions to the actual value then gives an indication of the performance of your model, and the quality of your training data.
@@ -80,34 +80,32 @@ In 2-fold cross validation you perform a split of the data into test and trainin
 The basic idea of regularization is preventing [overfitting](#overfitting) your [model](#model) by simplifying it. Suppose your data is a 3rd degree polynomial function, but your data has noise and this would cause the model to be of a higher degree. Then the model would perform poorly on new data, whereas it seems to be a good model at first. Regularization helps preventing this, by simplifying the model with a certain value *lambda*. However to find the right lambda for a model is hard when you have no idea as to when the model is overfitted or not. This is why [cross validation](#cross-validation) is often used to find the best lambda fitting your model.
 
 ##### Precision
-In the field of computer science we use the term precision to define the amount of items selected which are actually relevant.
+In the field of computer science we use the term precision to define the amount of items selected which are actually relevant. So when you compute the precision value for a search algorithm on documents, the precision of that algorithm is defined by how many documents from the result set are actually relevant.
 
 This value is computed as follows:
 
 <img src="./Images/Precision.png"/>
 
-To give an example:
+As this might be a bit hard to grasp I will give an example:
 
-Say we have documents {aa, ab, bc, bd, ee} and we query for documents with a in the name. If our algorithm would be to return {aa, ab} the precision would be 100% intuitively. Let's verify it by filling in the formula:
+Say we have documents {aa, ab, bc, bd, ee} as the complete corpus, and we query for documents with `a` in the name. If our algorithm would then return the document set {aa, ab}, the precision would be 100% intuitively. Let's verify it by filling in the formula:
 
 <img src="./Images/PrecisionFull.png"/>
 
-Indeed it is 100%. Next we shall show what happens if more results are returned:
+Indeed it is 100%. If we would run the query again but get more results than only {aa, ab}, say we additionally get {bc,de}  back as well, this influences the precision as follows:
 
 <img src="./Images/PrecisionHalf.png"/>
 
 Here the results contained the relevant results but also 2 irrelevant results. This caused the precision to decrease. However if you would calculate the [recall](#recall) for this example it would be 100%. This is how precision and recall differ from each other.
 
 ##### Recall
-In the field of computer science we use the term recall to define the amount of relevant items that are retrieved for a query.
-
-This value is computed as follows:
+Recall is used to define the amount of relevant items that are retrieved by an algorithm given a query and a data corpus. So given a set of documents, and a query that should return a subset of those documents, the recall value represents how many of the relevant documents are actually returned. This value is computed as follows:
 
 <img src="./Images/Recall.png"/>
 
-To give an example:
+Given this formula, let's do an example to see how it works:
 
-Say we have documents {aa,ab,bc,bd,ee} and we query for documents with a in the name. If our algorithm would be to return {aa,ab} the recall would be 100% intuitively. Let's verify it by filling in the formula:
+Say we have documents {aa,ab,bc,bd,ee} as complete corpus and we query for documents with `a` in the name. If our algorithm would be to return {aa,ab} the recall would be 100% intuitively. Let's verify it by filling in the formula:
 
 <img src="./Images/RecallFull.png"/>
 
@@ -118,11 +116,11 @@ Indeed it is 100%. Next we shall show what happens if not all relevant results a
 Here the results only contained half of the relevant results. This caused the recall to decrease. However if you would compute the [precision](#precision) for this situation, it would result in 100% precision, because all results are relevant.
 
 ##### Prior
-The prior value that belongs to a classifier given a datapoint represents the likelihood that this datapoint belongs to this classifier. 
+The prior value that belongs to a classifier given a datapoint represents the likelihood that this datapoint belongs to this classifier.  In practice this means that when you get a prediction for a datapoint, the prior value that is given with it, represents how 'convinced' the model is regarding the classification given to that datapoint. 
+
 
 ##### Root Mean Squared Error (RMSE)
-The Root Mean Squared Error (RMSE or RMSD where D stands for deviation) is the square root of the variance of the differences between the actual value and predicted value.
-Suppose we have the following values:
+The Root Mean Squared Error (RMSE or RMSD where D stands for deviation) is the square root of the mean of the squared differences between the actual value and predicted value. As this is might be hard to grasp, I'll explain it using an example. Suppose we have the following values:
 
 | Predicted temperature | Actual temperature | squared difference for Model | square difference for average |
 | :--: | :--:| :--:| :--: | 
@@ -130,7 +128,7 @@ Suppose we have the following values:
 |20 | 17 | 9 | 5.4444 |
 |15 | 15 | 0 | 0.1111 |
 
-The mean of this squared difference for the model is 4.33333, and the root of this is 2.081666. So in average, the model predicts the values with an error of 2.08. The lower this RMSE value is, the better the model is in its predictions. This is why in the field, when selecting features, one computes the RMSE with and without a certain feature, in order to say something about how that feature affects the performance of the model. With this information one can then decide whether the additional computation time for this feature is worth it in comparison to the improvement rate on the model.
+The mean of these squared differences for the model is 4.33333, and the root of this is 2.081666. So in average, the model predicts the values with an error of 2.08. The lower this RMSE value is, the better the model is in its predictions. This is why in the field, when selecting features, one computes the RMSE with and without a certain feature, in order to say something about how that feature affects the performance of the model. With this information one can then decide whether the additional computation time for this feature is worth it in comparison to the improvement rate on the model.
 
 Additionally, because the RMSE is an absolute value, it can be normalised in order to compare models. This results in the Normalised Root Mean Square Error (NRMSE). For computing this however, you need to know the minimum and maximum value that the system can contain. Let's suppose we can have temperatures ranging from minimum of 5 to a maximum of 25 degrees, then computing the NRMSE is as follows:
 
@@ -216,19 +214,20 @@ In this section we present you a set of machine learning algorithms in a practic
 
 The following examples are available:
 
-* [Labeling ISP's based on their down/upload speed (K-NN)](#labeling-isps-based-on-their-downupload-speed-knn-using-smile-in-scala)
-* [Classifying email as spam or ham](#classifying-email-as-spam-or-ham-naive-bayes)
+* [Labeling ISP's based on their down/upload speed (K-NN)](#labeling-isps-based-on-their-downupload-speed-k-nn-using-smile-in-scala)
+* [Classifying email as spam or ham (Naive Bayes)](#classifying-email-as-spam-or-ham-naive-bayes)
 * [Ranking emails based on their content (Recommendation system)](#ranking-emails-based-on-their-content-recommendation-system)
-* [An attempt at rank prediction for top selling books using text regression](#an-attempt-at-rank-prediction-for-top-selling-books-using-text-regression)
 * [Predicting weight based on height (Linear Regression OLS)](#predicting-weight-based-on-height-using-ordinary-least-squares)
+* [An attempt at rank prediction for top selling books using text regression](#an-attempt-at-rank-prediction-for-top-selling-books-using-text-regression)
 * [Using unsupervised learning to merge features (PCA)](#using-unsupervised-learning-to-merge-features-pca)
+* [Using Support Vector Machines (SVMS)](#using-support-vector-machines-svms)
 
 For each of these examples we used the [Smile Machine Learning](https://github.com/haifengl/smile/releases) library. This library is now available from Maven in 2 parts: 'com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2'.
 
 
 ###Labeling ISPs based on their down/upload speed (K-NN using Smile in Scala)
 
-The goal of this section is to use the K-Nearest Neighbours(K-NN) Algorithm to classify download/upload speed pairs as [ISP](http://en.wikipedia.org/wiki/Internet_service_provider) Alpha (represented by 0) or Beta (represented by 1). The idea behind K-NN is that you classify unknown datapoints based on the classifications of that points surroundings. Thus given a set of points that are classified, you can classify the new point by looking at its K neighbours.
+The goal of this section is to use the K-Nearest Neighbours (K-NN) Algorithm to classify download/upload speed pairs as [internet service provider (ISP)](http://en.wikipedia.org/wiki/Internet_service_provider) Alpha (represented by 0) or Beta (represented by 1). The idea behind K-NN is as follows: given a set of points that are classified, you can classify the new point by looking at its K neighbours (K being a positive integer). The idea is that you find the K-neighbours by looking at the euclidean distance between the new point and its surrounding points. For these neighbours you then look at the biggest representative class and assign that class to the new point.
 
 To start this example I assume you created a new Scala project in your favourite IDE, added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars. Finally you also downloaded the [example data](./Example%20Data/KNN_Example_1.csv).
 
@@ -292,11 +291,11 @@ The idea behind plotting the data is to verify whether K-NN is a fitting Machine
 
 <img src="./Images/KNNPlot.png" width="300px" height="300px" />
 
-In this plot you can see  that the blue and red points seem to be mixed in the area (3 < x < 5) and (5 < y < 7.5). Since the groups are mixed the K-NN algorithm is a good choice as fitting a linear decision boundary would cause a lot of false classifications in the mixed area.
+In this plot you can see that the blue and red points seem to be mixed in the area (3 < x < 5) and (5 < y < 7.5). Since the groups are mixed the K-NN algorithm is a good choice, as fitting a linear decision boundary would cause a lot of false classifications in the mixed area.
 
-Given this choice to use K-NN to be a good one, lets continue with the actual Machine Learning part. For this the GUI is ditched since it does not really add any value. Recall from the section [*The global idea of Machine Learning*](#the-global-idea-of-machine-learning) that in machine learning there are 2 key parts: Prediction and Validation. First we will look at the validation, as using a model without any validation is never a good idea. The main reason to validate the model here is to prevent [overfitting](#overfitting). However, before we even can do validation, a *correct* K should be chosen. 
+Given this choice to use the K-NN algorithm to be a good fit for this problem, lets continue with the actual Machine Learning part. For this the GUI is ditched since it does not really add any value. Recall from the section [*The global idea of Machine Learning*](#the-global-idea-of-machine-learning) that in machine learning there are 2 key parts: Prediction and Validation. First we will look at the validation, as using a model without any validation is never a good idea. The main reason to validate the model here is to prevent [overfitting](#overfitting). However, before we even can do validation, a *correct* K should be chosen. 
 
-The drawback is that there is no golden rule for finding the correct K but finding a K that allows for most datapoints to be classified correctly can be done by looking at the data. Additionally the K should be picked carefully to prevent undecidability by the algorithm. Say for example ```K=2```, and the problem has 2 labels, then when a point is between both labels, which one should the algorithm pick. There is a *rule of thumb* that K should be the square root of the number of features (on other words the number of dimensions). In our example this would be ```K=1```, but this is not really a good idea since this would lead to higher false-classifications around decision boundaries. Picking ```K=2``` would result in the error regarding our two labels, thus picking ```K=3``` seems like a good fit for now.
+The drawback is that there is no golden rule for finding the correct K. However, finding a *good* K that allows for most datapoints to be classified correctly can be done by looking at the data. Additionally the K should be picked carefully to prevent undecidability by the algorithm. Say for example ```K=2```, and the problem has 2 labels, then when a point is between both labels, which one should the algorithm pick. There is a *rule of thumb* that K should be the square root of the number of features (on other words the number of dimensions). In our example this would be ```K=1```, but this is not really a good idea since this would lead to higher false-classifications around decision boundaries. Picking ```K=2``` would result in the error regarding our two labels, thus picking ```K=3``` seems like a good fit for now.
 
 For this example we do [2-fold Cross Validation](http://en.wikipedia.org/wiki/Cross-validation_(statistics)). In general 2-fold cross validation is a rather weak method of model Validation, as it splits the dataset in half and only validates twice, which still allows for overfitting, but since the dataset is only 100 points, 10-fold (which is a stronger version) does not make sense, since then there would only be 10 datapoints used for testing, which would give a skewed error rate.
 
@@ -354,7 +353,7 @@ If you execute this code several times you might notice the false prediction rat
 
 Unfortunately I cannot provide you with a golden rule to when your model was trained with the best possible training set. One would say that the model with the least error rate is always the best, but when you recall the term [overfitting](#overfitting), picking this particular model might perform really bad on future data. This is why having a large enough and representative dataset is key to a good Machine Learning application. However, when aware of this issue, you could implement manners to keep updating your model based on new data and known correct classifications.
 
-Let's suppose you implement the K-NN into your application, then you should have gone through the following steps. First you took care of getting the training and testing data. Next up you generated and validated several models and picked the model which gave the best results. After these steps you can finally do predictions using your ML implementation:
+Let's recap what we've done so far. First you took care of getting the training and testing data. Next up you generated and validated several models and picked the model which gave the best results. Then we now have one final step to do, which is making predictions using this model:
 
 ```scala
 val knn = KNN.learn(record._1, record._2, 3)
@@ -375,10 +374,24 @@ else
 
 ```
 
-These predictions can then be used to present to the users of your system, for example as friend suggestion on a social networking site. The feedback the user gives on these predictions is valuable and should thus be fed into the system for updating your model.
+The result of executing this code is labeling the ```unknownDataPoint``` (5.3, 4.3) as ISP Alpha. This is one of the easier points to classify as it is clearly in the Alpha field of the datapoints in the plot. As it is now clear how to do these predictions I won't present you with other points, but feel free to try out how different points get predicted.
+
+
 
 ###Classifying email as spam or ham (Naive Bayes)
-The goal of this section is to use the Naive Bayes implementation from [Smile](https://github.com/haifengl/smile) in Scala to classify emails as spam or ham based on their content.  
+In this example we will be using the [Naive Bayes algorithm](http://en.wikipedia.org/wiki/Naive_Bayes_classifier) to classify email as ham (good emails) or spam (bad emails) based on their content. The Naive Bayes algorithm calculates the probability for an object for each possible class, and then returns the class with the highest probability. For this probability calculation the algorithm uses features. The reason its called *Naive* Bayes is because it does not incorporate any correlation between features. In other words, each feature counts the same. I'll explain a bit more using an example:
+
+Say you are classifying fruits and vegetables based on the features *color*, *diameter* and *shape* and you have the following classes: *apple*, *tomato*, and *strawberry*.
+
+Suppose you then want to classify an object with the following values for the features: (red,5 cm, round). This would obviously be a tomato for us, as it is way to small to be an apple, and too large for a strawberry.Additionally a strawberry is more triangle shaped rather than round. However, because the Naive Bayes algorithm evaluates each feature individually it will classify it as follows:
+
+* Apple  66.6% probable (based on color and shape)
+* Tomato 66.6% probable (based on color and size)
+* Strawberry 33.3% probable (based on color)
+
+Thus for this case, Naive Bayes does poor classification, and more advanced alternatives should be used such as [Random Forest](http://en.wikipedia.org/wiki/Random_forest) which is not addressed in this blog. However, for spam classification Naive Bayes works well, as spam or ham cannot be classified purely based on one word.
+
+As you should now have an idea on how the Naive Bayes algorithm works, we can continue with the actual example. For this example we will use the Naive Bayes implementation from [Smile](https://github.com/haifengl/smile) in Scala to classify emails as spam or ham based on their content.  
 
 To start with this example I assume you created a new Scala project in your favourite IDE, and  and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars. As final assumption you also downloaded and extracted the [example data](http://spamassassin.apache.org/publiccorpus/) from the SpamAssasins public corpus. The data you need for the example is only the [easy_ham](http://spamassassin.apache.org/publiccorpus/20030228_easy_ham.tar.bz2) and [spam](http://spamassassin.apache.org/publiccorpus/20030228_spam.tar.bz2) files, but the rest can also be used in case you feel like experimenting some more. Additionally you will need the [stop words file](./Example%20Data/stopwords.txt) for filtering purposes.
 
@@ -386,7 +399,7 @@ As with every machine learning implementation, the first step is to load in the 
 
 In this example we will use the content of the email as feature. By this we mean we will select the features (words in this case) from the bodies of the emails in the training set. In order to be able to do this, we need to build a [Term Document Matrix (TDM)](http://en.wikipedia.org/wiki/Document-term_matrix). 
 
-We will start off with writing the functions for loading the example data. This will be done with a ```getMessage``` method which gets a filtered body from an email given a filename as parameter.
+We will start off with writing the functions for loading the example data. This will be done with a ```getMessage``` method which gets a filtered body from an email given a File as parameter.
 
 ```scala
 
@@ -555,7 +568,7 @@ var hamData = hamMails.map(x => bag.feature(x._2.split(" "))).toArray
 var trainingData = spamData ++ hamData
 ```
 
-Given this feature bag, and a set of training data, we can start training the algorithm. For this we can choose a few different models: 'general', 'multinomial' and Bernoulli. In this example we focus on the multinomial but feel free to try out the other model types as well.
+Given this feature bag, and a set of training data, we can start training the algorithm. For this we can choose a few different models: `General`, `Multinomial` and `Bernoulli`. The `General` model needs to have a distribution defined, which we do not know on beforehand, so this is not a good option. The difference between the `Multinomial` and `Bernoulli` is the way in which they handle occurrence of words. The `Bernoulli` model only verifies whether a feature is there  (binary 1 or 0), thus leaves out the statistical data of occurrences, where as the `Multinomial` model incorporates the occurrences (represented by the value). This causes the `Bernoulli` model to perform bad on longer documents in comparison to the `Multinomial` model. Since we will be rating emails, and we want to use the occurrence, we focus on the multinomial but feel free to try out the `Bernoulli` model as well.
 
 ```scala
 //Create the bayes model as a multinomial with 2 classification groups and the amount of features passed in the constructor.
@@ -594,9 +607,9 @@ If we run this code several times with different feature amounts, we get the fol
 | 200     					| 1197 (85.68%)	| 16 (1.15%)	| 184 (13.17%)|
 | 400     					| 1219 (87.26%)	| 13 (0.93%)	| 165 (11.81%)|
 
-Interestingly enough, the algorithm works best for classifying spam with only 50 features. However, if you recall that there were still *stop words* in the top 50 classification terms which could explain this result. If you look at how the values change as the amount of features increase (starting at 100), you can see that with more features, the overall result increases. Note that there is a group of unknown emails. For these emails the [prior](#prior) was equal for both classes. Note that this also is the case if there are no feature words for ham nor spam in the email, because then the algorithm would classify it 50% ham and 50% spam.
+Note that the amount of emails classified as Spam are the ones that are correctly classified by the model. Interestingly enough, the algorithm works best for classifying spam with only 50 features. However, if you recall that there were still *stop words* in the top 50 classification terms which could explain this result. If you look at how the values change as the amount of features increase (starting at 100), you can see that with more features, the overall result increases. Note that there is a group of unknown emails. For these emails the [prior](#prior) was equal for both classes. Note that this also is the case if there are no feature words for ham nor spam in the email, because then the algorithm would classify it 50% ham and 50% spam.
 
-If we change the path from the variable ```listOfSpam2Files``` to ```easyHam2Path``` and rerun the code we get the following results:
+We will now do the same classification process for the ham emails. This is done by  changing the path from the variable ```listOfSpam2Files``` to ```easyHam2Path``` and rerunning the code. This gives us the following results:
 
 | amountOfFeaturesToTake	| Spam | Unknown| Ham  (Correct) | 
 | ---------------------		|:-------------	| :----- |:----|
@@ -605,12 +618,16 @@ If we change the path from the variable ```listOfSpam2Files``` to ```easyHam2Pat
 | 200 						| 36 (2.57%)	| 7 (0.5%)	| 1357 (96.93%)	|
 | 400     					| 24 (1.71%)	| 7 (0.5%)	| 1369 (97.79%) |
 
-Here we see that indeed, when you use only 50 features, the amount of ham that gets classified correctly is significantly lower in comparison to the correct classifications when using 100 features. 
+Note that now the correctly classified emails are those who are classified as ham. Here we see that indeed, when you use only 50 features, the amount of ham that gets classified correctly is significantly lower in comparison to the correct classifications when using 100 features. You should be aware of this and always verify your model for all classes, so in this case for both spam and ham  test data.  
 
-With this we have shown how you can use Naive Bayes to classify email has ham or spam. We could work through the hard ham from the corpus website, but since the building bricks are already here, we leave this to you.
+To recap the example, we've worked through how you can use Naive Bayes to classify email has ham or spam, and got results of up to 87.26% correct classification for spam and 97.79% for ham. This shows that Naive Bayes indeed performs pretty well for classifying email as ham or spam. 
+
+With this we end the example of Naive Bayes. If you want to play around a bit more with Naive Bayes and Spam classification the corpus website also has a set of 'hard ham'  emails that you could try to classify correctly by tweaking the feature amounts and removing more stopwords.
 
 ###Ranking emails based on their content (Recommendation system)
-This example will be completely about building your own recommendation system. We will use a subset of the email data which we used in the example [Classifying email as spam or ham](#classifying-email-as-spam-or-ham-naive-bayes). This subset can be downloaded [here](http://spamassassin.apache.org/publiccorpus/20030228_easy_ham.tar.bz2). Additionally you need the [stop words file](./Example%20Data/stopwords.txt). Note that the data is a set of received emails, thus we lack half of the data, namely the outgoing emails of this mailbox. However even without this information we can do some pretty neat ranking as we will see later on.
+This example will be completely about building your own recommendation system. We will be ranking emails based on the following features: 'sender', 'subject', 'common terms in subject' and 'common terms in email body'. Later on in the example we will explain each of these features. Note that these features are for you to be defined when you make your own recommendation system. The main idea behind this example is to show you how to do this feature selection, and how to solve issues that occur when you start doing this with your own data.
+
+We will use a subset of the email data which we used in the example [Classifying email as spam or ham](#classifying-email-as-spam-or-ham-naive-bayes). This subset can be downloaded [here](http://spamassassin.apache.org/publiccorpus/20030228_easy_ham.tar.bz2). Additionally you need the [stop words file](./Example%20Data/stopwords.txt). Note that the data is a set of received emails, thus we lack half of the data, namely the outgoing emails of this mailbox. However even without this information we can do some pretty neat ranking as we will see later on.
 
 To start with this example I assume you created a new Scala project in your favourite IDE, and  and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars.
 
@@ -745,7 +762,7 @@ object RecommendationSystem extends SimpleSwingApplication {
 
 ```
 
-This pre-processing of the data is very common and can be a real pain when your data is not standardised such as with the dates and senders of these emails. However given this chunk of code we now have available the following properties of our example data:(full email, receiving date, sender, subject, body). This allows us to continue working on the actual features to use in the recommendation system. 
+This pre-processing of the data is very common and can be a real pain when your data is not standardised such as with the dates and senders of these emails. However given this chunk of code we now have available the following properties of our example data: full email, receiving date, sender, subject, and body. This allows us to continue working on the actual features to use in the recommendation system. 
 
 The first recommendation feature we will make is based on the sender of the email. Those who you receive more emails from should be ranked higher than ones you get less email from. This is a strong assumption, but instinctively you will probably agree, given the fact that spam is left out. Let's look at the distribution of senders over the complete email set.
 
@@ -776,7 +793,7 @@ bounds = new Rectangle(800, 600)
 
 ```
 
-<img src="./Images/Mail_per_Sender_Distribution.png" width="400px" /> 
+<img src="./Images/Mail_per_Sender_Distribution.png" width="600px" /> 
 
 Here you can see that the most frequent sender sent 45 emails, followed by 37 emails and then it goes down rapidly. Due to these huge outliers, directly using this data would result in the highest 1 or 2 senders to be rated as very important whereas the rest would not be considered in the recommendation system. In order to prevent this behaviour we will re-scale the data  by taking ```log1p```.  The ```log1p``` function takes the log of the value but on beforehand adds 1 to the value. This addition of 1 is to prevent trouble when taking the log value for senders who sent only 1 email. After taking the log the data looks like this.
 
@@ -849,13 +866,13 @@ Here the value's now range between 0.69 and 3.41, which is a lot better than a r
     						) / 1000))
 
 //turn into a list of tuples with (topic, list of emails, time difference, and weight) filtered that only threads occur
-    val threadGroupsWithWeights = mailGroupsWithMinMaxDates
+    val threadGroupedWithWeights = mailGroupsWithMinMaxDates
     .filter(x => x._3 != 0)
     .map(x => (x._1, x._2, x._3, 10 + Math.log10(x._2.length.toDouble / x._3)))
 
 ```
 
-Note how we determine the difference between the min and the max, and divide it by 1000. This is to scale the time value from milliseconds to seconds. Additionally we compute the weights by taking the frequency of a subject  and dividing it by the time difference. Since this value is very small, we want to rescale it up a little, which is done by taking the 10log. This however causes our values to become negative, which is why we add a basic value of 10 to make every value positive. The end result of this weighting is as follows:
+Note how we determine the difference between the min and the max, and divide it by 1000. This is to scale the time value from milliseconds to seconds. Additionally we compute the weights by taking the frequency of a subject  and dividing it by the time difference. Since this value is very small, we want to rescale it up a little, which is done by taking the ```10log```. This however causes our values to become negative, which is why we add a basic value of 10 to make every value positive. The end result of this weighting is as follows:
 
 <img src="./Images/Weighted_Subject_Distribution.png" width="400px" />
 
@@ -891,7 +908,7 @@ We see our values ranging roughly between (4.4 and 8.6) which shows that outlier
 |[ilug] modem problems | 2  | 709500 | 4.45 | 
 |tech's major decline | 2  | 747660 | 4.43 | 
 
-As you can see the highest weights are given to emails which almost instantly got a follow up email response, whereas the lowest weights are given to emails with very long timeframes. This allows for emails with a very low frequency to still be rated as very important based on the timeframe in which they were sent. With this we have 2 features: the amount of emails from a sender ```mailsGroupedBySender```, and the weight of emails that belong to an existing thread ```threadGroupsWithWeights```.
+As you can see the highest weights are given to emails which almost instantly got a follow up email response, whereas the lowest weights are given to emails with very long timeframes. This allows for emails with a very low frequency to still be rated as very important based on the timeframe in which they were sent. With this we have 2 features: the amount of emails from a sender ```mailsGroupedBySender```, and the weight of emails that belong to an existing thread ```threadGroupedWithWeights```.
 
 Let's continue with the next feature, as we want to base our ranking on as much features as possible. This next feature will be based on the weight ranking that we just computed. The idea is that new emails with different subjects will arrive. However, chances are that they contain keywords that are similar to earlier received important subjects. This will allow us to rank emails as important before a thread (multiple messages with the same subject) was started. For that we specify the weight of the keywords to be the weight of the subject in which the term occurred. If this term occurred in multiple threads, we take the highest weight as the leading one.
 
@@ -909,7 +926,7 @@ There is one issue with this feature, which are stop words. Luckily we have a st
 //Add to top:
 val stopWords = getStopWords
 
-val threadTermWeights =  threadGroupsWithWeights
+val threadTermWeights =  threadGroupedWithWeights
 	.toArray
 	.sortBy(x => x._4)
 	.flatMap(x => x._1
@@ -969,7 +986,7 @@ val trainingRanks = trainingData.map(mail => {
       else 1.0
 
       //Determine if the email is from a thread, and if it is the weight from this thread:
-      val threadGroupWeight: Double = threadGroupsWithWeights
+      val threadGroupWeight: Double = threadGroupedWithWeights
         .collectFirst { case (mail._3, _, _, weight) => weight}
         .getOrElse(1.0)
 
@@ -1026,7 +1043,7 @@ To see how much of the testing emails are ranked priority, we add the following 
       else 1.0
 
       //Determine if the email is from a thread, and if it is the weight from this thread:
-      val threadGroupWeight: Double = threadGroupsWithWeights
+      val threadGroupWeight: Double = threadGroupedWithWeights
         .collectFirst { case (mail._3, _, _, weight) => weight}
         .getOrElse(1.0)
 
@@ -1336,14 +1353,16 @@ We need to find an optimal lambda however, thus we should try for several lambda
     
 ```
 
-Running this code multiple times gives an RMSE varying between 36 and 51. This means that the rank prediction we would do would be off by at least 36 ranks. Given the fact that we are trying to predict the top 100 ranks, it shows that the algorithm performs very poorly. Differences in lambda are in this case not noticeable. However when using this in practice you should be careful when picking the lambda value: The higher the lambda you pick, the lower the amount of features for the algorithm becomes. This is why cross validation is important to see how the algorithm performs on different lambda's.
+Running this code multiple times gives an [RMSE](#root-mean-squared-error) varying between 36 and 51. This means that the rank prediction we would do would be off by at least 36 ranks. Given the fact that we are trying to predict the top 100 ranks, it shows that the algorithm performs very poorly. Differences in lambda are in this case not noticeable. However when using this in practice you should be careful when picking the lambda value: The higher the lambda you pick, the lower the amount of features for the algorithm becomes. This is why cross validation is important to see how the algorithm performs on different lambda's.
 
 To conclude this example, we rephrase a quote from [John Tukey](http://en.wikipedia.org/wiki/John_Tukey): 
 >The data may not contain the answer. The combination of some data and an aching desire for an answer does not ensure that a reasonable answer can be extracted from a given body of data.
 
 ###Using unsupervised learning to merge features (PCA)
 
-In this example we are going to use [PCA](#principal-components-analysis-pca) to merge stock prices from 24 stocks into 1 over a time period of 2002 - 2012. This single value (over time) then represents a stock market index based on data of these 24 stocks. Merging these 24 stock prices into 1 significantly reduces the amount of data to process, and decreases the dimension of our problem, which is a big advantage if we later apply other machine learning algorithms such as regression for prediction. In order to see the performance of our feature reduction of 24 to 1, we will compare our result to the Dow Jones Index over that same time period. 
+The basic idea of [PCA](#principal-components-analysis-pca) is to reduce the amount of dimensions of a problem. This can be useful for getting rid of the [curse of dimensionality](#curse-of-dimensionality) or to merge data such that you can see trends within the data without noise of correlated data. 
+
+In this example we are going to use [PCA](#principal-components-analysis-pca) to merge stock prices from 24 stocks into 1 over a time period of 2002 - 2012. This single value (over time) then represents a stock market index based on data of these 24 stocks. Merging these 24 stock prices into 1 significantly reduces the amount of data to process, and decreases the dimension of our data, which is a big advantage if we later apply other machine learning algorithms such as regression for prediction. In order to see the performance of our feature reduction of 24 to 1, we will compare our result to the Dow Jones Index (DJI) over that same time period. 
 
 To start with this example I assume you created a new Scala project in your favourite IDE, and  and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars
 
@@ -1417,11 +1436,12 @@ This code not only does the PCA but also plots the results, with the feature val
 
 <img src="./Images/Unscaled_PCA_Index.png" width="400px" />
 
-If we now add the Dow Jones index to the plot by adjusting the code as follows.
+In order to be able to see how our PCA combination words, we should now add the Dow Jones index to the plot by adjusting the code as follows:
 
+
+First we add this to the ```def top``` method
 ```scala
-
-//Add to `def top` 
+ 
  //Verification against DJI
     val verificationDataPath = basePath + "PCA_Example_2.csv"
     val verificationData = GetDJIFromFile(new File(verificationDataPath))
@@ -1430,9 +1450,9 @@ If we now add the Dow Jones index to the plot by adjusting the code as follows.
 
 ```
 
-```scala
+And then we need to introduce the following two methods:
 
-//added methods
+```scala
 
   def GetDJIRecordFromString(dataString: String): (Date,Double) = {
 
@@ -1464,8 +1484,7 @@ If we now add the Dow Jones index to the plot by adjusting the code as follows.
   }
 
 ```
-
-When we execute this code, the result plot is rather useless.
+This code loads the DJI data, and adds it in the plot which already contained our own index of the stock market. However, when we execute this code, the result plot is rather useless.
 
 <img src="./Images/Unscaled_DJI_PCA_Index.png" width="400px" />
 
@@ -1504,7 +1523,7 @@ val plotData = points.zipWithIndex.map(x => Array(x._2.toDouble, -x._1(0) / rang
 
 <img src="./Images/PCA_Normalised.png" width="400px" />
 
-We see now that even though the data of the DJI ranges between 0.8 and 1.8 whereas our new feature ranges between -0.5 and 0.5, the trend lines correspond quite well. With this example, and the explanation of [PCA](#principal-components-analysis-pca) in the general section you should now be able to use PCA and apply it your own data.
+We see now that even though the data of the DJI ranges between 0.8 and 1.8 whereas our new feature ranges between -0.5 and 0.5, the trend lines correspond quite well. With this example, and the explanation of [PCA](#principal-components-analysis-pca) in the general section you should now be able to use PCA and apply it to your own data.
 
 ###Using Support Vector Machines (SVM's)
 
@@ -1513,7 +1532,7 @@ In this example we will work through several small cases where a Support Vector 
 For each sub example we will provide code, a plot, a few test runs with different parameters on the SVM and an explanation on the results. This should give you an idea on the parameters to feed into the SVM algorithm. 
 
 
-In the first example we will use the GaussianKernel, but there are many other kernels available in [Smile](https://github.com/haifengl/smile). The other kernels can be found [here](http://haifengl.github.io/smile/doc/smile/math/kernel/MercerKernel.html), and some of them we will use in the other examples.
+In the first example we will use the ```GaussianKernel```, but there are many other kernels available in [Smile](https://github.com/haifengl/smile). The other kernels can be found [here](http://haifengl.github.io/smile/doc/smile/math/kernel/MercerKernel.html), and some of them we will use in the other examples.
 
 We will use the following base for each example, with only the  filePaths and ```svm``` construction changing per example.
 
@@ -1579,9 +1598,9 @@ In this example we present the most commonly used kernel for SVMs, namely the Ga
 
 <img src="./Images/SVM_Datapoints.png" width="400px" />
 
-It is clear from this plot that a linear regression line would not work. Instead we will use a SVM to make predictions. In the first code we gave, the GaussianKernel with a sigma of 0.01, a margin penalty of 1.0 and the amount of classes of 2 is passed to SVM. Now what does this all mean?
+It is clear from this plot that a linear regression line would not work. Instead we will use a SVM to make predictions. In the first code we gave, the ```GaussianKernel``` with a sigma of 0.01, a margin penalty of 1.0 and the amount of classes of 2 is passed to SVM. Now what does this all mean?
 
-Lets start with the ```GaussianKernel```. This kernel represents the way in which the SVM will calculate the similarity over pairs of datapoints in the system. For the gaussianKernel the variance in the euclidian distance is used. The reason for picking the GaussianKernel specifically is because the data does not contain a clear structure such as a linear, polynomial or hyperbolic function. Instead the data is clustered in 3 groups. 
+Lets start with the ```GaussianKernel```. This kernel represents the way in which the SVM will calculate the similarity over pairs of datapoints in the system. For the ```GaussianKernel``` the variance in the euclidian distance is used. The reason for picking the GaussianKernel specifically is because the data does not contain a clear structure such as a linear, polynomial or hyperbolic function. Instead the data is clustered in 3 groups. 
 
 The parameter we pass in the constructor of the ```GaussianKernel``` is the sigma. This sigma value represents a smoothness value of the kernel. We will show what changing this parameter has for effect in the predictions. As margin penalty we pass 1. This parameter defines the margin of the vectors in the system, thus making this value lower results in more bounded vectors. We will show with a set of runs and their results what kind of effect this has in practice. Note that the `s:` stands for sigma, and the `c:` stands for the correction penalty. The percentages represent the error rate in the prediction, which is simply the percentage of false predictions on the same dataset after training.
 
