@@ -1527,14 +1527,18 @@ We see now that even though the data of the DJI ranges between 0.8 and 1.8 where
 
 ###Using Support Vector Machines (SVM's)
 
+Before we actually go into using Support Vector Machines (SVM's)  I'll first mildly introduce what an SVM is. The basic SVM is a binary classifier that divides a dataset into 2 parts by picking a hyperplane that represents the largest separation between the datapoints. A SVM takes a so called 'correction rate' value. If there is no perfect split, the correction rate allows for picking a hyperplane that still splits as well as possible within that error rate. Thus the correction rate allows the hyperplane to be fit even when there are some points in the way. This means that we cannot come up with a 'standard' correction rate for every case. However when there is no overlap in the data, lower values should perform better than higher values. 
+
+I just explained the basic SVM, which is a binary classifier, but this same idea can be used with more classes as well. However, for now we will stick with 2 classes, as there is enough to address already with just 2 classes.
+
 In this example we will work through several small cases where a Support Vector Machine (SVM) will outperform other classifying algorithms such as [KNN](#labeling-isps-based-on-their-downupload-speed-knn-using-smile-in-scala). This approach is different from the former examples, but will help you understand how and when to use SVM's more easily. 
 
 For each sub example we will provide code, a plot, a few test runs with different parameters on the SVM and an explanation on the results. This should give you an idea on the parameters to feed into the SVM algorithm. 
 
 
-In the first example we will use the ```GaussianKernel```, but there are many other kernels available in [Smile](https://github.com/haifengl/smile). The other kernels can be found [here](http://haifengl.github.io/smile/doc/smile/math/kernel/MercerKernel.html), and some of them we will use in the other examples.
+In the first example we will use the ```GaussianKernel```, but there are many other kernels available in [Smile](https://github.com/haifengl/smile). The other kernels can be found [here](http://haifengl.github.io/smile/doc/smile/math/kernel/MercerKernel.html). Next to the ```GaussianKernel``` we will address the ```PolynomialKernel``` as this one differs a lot from the Gaussian one.
 
-We will use the following base for each example, with only the  filePaths and ```svm``` construction changing per example.
+We will use the following base for each example, with only the  ```filePaths``` and ```svm``` construction changing per example.
 
 ```scala
 
@@ -1591,10 +1595,10 @@ object SupportVectorMachine extends SimpleSwingApplication {
   
 ```
 
-Note that also in this example I assume you created a new Scala project in your favourite IDE, and  and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars
+Note that also in this example I assume you created a new Scala project in your favourite IDE, and  and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars.
 
 ####Example 1 (Gaussian Kernel)
-In this example we present the most commonly used kernel for SVMs, namely the Gaussian Kernel. The idea behind this example is to help finding good input parameters on this kernel. The data we used for this example can be download [here](./Example%20Data/SVM_Example_1.csv).
+In this example we present the most commonly used kernel for SVMs, namely the Gaussian Kernel. The idea behind this example is to help finding good input parameters on this kernel. The data we used for this example can be downloaded [here](./Example%20Data/SVM_Example_1.csv).
 
 <img src="./Images/SVM_Datapoints.png" width="400px" />
 
@@ -1619,13 +1623,11 @@ The parameter we pass in the constructor of the ```GaussianKernel``` is the sigm
 
 Unfortunately there is no golden rule for finding the right sigma for every dataset. Possibly one of the best approaches is to calculate the sigma for your data, which is the `√(variance)` and then take steps around that value to see which sigma performs well. Since the variance in this data was between 0.2 and 0.5 we took this as center and explored several values at each side of this center to see the performance of the SVM with the gaussian kernel in our case.
  
-In order to determine a good correction rate you should understand a little bit of the theory behind an SVM. The basic SVM is a binary classifier that divides a dataset into 2 parts by picking a hyperplane that represents the largest separation between the datapoints. If there is no perfect split, the correction rate allows for picking a hyperplane that still splits as well as possible within that error rate. Thus the correction rate allows the hyperplane to be fit even when there are some points in the way. This means that we cannot come up with a 'standard' correction rate for every case.However when there is no overlap in the data, lower values should perform better than higher values. As for a start, we took the correction rate identical to the sigma values.
-
 When we look at the results table and their false prediction percentages, it shows that the best performance is with a very low sigma (0.001) and a correction rate of 1.0 and up. However if we would use this model in practice with new data, it might be [overfitted](#overfitting). This is why you should always be careful when testing the model against its own training data. A better approach would be to perform [cross validation](#cross-validation), or verify against future data.
 
 ####Example 2 (Polynomial Kernel)
 
-The gaussian kernel is not always the best choice, even though it is the most commonly picked kernel when using SVM's. This is why in this example we will show a case in which a polynomial kernel outperforms the gaussian kernel. Note that even though the example data for this case is constructed, similar data can be found in the field. The training data we used for this example can be download [here](./Example%20Data/SVM_Example_2.csv), and the testing data [here](./Example%20Data/SVM_Example_2_Test_data.csv)
+The gaussian kernel is not always the best choice, even though it is the most commonly picked kernel when using SVM's. This is why in this example we will show a case in which a polynomial kernel outperforms the gaussian kernel. Note that even though the example data for this case is constructed, similar data can be found in the field (with a bit more noise). The training data we used for this example can be downloaded [here](./Example%20Data/SVM_Example_2.csv), and the testing data [here](./Example%20Data/SVM_Example_2_Test_data.csv)
 
 For the example data we created 2 classes with a polynomial degree of 3, and generated a testing and training data file. The training data contains the first 500 points on the x axis, whereas the testing data contains the points from 500 to 1000 on the x axis. In order to see why a polynomial kernel would work, we plot the data. The left plot is the training data, and the right one the testing data.
 
@@ -1655,17 +1657,16 @@ If we then run the code to see the performance with the gaussian kernel we get t
 | **c: 10.0** | 50% | 49.8% | 49.7% | 49.4% | 49.3% | 49% | 48.4% | 46.7% | 33.2% |
 | **c: 100.0** | 50% | 49.8% | 49.7% | 49.4% | 49.3% | 49.1% | 48.6% | 46.7% | 32.2% |
 
-We see that even in the best case, 27.4% of the testing data is falsely classified. This is interesting as when we look at the plots, a very clear distinction can be found between both classes. We could fine tune the sigma and correction rate, but when prediction points very far away (say x is 100000) the sigma and correction rate would be way to high for it to do a good performance (time wise and prediction wise).
+We see that even in the best case, still 27.4% of the testing data is falsely classified. This is interesting as when we look at the plots, a very clear distinction can be found between both classes. We could fine tune the sigma and correction rate, but when prediction points very far away (say x is 100000) the sigma and correction rate would be way to high for it to do a good performance (time wise and prediction wise).
 
-So if we now change the kernel from gaussian to a polynomial one as follows
+So let's change the kernel from gaussian to a polynomial one as follows
 
 ```scala
 
  val svm = new SVM[Array[Double]](new PolynomialKernel(2), 1.0,2)
  
 ```
-
-And if we then perform the runs not only for degree 2, but for degrees of 2,3,4,5 and for the correction rates differing again from 0.001 up to 100, we get the following results:
+Note how we pass 2 in the constructor of the ```PolynomialKernel```. This 2 represents the degree of the function it tries to fit on. If we perform the runs not only for degree 2, but for degrees of 2,3,4,5 and for the correction rates differing again from 0.001 up to 100, we get the following results:
 
 | | degree: 2 | degree: 3 | degree: 4 | degree: 5 |
 | :-- | :--: | :--: | :--: | :--: | :--: | :--: | :--: | 
