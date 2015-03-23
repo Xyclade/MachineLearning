@@ -222,14 +222,16 @@ The following examples are available:
 * [Using unsupervised learning to merge features (PCA)](#using-unsupervised-learning-to-merge-features-pca)
 * [Using Support Vector Machines (SVMS)](#using-support-vector-machines-svms)
 
-For each of these examples we used the [Smile Machine Learning](https://github.com/haifengl/smile/releases) library. This library is now available from Maven in 2 parts: 'com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2'.
+For each of these examples we used the [Smile Machine Learning](https://github.com/haifengl/smile/releases) library. We used both the `smile-core` and `smile-plot` libraries. These libraries are available on [Maven](http://search.maven.org), Gradle, Ivy, SBT and Leiningen. Information on how to add them using one of these systems can be found [here for the core](https://www.versioneye.com/java/com.github.haifengl:smile-core/1.0.2), and [here for the plotting library](https://www.versioneye.com/java/com.github.haifengl:smile-plot/1.0.2).
+
+So before you start working through an example, I assume you made a new project in your favourite IDE, and added the `smile-core` and `smile-plot` libraries to your project. Additional libraries addition and how to get the example data is addressed per example.
 
 
 ###Labeling ISPs based on their down/upload speed (K-NN using Smile in Scala)
 
 The goal of this section is to use the K-Nearest Neighbours (K-NN) Algorithm to classify download/upload speed pairs as [internet service provider (ISP)](http://en.wikipedia.org/wiki/Internet_service_provider) Alpha (represented by 0) or Beta (represented by 1). The idea behind K-NN is as follows: given a set of points that are classified, you can classify the new point by looking at its K neighbours (K being a positive integer). The idea is that you find the K-neighbours by looking at the euclidean distance between the new point and its surrounding points. For these neighbours you then look at the biggest representative class and assign that class to the new point.
 
-To start this example I assume you created a new Scala project in your favourite IDE, added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars. Finally you also downloaded the [example data](./Example%20Data/KNN_Example_1.csv).
+To start this example you should download the [example data](./Example%20Data/KNN_Example_1.csv). Additionally you should set the path in the code snippet to where you stored this example data.
 
 The first step is to load the CSV data file. As this is no rocket science, I provide the code for this without further explanation:
 
@@ -238,19 +240,19 @@ The first step is to load the CSV data file. As this is no rocket science, I pro
 object KNNExample {
    def main(args: Array[String]): Unit = {
     val basePath = "/.../KNN_Example_1.csv"
-    val testData = GetDataFromCSV(new File(basePath))    
+    val testData = getDataFromCSV(new File(basePath))    
     }
     
-  def GetDataFromCSV(file: File): (Array[Array[Double]], Array[Int]) = {
+  def getDataFromCSV(file: File): (Array[Array[Double]], Array[Int]) = {
     val source = scala.io.Source.fromFile(file)
-    val data = source.getLines().drop(1).map(x => GetDataFromString(x)).toArray
+    val data = source.getLines().drop(1).map(x => getDataFromString(x)).toArray
     source.close()
     val dataPoints = data.map(x => x._1)
     val classifierArray = data.map(x => x._2)
     return (dataPoints, classifierArray)        
   }
   
-  def GetDataFromString(dataString: String): (Array[Double], Int) = {
+  def getDataFromString(dataString: String): (Array[Double], Int) = {
 
     //Split the comma separated value string into an array of strings
     val dataArray: Array[String] = dataString.split(',')
@@ -277,7 +279,7 @@ Given the data the first thing to do next is to see what the data looks like. Fo
     title = "KNN Example"
     val basePath = "/.../KNN_Example_1.csv"
 
-    val testData = GetDataFromCSV(new File(basePath))
+    val testData = getDataFromCSV(new File(basePath))
 
     val plot = ScatterPlot.plot(testData._1, testData._2, '@', Array(Color.red, Color.blue))
     peer.setContentPane(plot)
@@ -303,7 +305,7 @@ For this example we do [2-fold Cross Validation](http://en.wikipedia.org/wiki/Cr
 
   def main(args: Array[String]): Unit = {
    val basePath = "/.../KNN_Example_1.csv"
-    val testData = GetDataFromCSV(new File(basePath))
+    val testData = getDataFromCSV(new File(basePath))
 
     //Define the amount of rounds, in our case 2 and initialise the cross validation
     val cv = new CrossValidation(testData._2.length, validationRounds)
@@ -393,7 +395,7 @@ Thus for this case, Naive Bayes does poor classification, and more advanced alte
 
 As you should now have an idea on how the Naive Bayes algorithm works, we can continue with the actual example. For this example we will use the Naive Bayes implementation from [Smile](https://github.com/haifengl/smile) in Scala to classify emails as spam or ham based on their content.  
 
-To start with this example I assume you created a new Scala project in your favourite IDE, and  and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars. As final assumption you also downloaded and extracted the [example data](http://spamassassin.apache.org/publiccorpus/) from the SpamAssasins public corpus. The data you need for the example is only the [easy_ham](http://spamassassin.apache.org/publiccorpus/20030228_easy_ham.tar.bz2) and [spam](http://spamassassin.apache.org/publiccorpus/20030228_spam.tar.bz2) files, but the rest can also be used in case you feel like experimenting some more. Additionally you will need the [stop words file](./Example%20Data/stopwords.txt) for filtering purposes.
+Before we can start however, you should download the [data](http://spamassassin.apache.org/publiccorpus/) for this example from the SpamAssasins public corpus. The data you need for the example is the [easy_ham](http://spamassassin.apache.org/publiccorpus/20030228_easy_ham.tar.bz2) and [spam](http://spamassassin.apache.org/publiccorpus/20030228_spam.tar.bz2) files, but the rest can also be used in case you feel like experimenting some more. You should unzip these files and adjust the file paths in the code snippets to match the location of the folders. Additionally you will need the [stop words file](./Example%20Data/stopwords.txt) for filtering purposes. 
 
 As with every machine learning implementation, the first step is to load in the training data. However in this example we are taking it 1 step further into machine learning. In the [KNN examples](#labeling-isps-based-on-their-downupload-speed-knn-using-smile-in-scala) we had the download and upload speed as [features](#features). We did not refer to them as features, as they where the only properties available. For spam classification it is not completely trivial what to use as features. One can use the Sender, the subject, the message content, and even the time of sending as features for classifying as spam or ham.  
 
@@ -628,8 +630,6 @@ With this we end the example of Naive Bayes. If you want to play around a bit mo
 This example will be completely about building your own recommendation system. We will be ranking emails based on the following features: 'sender', 'subject', 'common terms in subject' and 'common terms in email body'. Later on in the example we will explain each of these features. Note that these features are for you to be defined when you make your own recommendation system. The main idea behind this example is to show you how to do this feature selection, and how to solve issues that occur when you start doing this with your own data.
 
 We will use a subset of the email data which we used in the example [Classifying email as spam or ham](#classifying-email-as-spam-or-ham-naive-bayes). This subset can be downloaded [here](http://spamassassin.apache.org/publiccorpus/20030228_easy_ham.tar.bz2). Additionally you need the [stop words file](./Example%20Data/stopwords.txt). Note that the data is a set of received emails, thus we lack half of the data, namely the outgoing emails of this mailbox. However even without this information we can do some pretty neat ranking as we will see later on.
-
-To start with this example I assume you created a new Scala project in your favourite IDE, and  and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars.
 
 The first thing to do is to determine what features we will base our ranking on. When building your own recommendation system this is one of the hardest parts. Coming up with good features is not trivial, and when you finally selected features the data might not be directly usable for these features. 
 
@@ -910,7 +910,7 @@ We see our values ranging roughly between (4.4 and 8.6) which shows that outlier
 
 As you can see the highest weights are given to emails which almost instantly got a follow up email response, whereas the lowest weights are given to emails with very long timeframes. This allows for emails with a very low frequency to still be rated as very important based on the timeframe in which they were sent. With this we have 2 features: the amount of emails from a sender ```mailsGroupedBySender```, and the weight of emails that belong to an existing thread ```threadGroupedWithWeights```.
 
-Let's continue with the next feature, as we want to base our ranking on as much features as possible. This next feature will be based on the weight ranking that we just computed. The idea is that new emails with different subjects will arrive. However, chances are that they contain keywords that are similar to earlier received important subjects. This will allow us to rank emails as important before a thread (multiple messages with the same subject) was started. For that we specify the weight of the keywords to be the weight of the subject in which the term occurred. If this term occurred in multiple threads, we take the highest weight as the leading one.
+Let's continue with the next feature, as we want to base our ranking values on as much features as possible. This next feature will be based on the weight ranking that we just computed. The idea is that new emails with different subjects will arrive. However, chances are that they contain keywords that are similar to earlier received important subjects. This will allow us to rank emails as important before a thread (multiple messages with the same subject) was started. For that we specify the weight of the keywords to be the weight of the subject in which the term occurred. If this term occurred in multiple threads, we take the highest weight as the leading one.
 
 There is one issue with this feature, which are stop words. Luckily we have a stop words file that allows us to remove (most) english stop words for now. However, when designing your own system you should take into account that multiple languages can occur, thus you should remove stop words for all languages that can occur in the system. Additionally you might need to be carefull with removing stop words from different languages, as some words may have different meanings among the different languages. As for now we stick with removing English stop words. The code for this feature is as follows:
 
@@ -1092,17 +1092,18 @@ In this top 10, based on the subjects we can say that these emails are important
 This concludes the recommendation system example.
 
 ###Predicting weight based on height (using Ordinary Least Squares)
-In this section we will introduce the [Ordinary Least Squares](http://en.wikipedia.org/wiki/Ordinary_least_squares) technique which is a form of linear regression. As this technique is quite powerful, it is important to have read [regression](#regression) and the [common pitfalls](#common-pitfalls) before starting with this example. We will cover some of these issues in this section, while others are shown in the sections [underfitting](#underfitting) and [overfitting](#overfitting)
+In this section we will introduce the [Ordinary Least Squares](http://en.wikipedia.org/wiki/Ordinary_least_squares) technique which is a form of linear regression. As this technique is quite powerful, it is important to have read [regression](#regression) and the [common pitfalls](#common-pitfalls) before starting with this example. We will cover some of these issues in this section, while others are shown in the sections [underfitting](#underfitting) and [overfitting](#overfitting).
 
-To start with this example I assume you created a new Scala project in your favourite IDE, and  and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars
+The idea behind linear regression is that an 'optimal' regression line is fitted on your training datapoints. Note that this only works if your data is linear, and does not have huge outliers. If this is not the case you could try to manipulate your data until this is the case, for example by taking the ```sqrt``` or ```log``` over the data.
+
 
 As always, the first thing to do when the project is set-up is to import a dataset. For this we provide you with the following [csv file](./Example%20Data/OLS_Regression_Example_3.csv) and code for reading this file:
 
 ```scala
 
-  def GetDataFromCSV(file: File): (Array[Array[Double]], Array[Double]) = {
+  def getDataFromCSV(file: File): (Array[Array[Double]], Array[Double]) = {
     val source = scala.io.Source.fromFile(file)
-    val data = source.getLines().drop(1).map(x => GetDataFromString(x)).toArray
+    val data = source.getLines().drop(1).map(x => getDataFromString(x)).toArray
     source.close()
     var inputData = data.map(x => x._1)
     var resultData = data.map(x => x._2)
@@ -1110,7 +1111,7 @@ As always, the first thing to do when the project is set-up is to import a datas
     return (inputData,resultData)
   }
 
-  def GetDataFromString(dataString: String): (Array[Double], Double) = {
+  def getDataFromString(dataString: String): (Array[Double], Double) = {
 
     //Split the comma separated value string into an array of strings
     val dataArray: Array[String] = dataString.split(',')
@@ -1144,7 +1145,7 @@ object LinearRegressionExample extends SimpleSwingApplication {
     title = "Linear Regression Example"
     val basePath = "/Users/.../OLS_Regression_Example_3.csv"
 
-    val testData = GetDataFromCSV(new File(basePath))
+    val testData = getDataFromCSV(new File(basePath))
 
     val plotData = (testData._1 zip testData._2).map(x => Array(x._1(1) ,x._2))
     val maleFemaleLabels = testData._1.map( x=> x(0).toInt)
@@ -1200,11 +1201,9 @@ This concludes linear regression, if you want to know more about how to apply re
 
 In the example of [predicting weights based on heights and gender](#predicting-weight-based-on-height-using-ordinary-least-squares) we introduced the notion of linear regression. However, sometimes one would want to apply regression on non numeric data such as text. 
 
-In this example we will show how text regression can be done by predicting the top 100 selling books from O'Reilly. Additionally with this example we will also show that for this particular case it does not work out to use text regression. The reason for this is that the data simply does not contain a signal for our test data. However this does not make this example useless because there might be an actual signal within the text in the data you are using in practice,which then can be detected using text regression as explained here.
+In this example we will show how text regression can be done by an attempt at predicting the top 100 selling books from O'Reilly. Additionally with this example we will also show that for this particular case it does not work out to use text regression. The reason for this is that the data simply does not contain a signal for our test data. However this does not make this example useless because there might be an actual signal within the data you are using in practice, which then can be detected using text regression as explained here.
 
-To start with this example I assume you created a new Scala project in your favourite IDE, and  and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars
-
-The data file we used in this example can be downloaded [here](./Example%20Data/TextRegression_Example_1.csv). Let's start off with getting the data we need:
+The data file we used in this example can be downloaded [here](./Example%20Data/TextRegression_Example_1.csv). Next to the Smile library, in this example we will also use the [Scala-csv library](https://www.versioneye.com/java/com.github.tototoshi:scala-csv_2.11/1.2.1) as the csv contains strings with comma's in them. Let's start off with getting the data we need:
 
 ```scala
 
@@ -1214,10 +1213,10 @@ object TextRegression  {
 
     //Get the example data
       val basePath = "/users/.../TextRegression_Example_4.csv"
-      val testData = GetDataFromCSV(new File(basePath))
+      val testData = getDataFromCSV(new File(basePath))
   }
 
-  def GetDataFromCSV(file: File) : List[(String,Int,String)]= {
+  def getDataFromCSV(file: File) : List[(String,Int,String)]= {
     val reader = CSVReader.open(file)
     val data = reader.all()
 
@@ -1319,11 +1318,11 @@ testData.foreach(x => documentTermMatrix.addDocumentToRecords(x._1,x._2,x._3))
 
 ```
 
-With this conversion from text to numeric value's we can open our regression toolbox. We used [Ordinary Least Squares(OLS)](http://en.wikipedia.org/wiki/Ordinary_least_squares) in the example [predicting weight based on height](#predicting-weight-based-on-height-using-ordinary-least-squares), however this time we will use [Least Absolute Shrinkage and Selection Operator (Lasso)](http://en.wikipedia.org/wiki/Least_squares#Lasso_method) regression. This is because we can give this regression method a certain lambda, which represents a penalty value. This penalty value allows the LASSO algorithm to select relevant features while discarding some of the other features. 
+With this conversion from text to numeric value's we can open our regression toolbox. We used [Ordinary Least Squares(OLS)](http://en.wikipedia.org/wiki/Ordinary_least_squares) in the example [predicting weight based on height](#predicting-weight-based-on-height-using-ordinary-least-squares), however this time we will use [Least Absolute Shrinkage and Selection Operator (Lasso)](http://en.wikipedia.org/wiki/Least_squares#Lasso_method) regression. This is because we can give this regression method a certain lambda, which represents a penalty value. This penalty value allows the LASSO algorithm to select relevant features (words) while discarding some of the other features (words). 
 
 This feature selection that Lasso performs is very useful in our case due too the large set of words that is used in the documents descriptions. Lasso will try to come up with an ideal subset of those words as features, whereas when applying the OLS, all words would be used, and the runtime would be extremely high. Additionally, the OLS implementation of Smile detects rank deficiency. This is one of the [curses of dimensionality](#curse-of-dimensionality)
 
-We need to find an optimal lambda however, thus we should try for several lambda using cross validation. We will do this as follows:
+We need to find an optimal lambda however, thus we should try for several lambda's using cross validation. We will do this as follows:
 
 ```scala
 
@@ -1364,8 +1363,6 @@ The basic idea of [PCA](#principal-components-analysis-pca) is to reduce the amo
 
 In this example we are going to use [PCA](#principal-components-analysis-pca) to merge stock prices from 24 stocks into 1 over a time period of 2002 - 2012. This single value (over time) then represents a stock market index based on data of these 24 stocks. Merging these 24 stock prices into 1 significantly reduces the amount of data to process, and decreases the dimension of our data, which is a big advantage if we later apply other machine learning algorithms such as regression for prediction. In order to see the performance of our feature reduction of 24 to 1, we will compare our result to the Dow Jones Index (DJI) over that same time period. 
 
-To start with this example I assume you created a new Scala project in your favourite IDE, and  and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars
-
 With the project set-up the next step is to load the data. For this we provide you with 2 files: [Data file 1](./Example%20Data/PCA_Example_1.csv) and [Data file 2](./Example%20Data/PCA_Example_2.csv).
 
 ```scala
@@ -1377,13 +1374,13 @@ object PCA extends SimpleSwingApplication{
     //Get the example data
     val basePath = "/users/.../Example Data/"
     val exampleDataPath = basePath + "PCA_Example_1.csv"
-    val trainData = GetStockDataFromCSV(new File(exampleDataPath))
+    val trainData = getStockDataFromCSV(new File(exampleDataPath))
     
     }
-  def GetStockDataFromCSV(file: File): (Array[Date],Array[Array[Double]]) = {
+  def getStockDataFromCSV(file: File): (Array[Date],Array[Array[Double]]) = {
     val source = scala.io.Source.fromFile(file)
     //Get all the records (minus the header)
-    val data = source.getLines().drop(1).map(x => GetStockDataFromString(x)).toArray
+    val data = source.getLines().drop(1).map(x => getStockDataFromString(x)).toArray
     source.close()
     //group all records by date, and sort the groups on date ascending
     val groupedByDate = data.groupBy(x => x._1).toArray.sortBy(x => x._1)
@@ -1398,7 +1395,7 @@ object PCA extends SimpleSwingApplication{
     (dateArray,doubleArray)
   }
 
-  def GetStockDataFromString(dataString: String): (Date,String,Double) = {
+  def getStockDataFromString(dataString: String): (Date,String,Double) = {
 
     //Split the comma separated value string into an array of strings
     val dataArray: Array[String] = dataString.split(',')
@@ -1444,8 +1441,8 @@ First we add this to the ```def top``` method
  
  //Verification against DJI
     val verificationDataPath = basePath + "PCA_Example_2.csv"
-    val verificationData = GetDJIFromFile(new File(verificationDataPath))
-    val DJIIndex = GetDJIFromFile(new File(verificationDataPath))
+    val verificationData = getDJIFromFile(new File(verificationDataPath))
+    val DJIIndex = getDJIFromFile(new File(verificationDataPath))
     canvas.line("Dow Jones Index", DJIIndex._2, Line.Style.DOT_DASH, Color.BLUE)
 
 ```
@@ -1454,7 +1451,7 @@ And then we need to introduce the following two methods:
 
 ```scala
 
-  def GetDJIRecordFromString(dataString: String): (Date,Double) = {
+  def getDJIRecordFromString(dataString: String): (Date,Double) = {
 
     //Split the comma separated value string into an array of strings
     val dataArray: Array[String] = dataString.split(',')
@@ -1469,10 +1466,10 @@ And then we need to introduce the following two methods:
     (date,close)
   }
 
-  def GetDJIFromFile(file: File): (Array[Date],Array[Double]) = {
+  def getDJIFromFile(file: File): (Array[Date],Array[Double]) = {
     val source = scala.io.Source.fromFile(file)
     //Get all the records (minus the header)
-    val data = source.getLines().drop(1).map(x => GetDJIRecordFromString(x)).toArray
+    val data = source.getLines().drop(1).map(x => getDJIRecordFromString(x)).toArray
     source.close()
 
     //turn the tuples into two separate arrays for easier use later on
@@ -1490,14 +1487,14 @@ This code loads the DJI data, and adds it in the plot which already contained ou
 
 As you can see, the ranges of the DJI and our computed feature are far off. This is why we will now normalise the data. The idea is that we scale the data based on its range, such that both datasets are on the same scale.
 
-Replace the ```GetDJIFromFile``` method with the following:
+Replace the ```getDJIFromFile``` method with the following:
 
 ```scala
 
-def GetDJIFromFile(file: File): (Array[Date],Array[Double]) = {
+def getDJIFromFile(file: File): (Array[Date],Array[Double]) = {
     val source = scala.io.Source.fromFile(file)
     //Get all the records (minus the header)
-    val data = source.getLines().drop(1).map(x => GetDJIRecordFromString(x)).toArray
+    val data = source.getLines().drop(1).map(x => getDJIRecordFromString(x)).toArray
     source.close()
 
     //turn the tuples into two separate arrays for easier use later on
@@ -1512,7 +1509,7 @@ def GetDJIFromFile(file: File): (Array[Date],Array[Double]) = {
   }
   
 ```
-and replace the `plotData`  val in def top and replace with
+and replace the `plotData` definition in the method```def top``` with
 
 ```scala
 val maxDataValue = points.maxBy(x => x(0))
@@ -1551,8 +1548,8 @@ object SupportVectorMachine extends SimpleSwingApplication {
     val trainingPath =  "/users/.../Example Data/SVM_Example_1.csv"
 	val testingPath =  "/users/.../Example Data/SVM_Example_1.csv"
     //Loading of the test data and plot generation stays the same
-    val trainingData = GetDataFromCSV(new File(path))
-    val testingData = GetDataFromCSV(new File(path))
+    val trainingData = getDataFromCSV(new File(path))
+    val testingData = getDataFromCSV(new File(path))
     
     val plot = ScatterPlot.plot(trainingData._1, trainingData._2, '@', Array(Color.blue, Color.green))
     peer.setContentPane(plot)
@@ -1572,16 +1569,16 @@ object SupportVectorMachine extends SimpleSwingApplication {
   }
 
 
-  def GetDataFromCSV(file: File): (Array[Array[Double]], Array[Int]) = {
+  def getDataFromCSV(file: File): (Array[Array[Double]], Array[Int]) = {
     val source = scala.io.Source.fromFile(file)
-    val data = source.getLines().drop(1).map(x => GetDataFromString(x)).toArray
+    val data = source.getLines().drop(1).map(x => getDataFromString(x)).toArray
     source.close()
     val dataPoints = data.map(x => x._1)
     val classifierArray = data.map(x => x._2)
     return (dataPoints, classifierArray)
   }
 
-  def GetDataFromString(dataString: String): (Array[Double], Int) = {
+  def getDataFromString(dataString: String): (Array[Double], Int) = {
     //Split the comma separated value string into an array of strings
     val dataArray: Array[String] = dataString.split(',')
 
@@ -1594,8 +1591,6 @@ object SupportVectorMachine extends SimpleSwingApplication {
   }
   
 ```
-
-Note that also in this example I assume you created a new Scala project in your favourite IDE, and  and added the [Smile Machine learning](https://github.com/haifengl/smile/releases) library via Maven ('com.github.haifengl:smile-core:1.0.2' and 'com.github.haifengl:smile-plot:1.0.2') or manually via downloading the jars.
 
 ####Example 1 (Gaussian Kernel)
 In this example we present the most commonly used kernel for SVMs, namely the Gaussian Kernel. The idea behind this example is to help finding good input parameters on this kernel. The data we used for this example can be downloaded [here](./Example%20Data/SVM_Example_1.csv).
