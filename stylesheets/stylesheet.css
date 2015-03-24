@@ -626,12 +626,13 @@ form {
   margin-left: -0.9em;
   color: #2c6ab7;
   content: "/";
+
 }
 
 #main-content h2 {
   margin-bottom: 8px;
 
-  font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif;
+ font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif;
   font-size: 22px;
   font-weight: bold;
   color: #474747;
@@ -966,13 +967,13 @@ footer a:hover {
 
 
 .index-h1 {
+
   font-weight: bold;
   font-size: 16px;
   line-height: 150%;
 }
 .p-index {
  position: fixed;
-
 }
 .index-h2 {
   font-weight: bolder;
@@ -982,6 +983,9 @@ footer a:hover {
    line-height: 150%;
 }
 
+.anchor{
+  padding-top: 20px;
+ }
 .index-h3 {
   line-height: 150%;
   display: block;
