@@ -480,7 +480,7 @@ header h2 {
 
 .inner {
   position: relative;
-  width: 940px;
+  width: 1140px;
   margin: 0 auto;
 }
 
@@ -499,19 +499,18 @@ header h2 {
 }
 
 aside#sidebar {
-  float: right;
-  width: 100px;
-  min-height: 504px;
+  float: left;
+  position: float;
+  width: 250px;
+  min-height: 58208px;
   padding-left: 20px;
+  margin-left: 10px;
   font-size: 12px;
   line-height: 1.3;
-  background: transparent url(../Images/sidebar-bg.jpg) 0 0 no-repeat;
+  background: transparent url(../Images/sidebar-bg.jpg) 0 0;
+   background-repeat: repeat-y;
 }
 
-aside#sidebar p.repo-owner,
-aside#sidebar p.repo-owner a {
-  font-weight: bold;
-}
 
 #downloads {
   margin-bottom: 40px;
@@ -631,7 +630,8 @@ form {
 
 #main-content h2 {
   margin-bottom: 8px;
-  font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif;
+
+  font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif;
   font-size: 22px;
   font-weight: bold;
   color: #474747;
@@ -964,6 +964,46 @@ footer a:hover {
     color: #1d3e81
 }
 
+
+.index-h1 {
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 150%;
+}
+.p-index {
+ position: fixed;
+
+}
+.index-h2 {
+  font-weight: bolder;
+  display: block;
+  font-size: 14px;
+  margin-left: 15px;
+   line-height: 150%;
+}
+
+.index-h3 {
+  line-height: 150%;
+  display: block;
+  font-size: 12px;
+  margin-left: 26px;
+}
+
+
+.index-h1:before {
+  content: "/";
+  color: #2c6ab7;
+}
+
+.index-h2:before {
+  content: "//";
+  color: #2c6ab7;
+}
+
+.index-h3:before {
+  content: "///";
+  color: #2c6ab7;
+}
 /* Mobile Landscape Size to Tablet Portrait (devices and browsers) */
 @media only screen and (min-width: 480px) and (max-width: 767px) { }
 
