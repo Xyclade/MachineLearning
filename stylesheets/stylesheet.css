@@ -423,6 +423,7 @@ table {
 
 td,
 th {
+  font-weight: bold;
   padding: 0;
 }
 
@@ -433,7 +434,7 @@ body {
   font-weight: 400;
   line-height: 1.5;
   color: #666;
-  background: #fafafa url(../images/body-bg.jpg) 0 0 repeat;
+  background: #fafafa url(../Images/body-bg.jpg) 0 0 repeat;
 }
 
 p {
@@ -451,12 +452,11 @@ header {
   padding-top: 40px;
   padding-bottom: 40px;
   font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif;
-  background: #2e7bcf url(../images/header-bg.jpg) 0 0 repeat-x;
-  border-bottom: solid 1px #275da1;
+  background: #2e7bcf url(../Images/header-bg.jpg) 0 0 repeat-x;
+  border-bottom: solid 1px #021979;
 }
 
 header h1 {
-  width: 540px;
   margin-top: 0;
   margin-bottom: 0.2em;
   font-size: 72px;
@@ -473,7 +473,7 @@ header h2 {
   font-size: 26px;
   font-weight: normal;
   line-height: 1.3;
-  color: #9ddcff;
+  color: #ffffff;
   letter-spacing: 0;
 }
 
@@ -490,7 +490,7 @@ header h2 {
 
 #main-content {
   float: left;
-  width: 690px;
+  width: 790px;
 }
 
 #main-content img {
@@ -499,12 +499,12 @@ header h2 {
 
 aside#sidebar {
   float: right;
-  width: 200px;
+  width: 100px;
   min-height: 504px;
   padding-left: 20px;
   font-size: 12px;
   line-height: 1.3;
-  background: transparent url(../images/sidebar-bg.jpg) 0 0 no-repeat;
+  background: transparent url(../Images/sidebar-bg.jpg) 0 0 no-repeat;
 }
 
 aside#sidebar p.repo-owner,
@@ -534,7 +534,7 @@ header a.button {
   position: absolute;
   top: 0;
   right: 0;
-  background: transparent url(../images/github-button.png) 0 0 no-repeat;
+  background: transparent url(../Images/github-button.png) 0 0 no-repeat;
 }
 aside a.button {
   display: block;
@@ -542,7 +542,7 @@ aside a.button {
   padding-left: 64px;
   margin-bottom: 20px;
   font-size: 21px;
-  background: transparent url(../images/download-button.png) 0 0 no-repeat;
+  background: transparent url(../Images/download-button.png) 0 0 no-repeat;
 }
 
 code, pre {
@@ -625,7 +625,7 @@ form {
 #main-content h1:before {
   padding-right: 0.3em;
   margin-left: -0.9em;
-  color: #9ddcff;
+  color: #2c6ab7;
   content: "/";
 }
 
@@ -641,7 +641,7 @@ form {
   padding-right: 0.3em;
   margin-left: -1.5em;
   content: "//";
-  color: #9ddcff;
+  color: #2c6ab7;
 }
 
 #main-content h3 {
@@ -658,7 +658,7 @@ form {
   padding-right: 0.3em;
   margin-left: -2em;
   content: "///";
-  color: #9ddcff;
+  color: #2c6ab7;
 }
 
 #main-content h4 {
@@ -674,7 +674,7 @@ h4:before {
   padding-right: 0.3em;
   margin-left: -2.8em;
   content: "////";
-  color: #9ddcff;
+  color: #2c6ab7;
 }
 
 #main-content h5 {
@@ -688,7 +688,7 @@ h5:before {
   padding-right: 0.3em;
   margin-left: -3.2em;
   content: "/////";
-  color: #9ddcff;
+  color: #2c6ab7;
 }
 
 #main-content h6 {
@@ -702,7 +702,7 @@ h6:before {
   padding-right: 0.3em;
   margin-left: -3.7em;
   content: "//////";
-  color: #9ddcff;
+  color: #2c6ab7;
 }
 
 p {
@@ -733,7 +733,7 @@ ul {
 ol {
   list-style-position: inside;
   list-style: decimal;
-  padding-left: 3px;
+  padding-left: 2em;
 }
 
 dl dd {
@@ -747,7 +747,7 @@ footer {
   margin-top: 40px;
   font-size: 13px;
   color: #aaa;
-  background: transparent url('../images/hr.png') 0 0 no-repeat;
+  background: transparent url('../Images/hr.png') 0 0 no-repeat;
 }
 
 footer a {
@@ -836,7 +836,7 @@ footer a:hover {
     line-height: 1;
     color: #2879d0;
     text-align: center;
-    background-color: #9ddcff;
+    background-color: #2c6ab7;
     background-image: none;
     border-radius: 5px;
     -moz-border-radius: 5px;
@@ -871,6 +871,97 @@ footer a:hover {
     margin-left: 0;
     content: none;
   }
+}
+
+
+
+.pl-c {
+    color: #969896
+}
+
+.pl-c1, .pl-s .pl-v {
+    color: #0086b3
+}
+
+.pl-e, .pl-en {
+    color: #795da3
+}
+
+.pl-s .pl-s1, .pl-smi {
+    color: #333
+}
+
+.pl-ent {
+    color: #63a35c
+}
+
+.pl-k {
+    color: #a71d5d
+}
+
+.pl-pds, .pl-s, .pl-s .pl-pse .pl-s1, .pl-sr, .pl-sr .pl-cce, .pl-sr .pl-sra,
+.pl-sr .pl-sre {
+    color: #183691
+}
+
+.pl-v {
+    color: #ed6a43
+}
+
+.pl-id {
+    color: #b52a1d
+}
+
+.pl-ii {
+    background-color: #b52a1d;
+    color: #f8f8f8
+}
+
+.pl-sr .pl-cce {
+    color: #63a35c;
+    font-weight: bold
+}
+
+.pl-ml {
+    color: #693a17
+}
+
+.pl-mh, .pl-mh .pl-en, .pl-ms {
+    color: #1d3e81;
+    font-weight: bold
+}
+
+.pl-mq {
+    color: #008080
+}
+
+.pl-mi {
+    color: #333;
+    font-style: italic
+}
+
+.pl-mb {
+    color: #333;
+    font-weight: bold
+}
+
+.pl-md {
+    background-color: #ffecec;
+    color: #bd2c00
+}
+
+.pl-mi1 {
+    background-color: #eaffea;
+    color: #55a532
+}
+
+.pl-mdr {
+    color: #795da3;
+    font-weight: bold
+}
+
+.pl-mo {
+    color: #1d3e81
 }
 
 /* Mobile Landscape Size to Tablet Portrait (devices and browsers) */
