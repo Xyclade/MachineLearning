@@ -1943,7 +1943,7 @@ Lets start with the ```GaussianKernel```. This kernel represents the way in whic
 
 The parameter we pass in the constructor of the ```GaussianKernel``` is the sigma. This sigma value represents a smoothness value of the kernel. We will show what changing this parameter has for effect in the predictions. As margin penalty we pass 1. This parameter defines the margin of the vectors in the system, thus making this value lower results in more bounded vectors. We will show with a set of runs and their results what kind of effect this has in practice. Note that the `s:` stands for sigma, and the `c:` stands for the correction penalty. The percentages represent the error rate in the prediction, which is simply the percentage of false predictions on the same dataset after training.
 
-|c, s->| 0.001 |  0.01 |  0.1 |  0.2 | 0.5 | 1.0 |  2.0 |  3.0 |  10.0 |
+| c, s-> | 0.001 |  0.01 |  0.1 |  0.2 | 0.5 | 1.0 |  2.0 |  3.0 |  10.0 |
 | :- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | **0.001** | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 
 |**0.01** | 48.4% | 48.4% | 40% | 43.8% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% |
@@ -1979,7 +1979,7 @@ val testingPath = "/users/.../Example Data/SVM_Example_2_Test_data.csv"
 
 If we then run the code to see the performance with the gaussian kernel we get the following results:
 
-|c, s-> | 0.01 | 0.1 | 0.2 | 0.5 | 1.0 | 2.0 | 3.0 | 10.0 | 100.0 |
+| c, s-> | 0.01 | 0.1 | 0.2 | 0.5 | 1.0 | 2.0 | 3.0 | 10.0 | 100.0 |
 | :-- | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | 
 | **0.001** | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 50% |
 | **0.01** | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 39.8% |
