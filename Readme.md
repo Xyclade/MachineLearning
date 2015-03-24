@@ -1285,8 +1285,8 @@ After actually running this test code, you will see that the amount of emails ra
 
 Note that I've removed part of the email address to prevent spam bots from crawling these mail addresses. We see in the table below that most of these top 10 priority emails are threads grouped together, which had very high activity. Take for example the highest ranked email. This email was a follow up to an email of 9 minutes earlier. This indicates that the email thread was important.  
 
-| Date | Sender  | Subject  | Rank | 
-| :--- | : -- | :--  | :-- |  
+| Date | Sender  | Subject  | Rank |
+| :--- | :-- | :--  | :-- |
 | Sat Sep 07 06:45:23 CEST 2002 | skip@... | [spambayes] can't write to cvs... | 81.11 |
 | Sat Sep 07 21:11:36 CEST 2002 | tim.one@... | [spambayes] test sets? | 79.59 |
 | Mon Sep 09 17:46:55 CEST 2002 | tim.one@... | [spambayes] deleting "duplicate" spam before training?  good idea | 79.54 |
