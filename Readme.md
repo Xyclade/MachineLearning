@@ -637,6 +637,8 @@ This is why we will go into detail a bit more on how we select the features and 
 
 object RecommendationSystem extends SimpleSwingApplication {
 
+ case class EmailData(emailDate : Date, sender : String, subject : String, body : String)
+ 
   def top = new MainFrame {
     title = "Recommendation System Example"
 
@@ -645,26 +647,35 @@ object RecommendationSystem extends SimpleSwingApplication {
 
     val mails = getFilesFromDir(easyHamPath).map(x => getFullEmail(x))
     val timeSortedMails = mails
-      .map(x => (getDateFromEmail(x), getSenderFromEmail(x), getSubjectFromEmail(x), getMessageBodyFromEmail(x)))
-      .sortBy(x => x._1)
+      .map	(x => EmailData	(	getDateFromEmail(x),
+      							getSenderFromEmail(x), 
+      							getSubjectFromEmail(x), 
+      							getMessageBodyFromEmail(x)
+      						)
+      		)
+      .sortBy(x => x.emailDate)
 
     val (trainingData, testingData) = timeSortedMails
-      .splitAt(timeSortedMails.length / 2)
+      		.splitAt(timeSortedMails.length / 2)
       
       }
 
   def getFilesFromDir(path: String): List[File] = {
     val d = new File(path)
     if (d.exists && d.isDirectory) {
-      //Remove the mac os basic storage file, and alternatively for unix systems "cmds"
-      d.listFiles.filter(x => x.isFile && !x.toString.contains(".DS_Store") && !x.toString.contains("cmds")).toList
+      //Remove the mac os basic storage file, 
+      //and alternatively for unix systems "cmds"
+      d.listFiles.filter(x => 	x.isFile &&
+      					 		!x.toString.contains(".DS_Store") && 
+      					 		!x.toString.contains("cmds")).toList
     } else {
       List[File]()
     }
   }
 
   def getFullEmail(file: File): String = {
-    //Note that the encoding of the example files is latin1, thus this should be passed to the from file method.
+    //Note that the encoding of the example files is latin1, 
+    //thus this should be passed to the from file method.
     val source = scala.io.Source.fromFile(file)("latin1")
     val fullEmail = source.getLines mkString "\n"
     source.close()
@@ -676,22 +687,26 @@ object RecommendationSystem extends SimpleSwingApplication {
 
     //Find the index of the end of the subject line
     val subjectIndex = email.indexOf("Subject:")
-    val endOfSubjectIndex = email.substring(subjectIndex).indexOf('\n') + subjectIndex
+    val endOfSubjectIndex = email	
+    .substring(subjectIndex)						.indexOf('\n') + subjectIndex
 
-    //Extract the subject: start of subject + 7 (length of Subject:) until the end of the line.
+    //Extract the subject: start of subject + 7 
+    // (length of Subject:) until the end of the line.
     val subject = email
     .substring(subjectIndex + 8, endOfSubjectIndex)
     .trim
     .toLowerCase
 
-    //Additionally, we check whether the email was a response and remove the 're: ' tag, to make grouping on topic easier:
+    //Additionally, we check whether the email was a response and 
+    //remove the 're: ' tag, to make grouping on topic easier:
     subject.replace("re: ", "")
   }
 
   def getMessageBodyFromEmail(email: String): String = {
 
     val firstLineBreak = email.indexOf("\n\n")
-    //Return the message body filtered by only text from a-z and to lower case
+    //Return the message body filtered by only text 
+    //from a-z and to lower case
     email.substring(firstLineBreak)
     .replace("\n", " ")
     .replaceAll("[^a-zA-Z ]", "")
@@ -700,26 +715,35 @@ object RecommendationSystem extends SimpleSwingApplication {
 
   def getSenderFromEmail(email: String): String = {
     //Find the index of the From: line
-    val fromLineIndex = email.indexOf("From:")
-    val endOfLine = email.substring(fromLineIndex).indexOf('\n') + fromLineIndex
+    val fromLineIndex = email
+    .indexOf("From:")
+    
+    val endOfLine = email
+    .substring(fromLineIndex)
+    .indexOf('\n') + fromLineIndex
 
-    //Search for the <> tags in this line, as if they are there, the email address is contained inside these tags
+    //Search for the <> tags in this line, as if they are there,
+    // the email address is contained inside these tags
+    
     val mailAddressStartIndex = email
     .substring(fromLineIndex, endOfLine)
     .indexOf('<') + fromLineIndex + 1
+    
     val mailAddressEndIndex = email
     .substring(fromLineIndex, endOfLine)
     .indexOf('>') + fromLineIndex
 
     if (mailAddressStartIndex > mailAddressEndIndex) {
 
-      //The email address was not embedded in <> tags, extract the substring without extra spacing and to lower case
+      //The email address was not embedded in <> tags,
+      // extract the substring without extra spacing and to lower case
       var emailString = email
       .substring(fromLineIndex + 5, endOfLine)
       .trim
       .toLowerCase
 
-      //Remove a possible name embedded in () at the end of the line, for example in test@test.com (tester) the name would be removed here
+      //Remove a possible name embedded in () at the end of the line,
+      //for example in test@test.com (tester) the name would be removed here
       val additionalNameStartIndex = emailString.indexOf('(')
       if (additionalNameStartIndex == -1) {
         emailString
@@ -733,7 +757,9 @@ object RecommendationSystem extends SimpleSwingApplication {
       }
     }
     else {
-      //Extract the email address from the tags. If these <> tags are there, there is no () with a name in the From: string in our data
+      //Extract the email address from the tags. 
+      //If these <> tags are there, there is no () with a name in
+      // the From: string in our data
       email
       .substring(mailAddressStartIndex, mailAddressEndIndex)
       .trim
@@ -743,17 +769,32 @@ object RecommendationSystem extends SimpleSwingApplication {
 
   def getDateFromEmail(email: String): Date = {
     //Find the index of the Date: line in the complete email
-    val dateLineIndex = email.indexOf("Date:")
-    val endOfDateLine = email.substring(dateLineIndex).indexOf('\n') + dateLineIndex
+    val dateLineIndex = email
+    .indexOf("Date:")
+    
+    val endOfDateLine = email
+    .substring(dateLineIndex)
+    .indexOf('\n') + dateLineIndex
 
     //All possible date patterns in the emails.
-    val datePatterns = Array("EEE MMM dd HH:mm:ss yyyy", "EEE, dd MMM yyyy HH:mm", "dd MMM yyyy HH:mm:ss", "EEE MMM dd yyyy HH:mm")
+    val datePatterns = Array(	"EEE MMM dd HH:mm:ss yyyy",
+     							"EEE, dd MMM yyyy HH:mm", 
+    							"dd MMM yyyy HH:mm:ss", 
+     							"EEE MMM dd yyyy HH:mm")
 
     datePatterns.foreach { x =>
-      //Try to directly return a date from the formatting.when it fails on a pattern it continues with the next one until one works
-      Try(return new SimpleDateFormat(x).parse(email.substring(dateLineIndex + 5, endOfDateLine).trim.substring(0, x.length)))
+      //Try to directly return a date from the formatting.
+      //when it fails on a pattern it continues with the next one
+      // until one works
+      
+      Try(return new SimpleDateFormat(x)
+      				.parse(email
+      						.substring(dateLineIndex + 5, endOfDateLine)
+      						.trim.substring(0, x.length)))
     }
-    //Finally, if all failed return null (this will not happen with our example data but without this return the code will not compile)
+    //Finally, if all failed return null 
+    //(this will not happen with our example data but without 
+    //this return the code will not compile)
     null
   }
 }
@@ -770,14 +811,17 @@ The first recommendation feature we will make is based on the sender of the emai
 
 //First we group the emails by Sender, then we extract only the sender address and amount of emails, and finally we sort them on amounts ascending
 val mailsGroupedBySender = trainingData
-.groupBy(x => x._3)
+.groupBy(x => x.sender)
 .map(x => (x._1, x._2.length))
 .toArray
 .sortBy(x => x._2)
 
 //In order to plot the data we split the values from the addresses as this is how the plotting library accepts the data.
-val senderDescriptions = mailsGroupedBySender.map(x => x._1)
-val senderValues = mailsGroupedBySender.map(x => x._2.toDouble)
+val senderDescriptions = mailsGroupedBySender
+	.map(x => x._1)
+	
+val senderValues = mailsGroupedBySender
+	.map(x => x._2.toDouble)
 
 val barPlot = BarPlot.plot("", senderValues, senderDescriptions)
    
@@ -799,10 +843,10 @@ Here you can see that the most frequent sender sent 45 emails, followed by 37 em
 
 //Code changes:
 val mailsGroupedBySender = trainingData
-.groupBy(x => x._3)
-.map(x => (x._1, Math.log1p(x._2.length)))
-.toArray
-.sortBy(x => x._2)
+	.groupBy(x => x.sender)
+	.map(x => (x._1, Math.log1p(x._2.length)))
+	.toArray
+	.sortBy(x => x._2)
 
 barPlot.setAxisLabel(1, "Amount of emails received on log Scale ")
 
@@ -820,7 +864,7 @@ Let's have a look at the subjects and their occurrence counts:
 ```scala
 //Add to 'def top'  
 val mailsGroupedByThread = trainingData
-	.groupBy(x => x._4)
+	.groupBy(x => x.subject)
 
 //Create a list of tuples with (subject, list of emails)
 val threadBarPlotData = mailsGroupedByThread
@@ -856,17 +900,22 @@ val threadBarPlotData = mailsGroupedByThread
 Here the value's now range between 0.69 and 3.41, which is a lot better than a range of 1 to 29 for the recommendation system. However we did not incorporate the time frame yet, thus we go back to the normal frequency and apply the transformation later on. To be able to do this, we first need to get the time between the first and last thread:
 
 ```scala
-//Create a list of tuples with (subject, list of emails, time difference between first and last email)
+//Create a list of tuples with (subject, list of emails, 
+//time difference between first and last email)
     val mailGroupsWithMinMaxDates = mailsGroupedByThread
-    .map(x => (x._1, x._2, (x._2
-    							.maxBy(x => x._2)
-    							._1.getTime - x._2    												.minBy(x => x._2)    												._1.getTime
+    .map(x => (x._1, x._2,
+    		(x._2
+    			.maxBy(x => x.emailDate)
+    			.emailDate.getTime - 
+    		 x._2.minBy(x => x.emailDate)    					.emailDate.getTime
     						) / 1000))
 
-//turn into a list of tuples with (topic, list of emails, time difference, and weight) filtered that only threads occur
+//turn into a list of tuples with (topic, list of emails, 
+// time difference, and weight) filtered that only threads occur
     val threadGroupedWithWeights = mailGroupsWithMinMaxDates
     .filter(x => x._3 != 0)
-    .map(x => (x._1, x._2, x._3, 10 + Math.log10(x._2.length.toDouble / x._3)))
+    .map(x => (x._1, x._2, x._3, 10 + 
+    			Math.log10(x._2.length.toDouble / x._3)))
 
 ```
 
@@ -915,7 +964,8 @@ There is one issue with this feature, which are stop words. Luckily we have a st
 ```scala
 
   def getStopWords: List[String] = {
-    val source = scala.io.Source.fromFile(new File("/Users/../stopwords.txt"))("latin1")
+    val source = scala.io.Source
+    	.fromFile(new File("/Users/../stopwords.txt"))("latin1")
     val lines = source.mkString.split("\n")
     source.close()
     lines.toList
@@ -948,7 +998,7 @@ As fourth feature we want to incorporate weighting based on the terms that are o
 ```scala
 
 val tdm = trainingData
-      .flatMap(x => x._4.split(" "))
+      .flatMap(x => x.body.split(" "))
       .filter(x => x.nonEmpty && !stopWords.contains(x))
       .groupBy(x => x)
       .map(x => (x._1, Math.log10(x._2.length + 1)))
@@ -964,16 +1014,18 @@ With these preparations for our 4 features, we can make our actual ranking calcu
 val trainingRanks = trainingData.map(mail => {
       //mail contains (full content, date, sender, subject, body)
 
-      //Determine the weight of the sender
+      //Determine the weight of the sender (and add 1 for multiplication purposes)
       val senderWeight = mailsGroupedBySender
-        .collectFirst { case (mail._2, x) => x}
+        .collectFirst { case (mail.sender, x) => x + 1}
         .getOrElse(1.0)
 
       //Determine the weight of the subject
-      val termsInSubject = mail._3
+      val termsInSubject = mail.subject
         .replaceAll("[^a-zA-Z ]", "")
         .toLowerCase.split(" ")
-        .filter(x => x.nonEmpty && !stopWords.contains(x))
+        .filter(x => 	x.nonEmpty && 
+        				!stopWords.contains(x)
+        		)
 
       val termWeight = if (termsInSubject.size > 0) termsInSubject
         .map(x => {
@@ -983,16 +1035,19 @@ val trainingRanks = trainingData.map(mail => {
         .sum / termsInSubject.length
       else 1.0
 
-      //Determine if the email is from a thread, and if it is the weight from this thread:
+      //Determine if the email is from a thread, 
+      //and if it is the weight from this thread:
       val threadGroupWeight: Double = threadGroupedWithWeights
-        .collectFirst { case (mail._3, _, _, weight) => weight}
+        .collectFirst { case (mail.subject, _, _, weight) => weight}
         .getOrElse(1.0)
 
       //Determine the commonly used terms in the email and the weight belonging to it:
-      val termsInMailBody = mail._4
+      val termsInMailBody = mail.body
         .replaceAll("[^a-zA-Z ]", "")
         .toLowerCase.split(" ")
-        .filter(x => x.nonEmpty && !stopWords.contains(x))
+        .filter(x => 	x.nonEmpty && 
+        				!stopWords.contains(x)
+        		)
 
       val commonTermsWeight = if (termsInMailBody.size > 0) termsInMailBody
         .map(x => {
@@ -1002,13 +1057,17 @@ val trainingRanks = trainingData.map(mail => {
         .sum / termsInMailBody.length
       else 1.0
 
-      val rank = termWeight * threadGroupWeight * commonTermsWeight * senderWeight
+      val rank = 	termWeight * 
+      				threadGroupWeight * 
+      				commonTermsWeight * 
+      				senderWeight
 
       (mail, rank)
     })
     
     val median = sortedTrainingRanks(sortedTrainingRanks.length / 2)._2
-    val mean = sortedTrainingRanks.map(x => x._2).sum / sortedTrainingRanks.length
+    val mean = 	sortedTrainingRanks.map(x => x._2).sum /
+    			sortedTrainingRanks.length
 ```
 
 This gives us a list ```trainingRanks``` which contains all training emails and their respective ranks.  Now how is this useful, since we want to rank new emails? The idea behind this is that sorting emails purely based on rank would not be really useful, as sorting on date is a way more intuitive way for sorting email. This is why we suggest placing a flag 'important' as a more intuitive way to represent important emails. In order to compute when this flag should be set you also need the ranks from the training set, and define a decision boundary.
@@ -1021,16 +1080,18 @@ To see how much of the testing emails are ranked priority, we add the following 
   val testingRanks = testingData.map(mail => {
       //mail contains (full content, date, sender, subject, body)
 
-      //Determine the weight of the sender
+      //Determine the weight of the sender (and add 1 for multiplication purposes)
       val senderWeight = mailsGroupedBySender
-        .collectFirst { case (mail._2, x) => x}
+        .collectFirst { case (mail.sender, x) => x + 1}
         .getOrElse(1.0)
 
       //Determine the weight of the subject
-      val termsInSubject = mail._3
+      val termsInSubject = mail.subject
         .replaceAll("[^a-zA-Z ]", "")
         .toLowerCase.split(" ")
-        .filter(x => x.nonEmpty && !stopWords.contains(x))
+        .filter(x => 	x.nonEmpty && 
+        				!stopWords.contains(x)
+        		)
 
       val termWeight = if (termsInSubject.size > 0) termsInSubject
         .map(x => {
@@ -1040,16 +1101,20 @@ To see how much of the testing emails are ranked priority, we add the following 
         .sum / termsInSubject.length
       else 1.0
 
-      //Determine if the email is from a thread, and if it is the weight from this thread:
+      //Determine if the email is from a thread, 
+      //and if it is the weight from this thread:
       val threadGroupWeight: Double = threadGroupedWithWeights
-        .collectFirst { case (mail._3, _, _, weight) => weight}
+        .collectFirst { case (mail.subject, _, _, weight) => weight}
         .getOrElse(1.0)
 
-      //Determine the commonly used terms in the email and the weight belonging to it:
-      val termsInMailBody = mail._4
+      //Determine the commonly used terms in the email and
+      // the weight belonging to it:
+      val termsInMailBody = mail.body
         .replaceAll("[^a-zA-Z ]", "")
         .toLowerCase.split(" ")
-        .filter(x => x.nonEmpty && !stopWords.contains(x))
+        .filter(x => 	x.nonEmpty && 
+        				!stopWords.contains(x)
+        		)
 
       val commonTermsWeight = if (termsInMailBody.size > 0) termsInMailBody
         .map(x => {
@@ -1059,31 +1124,36 @@ To see how much of the testing emails are ranked priority, we add the following 
         .sum / termsInMailBody.length
       else 1.0
 
-      val rank = termWeight * threadGroupWeight * commonTermsWeight * senderWeight
+      val rank = 	termWeight * 
+      				threadGroupWeight * 
+      				commonTermsWeight * 
+      				senderWeight
 
       (mail, rank)
     })
 
-    val priorityEmails = testingRanks.filter(x => x._2 >= mean)
+    val priorityEmails = testingRanks
+    	.filter(x => x._2 >= mean)
 
     println(priorityEmails.length + " ranked as priority")
 
 ```
 
-After actually running this test code, you will see that the amount of emails ranked as priority from the test set is actually  204. This is 16.32% of the test email set. To gain a bit more insight we will show the top 10 for the priority labeled emails.
+After actually running this test code, you will see that the amount of emails ranked as priority from the test set is actually only 13. This is 1.04% of the test email set. To gain a bit more insight whether this ranking was done well for these results we will now look into the top 10 for the priority labeled emails.
 
-| Date | Sender  | Subject  | Rank |
-| :-- | :-- | :--  | :-- | 
-| Wed Sep 25 12:57:00 CEST 2002 | whit@transpect.com | [razor-users] "no razor servers available at this time" | 9.142285151868377 |
-| Tue Oct 01 06:18:00 CEST 2002 | angles@aminvestments.com | use new apt to do null to rh8 upgrade? | 9.03879575228188 |
-| Thu Oct 03 08:02:00 CEST 2002 | rssfeeds@spamassassin.taint.org | perl.  it's just a language. | 8.859240257643194 |
-| Mon Sep 30 11:11:00 CEST 2002 | axel.thimm@physik.fu-berlin.de | all set for red hat linux 8.0 | 8.844148047621394 |
-| Thu Sep 26 02:00:00 CEST 2002 | pudge@perl.org | [use perl] headlines for 2002-09-26 | 8.765830978559473 |
-| Thu Oct 03 12:33:00 CEST 2002 | whit@transpect.com | [razor-users] "no razor servers available at this time" | 8.739690791945359 |
-| Mon Oct 07 15:22:00 CEST 2002 | blue@rocinante.com | [razor-users] razor2 error: can't find "new" | 8.734496269696358 |
-| Tue Oct 01 02:00:00 CEST 2002 | pudge@perl.org | [use perl] headlines for 2002-10-01 | 8.697201448679307 |
-| Tue Oct 01 02:00:00 CEST 2002 | pudge@perl.org | [use perl] stories for 2002-10-01 | 8.596675141637018 |
-| Mon Sep 23 10:32:49 CEST 2002 | peter.peltonen@iki.fi | new testing packages | 8.596151383796718 |
+|Date | Sender  | Subject  | Rank
+| :--- | : -- | :--  | :-- | 
+| Sun Sep 22 03:00:00 CEST 2002 | cdale@techmonkeys.net | oh my... | 121.40 |
+| Sun Sep 22 21:58:00 CEST 2002 | welch@panasas.com | linking message [was: patch to complete a change...] | 108.02 |
+| Mon Sep 30 07:14:00 CEST 2002 | angles@aminvestments.com | new testing packages | 99.14 |
+| Wed Sep 25 23:09:00 CEST 2002 | aeriksson@fastmail.fm | exmh && speed | 89.41 |
+| Mon Sep 30 21:46:00 CEST 2002 | mark@talios.com | new testing packages | 76.37 |
+| Fri Sep 27 12:33:00 CEST 2002 | ejw@cse.ucsc.edu | the big jump | 75.68 |
+| Mon Sep 23 18:02:00 CEST 2002 | matthias@egwn.net | sylpheed-claws | 73.69 |
+| Mon Sep 23 17:41:00 CEST 2002 | matthias@egwn.net | sylpheed-claws | 72.34 |
+| Mon Sep 23 11:18:00 CEST 2002 | dl@silcom.com | [void] a new low on the personals tip... | 72.03 |
+| Mon Sep 23 16:23:00 CEST 2002 | kre@munnari.oz.au | bad focus/click behaviours | 70.39 |
+
 
 In this top 10, based on the subjects we can say that these emails are important, however this is no formal proof of the actual importance of these emails. Validating a ranker like this is rather hard when you have no ground truth. One of the most common ways of validating and improving it is by actually presenting it to the user and letting him/her mark correct mistakes. These corrections can then be used to improve the system.
 

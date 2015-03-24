@@ -10,6 +10,8 @@ import scala.util.Try
 object RecommendationSystem extends SimpleSwingApplication {
 
 
+  case class EmailData(emailDate : Date, sender : String, subject : String, body : String)
+
   def top = new MainFrame {
     title = "Recommendation System Example"
 
@@ -18,8 +20,8 @@ object RecommendationSystem extends SimpleSwingApplication {
 
     val mails = getFilesFromDir(easyHamPath).map(x => getFullEmail(x))
     val timeSortedMails = mails
-      .map(x => (getDateFromEmail(x), getSenderFromEmail(x), getSubjectFromEmail(x), getMessageBodyFromEmail(x)))
-      .sortBy(x => x._1)
+      .map(x => EmailData(getDateFromEmail(x), getSenderFromEmail(x), getSubjectFromEmail(x), getMessageBodyFromEmail(x)))
+      .sortBy(x => x.emailDate)
 
     val (trainingData, testingData) = timeSortedMails
       .splitAt(timeSortedMails.length / 2)
@@ -27,7 +29,7 @@ object RecommendationSystem extends SimpleSwingApplication {
 
     //First we group the emails by Sender, then we extract only the sender address and amount of emails, and finally we sort them on amounts ascending
     val mailsGroupedBySender = trainingData
-      .groupBy(x => x._3)
+      .groupBy(x => x.sender)
       .map(x => (x._1, Math.log1p(x._2.length)))
       .toArray
       .sortBy(x => x._2)
@@ -47,7 +49,7 @@ object RecommendationSystem extends SimpleSwingApplication {
     bounds = new Rectangle(800, 600)
 
     val mailsGroupedByThread = trainingData
-      .groupBy(x => x._4)
+      .groupBy(x => x.subject)
 
     //Create a list of tuples with (subject, list of emails)
     val threadBarPlotData = mailsGroupedByThread
@@ -62,8 +64,8 @@ object RecommendationSystem extends SimpleSwingApplication {
 
     val mailGroupsWithMinMaxDates = mailsGroupedByThread
       .map(x => (x._1, x._2, (x._2
-      .maxBy(x => x._2)
-      ._1.getTime - x._2.minBy(x => x._2)._1.getTime
+      .maxBy(x => x.emailDate)
+      .emailDate.getTime - x._2.minBy(x => x.emailDate).emailDate.getTime
       ) / 1000))
 
     //turn into a list of tuples with (topic, list of emails, time difference, and weight) filtered that only threads occur
@@ -91,7 +93,7 @@ object RecommendationSystem extends SimpleSwingApplication {
 
 
     val tdm = trainingData
-      .flatMap(x => x._4.split(" "))
+      .flatMap(x => x.body.split(" "))
       .filter(x => x.nonEmpty && !stopWords.contains(x))
       .groupBy(x => x)
       .map(x => (x._1, Math.log10(x._2.length + 1)))
@@ -103,11 +105,11 @@ object RecommendationSystem extends SimpleSwingApplication {
 
       //Determine the weight of the sender
       val senderWeight = mailsGroupedBySender
-        .collectFirst { case (mail._2, x) => x}
+        .collectFirst { case (mail.sender, x) => x + 1}
         .getOrElse(1.0)
 
       //Determine the weight of the subject
-      val termsInSubject = mail._3
+      val termsInSubject = mail.subject
         .replaceAll("[^a-zA-Z ]", "")
         .toLowerCase.split(" ")
         .filter(x => x.nonEmpty && !stopWords.contains(x))
@@ -122,11 +124,11 @@ object RecommendationSystem extends SimpleSwingApplication {
 
       //Determine if the email is from a thread, and if it is the weight from this thread:
       val threadGroupWeight: Double = threadGroupsWithWeights
-        .collectFirst { case (mail._3, _, _, weight) => weight}
+        .collectFirst { case (mail.subject, _, _, weight) => weight}
         .getOrElse(1.0)
 
       //Determine the commonly used terms in the email and the weight belonging to it:
-      val termsInMailBody = mail._4
+      val termsInMailBody = mail.body
         .replaceAll("[^a-zA-Z ]", "")
         .toLowerCase.split(" ")
         .filter(x => x.nonEmpty && !stopWords.contains(x))
@@ -156,11 +158,11 @@ object RecommendationSystem extends SimpleSwingApplication {
 
       //Determine the weight of the sender
       val senderWeight = mailsGroupedBySender
-        .collectFirst { case (mail._2, x) => x}
+        .collectFirst { case (mail.sender, x) => x +1}
         .getOrElse(1.0)
 
       //Determine the weight of the subject
-      val termsInSubject = mail._3
+      val termsInSubject = mail.subject
         .replaceAll("[^a-zA-Z ]", "")
         .toLowerCase.split(" ")
         .filter(x => x.nonEmpty && !stopWords.contains(x))
@@ -175,11 +177,11 @@ object RecommendationSystem extends SimpleSwingApplication {
 
       //Determine if the email is from a thread, and if it is the weight from this thread:
       val threadGroupWeight: Double = threadGroupsWithWeights
-        .collectFirst { case (mail._3, _, _, weight) => weight}
+        .collectFirst { case (mail.subject, _, _, weight) => weight}
         .getOrElse(1.0)
 
       //Determine the commonly used terms in the email and the weight belonging to it:
-      val termsInMailBody = mail._4
+      val termsInMailBody = mail.body
         .replaceAll("[^a-zA-Z ]", "")
         .toLowerCase.split(" ")
         .filter(x => x.nonEmpty && !stopWords.contains(x))
@@ -194,14 +196,15 @@ object RecommendationSystem extends SimpleSwingApplication {
 
       val rank = termWeight * threadGroupWeight * commonTermsWeight * senderWeight
 
-      (mail, rank)
+      (mail, rank, termWeight,threadGroupWeight,commonTermsWeight,senderWeight)
     })
 
-    val priorityEmails = testingRanks.filter(x => x._2 >= mean).sortBy(x => -x._2)
+    val priorityEmails = testingRanks.filter(x => x._2 >= mean/2).sortBy(x => -x._2)
+    val df = new java.text.DecimalFormat("#.##")
 
-    println("|Date | Sender  | Subject  | Rank")
-    println("| :--- | : -- | :--  | :-- | ")
-    priorityEmails.take(10).foreach(x => println("| " + x._1._1.toString + " | " + x._1._2 + " | " + x._1._3 + " | " + x._2 + " |"))
+    println("|Date | Sender  | Subject  | Rank | thread term  | thread time  | common terms  | sender |")
+    println("| :--- | : -- | :--  | :-- | :-- |  :-- |  :-- |  :-- |  ")
+    priorityEmails.take(10).foreach(x => println("| " + x._1.emailDate + " | " + x._1.sender + " | " + x._1.subject + " | " + df.format(x._2) + " |"+ df.format(x._3) + " |"+ df.format(x._4) + " |"+ df.format(x._5) + " |"+ df.format(x._6) + " |"))
 
 
     println(priorityEmails.length + " ranked as priority")
