@@ -1943,18 +1943,18 @@ Lets start with the ```GaussianKernel```. This kernel represents the way in whic
 
 The parameter we pass in the constructor of the ```GaussianKernel``` is the sigma. This sigma value represents a smoothness value of the kernel. We will show what changing this parameter has for effect in the predictions. As margin penalty we pass 1. This parameter defines the margin of the vectors in the system, thus making this value lower results in more bounded vectors. We will show with a set of runs and their results what kind of effect this has in practice. Note that the `s:` stands for sigma, and the `c:` stands for the correction penalty. The percentages represent the error rate in the prediction, which is simply the percentage of false predictions on the same dataset after training.
 
-| | s: 0.001 | s: 0.01 | s: 0.1 | s: 0.2 | s: 0.5 | s: 1.0 | s: 2.0 | s: 3.0 | s: 10.0 |
+|c, s ->| 0.001 |  0.01 |  0.1 |  0.2 | 0.5 | 1.0 |  2.0 |  3.0 |  10.0 |
 | :-- | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: |
-| **c: 0.001** | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 
-|**c: 0.01** | 48.4% | 48.4% | 40% | 43.8% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% |
-| **c: 0.1** | 48.4% | 48.4% | 12.4% | 14.2% | 17.4% | 48.4% | 48.4% | 48.4% | 48.4% | 
-| **c: 0.2** | 48.4% | 45.6% | 9.1% | 10.1% | 12.3% | 48.4% | 48.4% | 48.4% | 48.4% |
-| **c: 0.5** | 47.5% | 3.4% | 6.3% | 7.2% | 7% | 8.9% | 48.4% | 48.4% | 48.4% | 
-| **c: 1.0** | 0% | 1.6% | 5.1% | 5.7% | 5.6% | 5.6% | 48.4% | 48.4% | 48.4% |
-| **c: 2.0** | 0% | 1% | 5.2% | 5% | 5.4% | 5.7% | 13.1% | 48.4% | 51.6% | |
-| **c: 3.0** | 0% | 1.2% | 6.4% | 5.8% | 5.7% | 7.4% | 18% | 51.6% | 51.6% |
-| **c: 10.0** | 0% | 1.5% | 7.5% | 6.4% | 7.7% | 12.9% | 26.2% | 51.6% | 51.6% |
-| **c: 100.0** | 0% | 1.5% | 10.1% | 12.8% | 14.6% | 18.3% | 41.6% | 51.6% | 51.6% |
+| **0.001** | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% | 
+|**0.01** | 48.4% | 48.4% | 40% | 43.8% | 48.4% | 48.4% | 48.4% | 48.4% | 48.4% |
+| **0.1** | 48.4% | 48.4% | 12.4% | 14.2% | 17.4% | 48.4% | 48.4% | 48.4% | 48.4% | 
+| **0.2** | 48.4% | 45.6% | 9.1% | 10.1% | 12.3% | 48.4% | 48.4% | 48.4% | 48.4% |
+| **0.5** | 47.5% | 3.4% | 6.3% | 7.2% | 7% | 8.9% | 48.4% | 48.4% | 48.4% | 
+| **1.0** | 0% | 1.6% | 5.1% | 5.7% | 5.6% | 5.6% | 48.4% | 48.4% | 48.4% |
+| **2.0** | 0% | 1% | 5.2% | 5% | 5.4% | 5.7% | 13.1% | 48.4% | 51.6% | |
+| **3.0** | 0% | 1.2% | 6.4% | 5.8% | 5.7% | 7.4% | 18% | 51.6% | 51.6% |
+| **10.0** | 0% | 1.5% | 7.5% | 6.4% | 7.7% | 12.9% | 26.2% | 51.6% | 51.6% |
+| **100.0** | 0% | 1.5% | 10.1% | 12.8% | 14.6% | 18.3% | 41.6% | 51.6% | 51.6% |
 
 Unfortunately there is no golden rule for finding the right sigma for every dataset. Possibly one of the best approaches is to calculate the sigma for your data, which is the `√(variance)` and then take steps around that value to see which sigma performs well. Since the variance in this data was between 0.2 and 0.5 we took this as center and explored several values at each side of this center to see the performance of the SVM with the gaussian kernel in our case.
  
@@ -1979,18 +1979,18 @@ val testingPath = "/users/.../Example Data/SVM_Example_2_Test_data.csv"
 
 If we then run the code to see the performance with the gaussian kernel we get the following results:
 
-| | s: 0.01 | s: 0.1 | s: 0.2 | s: 0.5 | s: 1.0 | s: 2.0 | s: 3.0 | s: 10.0 | s: 100.0 |
+|c, s -> | 0.01 | 0.1 | 0.2 | 0.5 | 1.0 | 2.0 | 3.0 | 10.0 | 100.0 |
 | :-- | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | 
-| **c: 0.001** | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 50% |
-| **c: 0.01** | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 39.8% |
-| **c: 0.1** | 50% | 50% | 50% | 50% | 50% | 49.4% | 49.1% | 47.5% | 35.4% |
-| **c: 0.2** | 50% | 50% | 50% | 50% | 49.4% | 49.2% | 48.8% | 47.1% | 34.3% |
-| **c: 0.5** | 50% | 49.9% | 49.8% | 49.5% | 49.3% | 48.9% | 48.6% | 46.8% | 33.1% |
-| **c: 1.0** | 50% | 49.8% | 49.7% | 49.4% | 49.4% | 48.9% | 48.6% | 46.2% | 50% |
-| **c: 2.0** | 50% | 49.8% | 49.7% | 49.4% | 49.3% | 49.2% | 48.8% | 45.7% | 31.7% |
-| **c: 3.0** | 50% | 49.8% | 49.7% | 49.8% | 49.5% | 49% | 48.8% | 46.2% | 27.4% |
-| **c: 10.0** | 50% | 49.8% | 49.7% | 49.4% | 49.3% | 49% | 48.4% | 46.7% | 33.2% |
-| **c: 100.0** | 50% | 49.8% | 49.7% | 49.4% | 49.3% | 49.1% | 48.6% | 46.7% | 32.2% |
+| **0.001** | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 50% |
+| **0.01** | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 50% | 39.8% |
+| **0.1** | 50% | 50% | 50% | 50% | 50% | 49.4% | 49.1% | 47.5% | 35.4% |
+| **0.2** | 50% | 50% | 50% | 50% | 49.4% | 49.2% | 48.8% | 47.1% | 34.3% |
+| **0.5** | 50% | 49.9% | 49.8% | 49.5% | 49.3% | 48.9% | 48.6% | 46.8% | 33.1% |
+| **1.0** | 50% | 49.8% | 49.7% | 49.4% | 49.4% | 48.9% | 48.6% | 46.2% | 50% |
+| **2.0** | 50% | 49.8% | 49.7% | 49.4% | 49.3% | 49.2% | 48.8% | 45.7% | 31.7% |
+| **3.0** | 50% | 49.8% | 49.7% | 49.8% | 49.5% | 49% | 48.8% | 46.2% | 27.4% |
+| **10.0** | 50% | 49.8% | 49.7% | 49.4% | 49.3% | 49% | 48.4% | 46.7% | 33.2% |
+| **100.0** | 50% | 49.8% | 49.7% | 49.4% | 49.3% | 49.1% | 48.6% | 46.7% | 32.2% |
 
 We see that even in the best case, still 27.4% of the testing data is falsely classified. This is interesting as when we look at the plots, a very clear distinction can be found between both classes. We could fine tune the sigma and correction rate, but when prediction points very far away (say x is 100000) the sigma and correction rate would be way to high for it to do a good performance (time wise and prediction wise).
 
