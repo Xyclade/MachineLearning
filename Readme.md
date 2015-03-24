@@ -16,16 +16,16 @@ As final note I'd like to thank the following people:
 * [Lars Willems](https://www.linkedin.com/profile/view?id=355522383) for his feedback and co-reading the blog.
 
 #The global idea of machine learning
-You probably have heard about Machine learning as a concept one time or another. However, if you would have to explain what machine learning to another person, how would you do this? Think about this for a second before reading the rest of this section.
+You probably have heard about Machine learning as a concept one time or another. However, if you would have to explain what machine learning is to another person, how would you do this? Think about this for a second before reading the rest of this section.
 
-Machine learning is explained in many ways, some more accurate than others, however there is a lot of inconsistency in its definition. Where some say machine learning is generating a static model based on historical data, which then allows you to predict for future data. Others say its a dynamic model that keeps on changing as more data is added over time.
+Machine learning is explained in many ways, some more accurate than others, however there is a lot of inconsistency in its definition. Some say machine learning is generating a static model based on historical data, which then allows you to predict for future data. Others say it's a dynamic model that keeps on changing as more data is added over time.
 
 I agree more with the dynamic definition but due to certain limitations we explain the static model method in the examples. However, we do explain how the dynamic principle would work in the subsection [Dynamic machine learning](#dynamic-machine-learning).
 
 The upcoming subsections explain commonly used definitions and notions in the machine learning field. We advise you to read through these before starting the practical examples.
 
 ##Features
-A *feature* is a property on which a [model](#model) is trained. Say for example that you classify emails as spam/ham based on the frequency of the word 'Buy' and 'Money'. Then these words are features, or part of a feature if you would combine it with more words. If you would use machine learning to predict whether one is a friend of you, the amount of 'common' friends could be a feature. Note that in the field, sometimes features are also referred to as *attributes*.
+A *feature* is a property on which a [model](#model) is trained. Say for example that you classify emails as spam/ham based on the frequency of the word 'Buy' and 'Money'. Then these words are features, or part of a feature if you would combine it with more words. If you would use machine learning to predict whether one is a friend of yours, the amount of 'common' friends could be a feature. Note that in the field, sometimes features are also referred to as *attributes*.
 
 ##Model
 When one talks about machine learning, often the term *model* is mentioned. The model is the result of any machine learning method and the algorithm used within this method. This model can be used to make predictions in [supervised](#supervised-learning), or to retrieve clusterings in [unsupervised learning](#unsupervised-learning). Chances are high that you will encounter the terms **online** and **offline** training of a model in the field. The idea behind online training is that you add training data to an already existing model, whereas with offline training you generate a new model from scratch. For performance reasons, online training would be the most preferable method. However for some algorithms this is not possible.
@@ -34,15 +34,15 @@ When one talks about machine learning, often the term *model* is mentioned. The 
 In the field of machine learning there are two leading ways of learning, namely [Supervised learning](#supervised-learning) and [Unsupervised learning](#unsupervised-learning). A brief introduction is necessary when you want to use Machine learning in your applications, as picking the right machine learning approach and algorithm is an important but sometimes also a little tedious process.
 
 ###Supervised learning
-In supervised learning you define explicitly what features you want to use, and what output you expect. An example is predicting gender based on height and weight, which is known as a [Classification](#classification) problem. Additionally you can also predict absolute values with [Regression](#regression). An example of regression with the same data would be predicting ones length based on gender and weight. Some supervised algorithms can only be used for either classification or regression, such as [K-NN](#labeling-isps-based-on-their-downupload-speed-knn-using-smile-in-scala). However there also exists algorithms such as [Support Vector Machines](#using-support-vector-machines) which can be used for both purposes. 
+In supervised learning you define explicitly what features you want to use, and what output you expect. An example is predicting gender based on height and weight, which is known as a [Classification](#classification) problem. Additionally you can also predict absolute values with [Regression](#regression). An example of regression with the same data would be predicting one's length based on gender and weight. Some supervised algorithms can only be used for either classification or regression, such as [K-NN](#labeling-isps-based-on-their-downupload-speed-k-nn-using-smile-in-scala). However there also exists algorithms such as [Support Vector Machines](#using-support-vector-machines-svms) which can be used for both purposes. 
 
 ####Classification
 The problem of classification within the domain of Supervised learning is relatively simple. Given a set of labels, and some data that already received the correct labels, we want to be able to *predict* labels for new data that we did not label yet. However, before thinking of your data as a classification problem, you should look at what the data looks like. If there is a clear structure in the data such that you can easily draw a regression line it might be better to use a [regression](#regression) algorithm instead. Given the data does not fit to a regression line, or when performance becomes an issue, classification is a good alternative.
 
-An example of a classification problem would be to classify emails as ham or spam based on their content. Given a training set in which emails are labeled ham or spam, a classification algorithm can be used to train a [Model](#model). This model can then be used to predict for future emails whether they are ham or spam. A typical example of a classification algorithm is the [K-NN algorithm](#labeling-isps-based-on-their-downupload-speed-knn-using-smile-in-scala). Another commonly used example of a classification problem is [Classifying email as spam or ham](#classifying-email-as-spam-or-ham-naive-bayes) which is also one of the examples written on this blog.
+An example of a classification problem would be to classify emails as ham or spam based on their content. Given a training set in which emails are labeled ham or spam, a classification algorithm can be used to train a [Model](#model). This model can then be used to predict for future emails whether they are ham or spam. A typical example of a classification algorithm is the [K-NN algorithm](#labeling-isps-based-on-their-downupload-speed-k-nn-using-smile-in-scala). Another commonly used example of a classification problem is [Classifying email as spam or ham](#classifying-email-as-spam-or-ham-naive-bayes) which is also one of the examples written on this blog.
 
 ####Regression
-Regression is a lot stronger in comparison to [classification](#classification). This is because in regression you are predicting actual values, rather than labels. Let us clarify this with a short example: given a table of weights, heights, and genders, you can use [K-NN](#labeling-isps-based-on-their-DownUpload-speed-knn-using-smile-in-scala) to predict ones gender when given a weight and height. With this same dataset using regression, you could instead predict ones weight or height, given the gender and the respective other missing parameter. 
+Regression is a lot stronger in comparison to [classification](#classification). This is because in regression you are predicting actual values, rather than labels. Let us clarify this with a short example: given a table of weights, heights, and genders, you can use [K-NN](#labeling-isps-based-on-their-downupload-speed-k-nn-using-smile-in-scala) to predict one's gender when given a weight and height. With this same dataset using regression, you could instead predict one's weight or height, given the gender and the respective other missing parameter. 
 
 With this extra power, comes great responsibility, thus in the working field of regression one should be very careful when generating the model. [Common pitfalls](#common-pitfalls) are [overfitting](#overfitting), [underfitting](#underfitting) and not taking into account how the model handles [extrapolation](http://en.wikipedia.org/wiki/Extrapolation) and [interpolation](http://en.wikipedia.org/wiki/Interpolation).
 
@@ -72,7 +72,7 @@ The technique of cross validation is one of the most common techniques in the fi
 The most important part of this cross validation is the splitting of data. You should always use the complete dataset when performing this technique. In other words you should not randomly select X datapoints for training and then randomly select X datapoints for testing, because then some datapoints can be in both sets while others might not be used at all.
 
 ####(2 fold) Cross validation
-In 2-fold cross validation you perform a split of the data into test and training for each fold (so 2 times) and train a model using the training dataset, followed by verification with the testing set. Doing so allows you to compute the error in the predictions for the test data 2 times. These error values then should not differ significantly. If they do, either something is wrong with your data or with the features you selected for model prediction. Either way you should look into the data more and find out what is happening for your specific case, as training a model based on the data might result in a [overfitted](#overfitting) model for erroneous data.
+In 2-fold cross validation you perform a split of the data into test and training for each fold (so 2 times) and train a model using the training dataset, followed by verification with the testing set. Doing so allows you to compute the error in the predictions for the test data 2 times. These error values then should not differ significantly. If they do, either something is wrong with your data or with the features you selected for model prediction. Either way you should look into the data more and find out what is happening for your specific case, as training a model based on the data might result in an [overfitted](#overfitting) model for erroneous data.
 
 ###Regularization
 The basic idea of regularization is preventing [overfitting](#overfitting) your [model](#model) by simplifying it. Suppose your data is a 3rd degree polynomial function, but your data has noise and this would cause the model to be of a higher degree. Then the model would perform poorly on new data, whereas it seems to be a good model at first. Regularization helps preventing this, by simplifying the model with a certain value *lambda*. However to find the right lambda for a model is hard when you have no idea as to when the model is overfitted or not. This is why [cross validation](#cross-validation) is often used to find the best lambda fitting your model.
@@ -148,7 +148,7 @@ This results in the following computation:
 
 <img src="./Images/Formula3.png" />
 
-Now what does this -1.307229 represent? Basically it says that the model that predicted these values performs +/- 1.31 percent worse than returning the average each time a value is to be predicted. In other words, we could better use the average function as a predictor rather than the model in this specific case.
+Now what does this -1.307229 represent? Basically it says that the model that predicted these values performs about 1.31 percent worse than returning the average each time a value is to be predicted. In other words, we could better use the average function as a predictor rather than the model in this specific case.
 
 ##Common pitfalls 
 This section describes some common pitfalls in applying machine learning techniques. The idea of this section is to make you aware of these pitfalls and help you prevent actually walking into one yourself.
@@ -156,7 +156,7 @@ This section describes some common pitfalls in applying machine learning techniq
 ###Overfitting
 When fitting a function on the data, there is a possibility the data contains noise (for example by measurement errors). If you fit every point from the data exactly, you incorporate this noise into the [model](#model). This causes the model to predict really well on your test data, but relatively poor on future data.
 
-The left image here below show how this overfitting would look like if you where to plot your data and the fitted functions, whereas the right image would represent a *good fit* of the regression line through the datapoints.
+The left image here below shows how this overfitting would look like if you were to plot your data and the fitted functions, whereas the right image would represent a *good fit* of the regression line through the datapoints.
 
 <img src="./Images/OverFitting.png" width="300px" /> 
 <img src="./Images/Good_Fit.png" width="300px" />
@@ -166,7 +166,7 @@ Overfitting can easily happen when applying [regression](#regression) but can ju
 Overfitting can be detected by performing [validation techniques](#validation-techniques) and looking into your data's statistical features, and detecting and removing outliers.
 
 ### Underfitting
-When you are turning your data into a model, but are leaving (a lot of) statistical data behind, this is called underfitting. This can happen due to various reasons, such as using a wrong regression type on the data. If you have a non-linear structure in the data, and you apply linear regression, this would result in an under-fitted model. The left image here below represents a under-fitted regression line whereas the right image shows a good fit regression line.
+When you are turning your data into a model, but are leaving (a lot of) statistical data behind, this is called underfitting. This can happen due to various reasons, such as using a wrong regression type on the data. If you have a non-linear structure in the data, and you apply linear regression, this would result in an under-fitted model. The left image here below represents an under-fitted regression line whereas the right image shows a good fit regression line.
 
 <img src="./Images/Under-fitting.png" width="300px" /> 
 <img src="./Images/Good_Fit.png" width="300px" />
@@ -176,7 +176,7 @@ You can prevent underfitting by plotting the data to get insights in the underly
 ###Curse of dimensionality
 The curse of dimensionality is a collection of problems that can occur when your data size is lower than the amount of features (dimensions) you are trying to use to create your machine learning [model](#model). An example of a dimensionality curse is matrix rank deficiency. When using [Ordinary Least Squares(OLS)](http://en.wikipedia.org/wiki/Ordinary_least_squares), the underlying algorithm solves a linear system in order to build up a model. However if you have more columns than you have rows, coming up with a single solution for this system is not possible. If this is the case, the best solution would be to get more datapoints or reduce the feature set. 
 
-If you want to know more regarding this curse of dimensionality, [a study focussed on this issue](http://lectures.molgen.mpg.de/networkanalysis13/LDA_cancer_classif.pdf). In this study, researchers Haifeng Li, Keshu Zhang and Tao Jiang developed an algorithm that improves cancer classification with very few datapoints. They compared their algorithm with [support vector machines](http://en.wikipedia.org/wiki/Support_vector_machine) and [random forests](http://en.wikipedia.org/wiki/Random_forest).
+If you want to know more regarding this curse of dimensionality, there is [a study focussed on this issue](http://lectures.molgen.mpg.de/networkanalysis13/LDA_cancer_classif.pdf). In this study, researchers Haifeng Li, Keshu Zhang and Tao Jiang developed an algorithm that improves cancer classification with very few datapoints. They compared their algorithm with [support vector machines](http://en.wikipedia.org/wiki/Support_vector_machine) and [random forests](http://en.wikipedia.org/wiki/Random_forest).
 
 ##Dynamic machine learning
 In almost all literature you can find about machine learning, a static model is generated and validated, and then used for predictions or recommendations. However in practice, this alone would not make a very good machine learning application. This is why in this section we will explain how to turn a static model into a dynamic model. Since the (most optimal) implementation depends on the algorithm you are using, we will explain the concept rather than giving a practical example. Because explaining it in text only will not be very clear we first present you the whole system in a diagram. We will then use this diagram to  explain machine learning and how to make the system dynamic.
@@ -208,7 +208,7 @@ Then you can compute a [prior](#prior) for every person on Facebook regarding th
 Additionally, the dataset grows over time, so we should keep on updating our model with the new data to make the predictions more accurate. How to do this however, depends on the size and mutation rate of your data. 
 
 #Practical examples
-In this section we present you a set of machine learning algorithms in a practical setting. The idea of these examples is to get you started with machine learning algorithms without an in depth explanation of the underlying algorithms. We focus purely on the functional aspect of there algorithms, how you can verify your implementation and finally try to make you aware of [common pitfalls](#common-pitfalls).
+In this section we present you a set of machine learning algorithms in a practical setting. The idea of these examples is to get you started with machine learning algorithms without an in depth explanation of the underlying algorithms. We focus purely on the functional aspect of these algorithms, how you can verify your implementation and finally try to make you aware of [common pitfalls](#common-pitfalls).
 
 The following examples are available:
 
@@ -222,7 +222,7 @@ The following examples are available:
 
 For each of these examples we used the [Smile Machine Learning](https://github.com/haifengl/smile/releases) library. We used both the `smile-core` and `smile-plot` libraries. These libraries are available on [Maven](http://search.maven.org), Gradle, Ivy, SBT and Leiningen. Information on how to add them using one of these systems can be found [here for the core](https://www.versioneye.com/java/com.github.haifengl:smile-core/1.0.2), and [here for the plotting library](https://www.versioneye.com/java/com.github.haifengl:smile-plot/1.0.2).
 
-So before you start working through an example, I assume you made a new project in your favourite IDE, and added the `smile-core` and `smile-plot` libraries to your project. Additional libraries addition and how to get the example data is addressed per example.
+So before you start working through an example, I assume you made a new project in your favourite IDE, and added the `smile-core` and `smile-plot` libraries to your project. Additional libraries when used, and how to get the example data is addressed per example.
 
 
 ##Labeling ISPs based on their down/upload speed (K-NN using Smile in Scala)
@@ -274,7 +274,7 @@ object KNNExample {
 
 First thing you might wonder now is *why is the data formatted this way*. Well, the separation between dataPoints and their label values is for easy splitting between testing and training data, and because the API expects the data this way for both executing the K-NN algorithm and plotting the data. Secondly the datapoints stored as an ```Array[Array[Double]]``` is done to support datapoints in more than just 2 dimensions.
 
-Given the data the first thing to do next is to see what the data looks like. For this Smile provides a nice plotting library. In order to use this however, the application should be changed to a Swing application. Additionally the data should be fed to the plotting library to get a JPane with the actual plot. After changing your code it should like this:
+Given the data the first thing to do next is to see what the data looks like. For this Smile provides a nice plotting library. In order to use this however, the application should be changed to a Swing application. Additionally the data should be fed to the plotting library to get a JPane with the actual plot. After changing your code it should look like this:
 
  ```scala
  
@@ -303,7 +303,7 @@ The idea behind plotting the data is to verify whether K-NN is a fitting Machine
 
 In this plot you can see that the blue and red points seem to be mixed in the area (3 < x < 5) and (5 < y < 7.5). Since the groups are mixed the K-NN algorithm is a good choice, as fitting a linear decision boundary would cause a lot of false classifications in the mixed area.
 
-Given this choice to use the K-NN algorithm to be a good fit for this problem, lets continue with the actual Machine Learning part. For this the GUI is ditched since it does not really add any value. Recall from the section [*The global idea of Machine Learning*](#the-global-idea-of-machine-learning) that in machine learning there are 2 key parts: Prediction and Validation. First we will look at the validation, as using a model without any validation is never a good idea. The main reason to validate the model here is to prevent [overfitting](#overfitting). However, before we even can do validation, a *correct* K should be chosen. 
+Given this choice to use the K-NN algorithm to be a good fit for this problem, let's continue with the actual Machine Learning part. For this the GUI is ditched since it does not really add any value. Recall from the section [*The global idea of Machine Learning*](#the-global-idea-of-machine-learning) that in machine learning there are 2 key parts: Prediction and Validation. First we will look at the validation, as using a model without any validation is never a good idea. The main reason to validate the model here is to prevent [overfitting](#overfitting). However, before we even can do validation, a *correct* K should be chosen. 
 
 The drawback is that there is no golden rule for finding the correct K. However, finding a *good* K that allows for most datapoints to be classified correctly can be done by looking at the data. Additionally the K should be picked carefully to prevent undecidability by the algorithm. Say for example ```K=2```, and the problem has 2 labels, then when a point is between both labels, which one should the algorithm pick. There is a *rule of thumb* that K should be the square root of the number of features (on other words the number of dimensions). In our example this would be ```K=1```, but this is not really a good idea since this would lead to higher false-classifications around decision boundaries. Picking ```K=2``` would result in the error regarding our two labels, thus picking ```K=3``` seems like a good fit for now.
 
@@ -408,23 +408,23 @@ The result of executing this code is labeling the ```unknownDataPoint``` (5.3, 4
 
 
 ##Classifying email as spam or ham (Naive Bayes)
-In this example we will be using the [Naive Bayes algorithm](http://en.wikipedia.org/wiki/Naive_Bayes_classifier) to classify email as ham (good emails) or spam (bad emails) based on their content. The Naive Bayes algorithm calculates the probability for an object for each possible class, and then returns the class with the highest probability. For this probability calculation the algorithm uses features. The reason its called *Naive* Bayes is because it does not incorporate any correlation between features. In other words, each feature counts the same. I'll explain a bit more using an example:
+In this example we will be using the [Naive Bayes algorithm](http://en.wikipedia.org/wiki/Naive_Bayes_classifier) to classify email as ham (good emails) or spam (bad emails) based on their content. The Naive Bayes algorithm calculates the probability for an object for each possible class, and then returns the class with the highest probability. For this probability calculation the algorithm uses features. The reason it's called *Naive* Bayes is because it does not incorporate any correlation between features. In other words, each feature counts the same. I'll explain a bit more using an example:
 
-Say you are classifying fruits and vegetables based on the features *color*, *diameter* and *shape* and you have the following classes: *apple*, *tomato*, and *strawberry*.
+Say you are classifying fruits and vegetables based on the features *color*, *diameter* and *shape* and you have the following classes: *apple*, *tomato*, and *cranberry*.
 
-Suppose you then want to classify an object with the following values for the features: (red,5 cm, round). This would obviously be a tomato for us, as it is way to small to be an apple, and too large for a strawberry.Additionally a strawberry is more triangle shaped rather than round. However, because the Naive Bayes algorithm evaluates each feature individually it will classify it as follows:
+Suppose you then want to classify an object with the following values for the features: (red,4 cm, round). This would obviously be a tomato for us, as it is way to small to be an apple, and too large for a cranberry. However, because the Naive Bayes algorithm evaluates each feature individually it will classify it as follows:
 
-* Apple  66.6% probable (based on color and shape)
-* Tomato 66.6% probable (based on color and size)
-* Strawberry 33.3% probable (based on color)
+* Apple  66.6% probable (based on color, and shape)
+* Tomato 100.0% probable (based on color, shape and size)
+* cranberry 66.6% probable (based on color and shape)
 
-Thus for this case, Naive Bayes does poor classification, and more advanced alternatives should be used such as [Random Forest](http://en.wikipedia.org/wiki/Random_forest) which is not addressed in this blog. However, for spam classification Naive Bayes works well, as spam or ham cannot be classified purely based on one word.
+Thus even though it seems really obvious that it can't be a cranberry or apple, Naive Bayes still gives it a 66.6% change of being either one. So even though it classifies the tomato correctly, it can give poor results in edge cases where the size is just outside the scope of the training set. However, for spam classification Naive Bayes works well, as spam or ham cannot be classified purely based on one feature (word).
 
 As you should now have an idea on how the Naive Bayes algorithm works, we can continue with the actual example. For this example we will use the Naive Bayes implementation from [Smile](https://github.com/haifengl/smile) in Scala to classify emails as spam or ham based on their content.  
 
 Before we can start however, you should download the [data](http://spamassassin.apache.org/publiccorpus/) for this example from the SpamAssasins public corpus. The data you need for the example is the [easy_ham](http://spamassassin.apache.org/publiccorpus/20030228_easy_ham.tar.bz2) and [spam](http://spamassassin.apache.org/publiccorpus/20030228_spam.tar.bz2) files, but the rest can also be used in case you feel like experimenting some more. You should unzip these files and adjust the file paths in the code snippets to match the location of the folders. Additionally you will need the [stop words file](./Example%20Data/stopwords.txt) for filtering purposes. 
 
-As with every machine learning implementation, the first step is to load in the training data. However in this example we are taking it 1 step further into machine learning. In the [KNN examples](#labeling-isps-based-on-their-downupload-speed-knn-using-smile-in-scala) we had the download and upload speed as [features](#features). We did not refer to them as features, as they where the only properties available. For spam classification it is not completely trivial what to use as features. One can use the Sender, the subject, the message content, and even the time of sending as features for classifying as spam or ham.  
+As with every machine learning implementation, the first step is to load in the training data. However in this example we are taking it 1 step further into machine learning. In the [KNN examples](#labeling-isps-based-on-their-downupload-speed-knn-using-smile-in-scala) we had the download and upload speed as [features](#features). We did not refer to them as features, as they were the only properties available. For spam classification it is not completely trivial what to use as features. One can use the Sender, the subject, the message content, and even the time of sending as features for classifying as spam or ham.  
 
 In this example we will use the content of the email as feature. By this we mean we will select the features (words in this case) from the bodies of the emails in the training set. In order to be able to do this, we need to build a [Term Document Matrix (TDM)](http://en.wikipedia.org/wiki/Document-term_matrix). 
 
@@ -509,7 +509,7 @@ And finally let's define a set of paths that make it easier to load the differen
   
 ```
 
-Now that we have the training data for both the ham and the spam email, we can start building 2 [TDM's](http://en.wikipedia.org/wiki/Document-term_matrix). But before we show you the code for this, lets first explain shortly why we actually need this. The TDM will contain **ALL** words which are contained in the bodies of the training set, including frequency rate. However, since frequency might not be the best measure (as 1 email which contains 1.000.000 times the word 'cake' would mess up the complete table) we will also compute the **occurrence rate**. By this we mean, the amount of documents that contain that specific term. So lets start off with generating the two TDM's.
+Now that we have the training data for both the ham and the spam email, we can start building 2 [TDM's](http://en.wikipedia.org/wiki/Document-term_matrix). But before we show you the code for this, let's first explain shortly why we actually need this. The TDM will contain **ALL** words which are contained in the bodies of the training set, including frequency rate. However, since frequency might not be the best measure (as 1 email which contains 1.000.000 times the word 'cake' would mess up the complete table) we will also compute the **occurrence rate**. By this we mean, the amount of documents that contain that specific term. So let's start off with generating the two TDM's.
 
 ```scala
 
@@ -545,12 +545,12 @@ Now that we have the training data for both the ham and the spam email, we can s
 
 ```
 
-Given the tables, I've generated images using a [wordcloud](http://www.wordle.net/) for some more insight. Lets take a look at the top 50 words for each table as represented in these images. Note that the red words are from the spam table and the green words are from the ham table. Additionally, the size of the words represents the occurrence rate. Thus the larger the word, the more documents contained that word at least once.
+Given the tables, I've generated images using a [wordcloud](http://www.wordle.net/) for some more insight. Let's take a look at the top 50 words for each table as represented in these images. Note that the red words are from the spam table and the green words are from the ham table. Additionally, the size of the words represents the occurrence rate. Thus the larger the word, the more documents contained that word at least once.
 
 <img src="./Images/Ham_Stopwords.png" width="400px" height="200px" />
 <img src="./Images/Spam_Stopwords.png" width="400px" height="200px" />
 
-As you can see, mostly stop words come forward. These stop words are noise, which we should prevent as much as possible in our feature selection. Thus we should remove these from the tables before selecting the features. We've included a list of stop words in the example dataset. Lets first define the code to get these stop words.
+As you can see, mostly stop words come forward. These stop words are noise, which we should prevent as much as possible in our feature selection. Thus we should remove these from the tables before selecting the features. We've included a list of stop words in the example dataset. Let's first define the code to get these stop words.
 
 ```scala
   def getStopWords() : List[String] =
@@ -593,7 +593,7 @@ val spamTDM  = spamMails
 
 ```
 
-If we once again look at the top 50 words for spam and ham, we see that most of the stop words are gone. We could fine-tune more, but for now lets go with this.
+If we once again look at the top 50 words for spam and ham, we see that most of the stop words are gone. We could fine-tune more, but for now let's go with this.
 
 <img src="./Images/Ham_No_Stopwords.png" width="400px" height="200px" />
 <img src="./Images/Spam_No_Stopwords.png" width="400px" height="200px" />
@@ -715,7 +715,7 @@ If we run this code several times with different feature amounts, we get the fol
 | 200     					| 1197 (85.68%)	| 16 (1.15%)	| 184 (13.17%)|
 | 400     					| 1219 (87.26%)	| 13 (0.93%)	| 165 (11.81%)|
 
-Note that the amount of emails classified as Spam are the ones that are correctly classified by the model. Interestingly enough, the algorithm works best for classifying spam with only 50 features. However, if you recall that there were still *stop words* in the top 50 classification terms which could explain this result. If you look at how the values change as the amount of features increase (starting at 100), you can see that with more features, the overall result increases. Note that there is a group of unknown emails. For these emails the [prior](#prior) was equal for both classes. Note that this also is the case if there are no feature words for ham nor spam in the email, because then the algorithm would classify it 50% ham and 50% spam.
+Note that the amount of emails classified as Spam are the ones that are correctly classified by the model. Interestingly enough, the algorithm works best for classifying spam with only 50 features. However, recall that there were still *stop words* in the top 50 classification terms which could explain this result. If you look at how the values change as the amount of features increase (starting at 100), you can see that with more features, the overall result increases. Note that there is a group of unknown emails. For these emails the [prior](#prior) was equal for both classes. Note that this also is the case if there are no feature words for ham nor spam in the email, because then the algorithm would classify it 50% ham and 50% spam.
 
 We will now do the same classification process for the ham emails. This is done by  changing the path from the variable ```listOfSpam2Files``` to ```easyHam2Path``` and rerunning the code. This gives us the following results:
 
@@ -728,7 +728,7 @@ We will now do the same classification process for the ham emails. This is done 
 
 Note that now the correctly classified emails are those who are classified as ham. Here we see that indeed, when you use only 50 features, the amount of ham that gets classified correctly is significantly lower in comparison to the correct classifications when using 100 features. You should be aware of this and always verify your model for all classes, so in this case for both spam and ham  test data.  
 
-To recap the example, we've worked through how you can use Naive Bayes to classify email has ham or spam, and got results of up to 87.26% correct classification for spam and 97.79% for ham. This shows that Naive Bayes indeed performs pretty well for classifying email as ham or spam. 
+To recap the example, we've worked through how you can use Naive Bayes to classify email as ham or spam, and got results of up to 87.26% correct classification for spam and 97.79% for ham. This shows that Naive Bayes indeed performs pretty well for classifying email as ham or spam. 
 
 With this we end the example of Naive Bayes. If you want to play around a bit more with Naive Bayes and Spam classification the corpus website also has a set of 'hard ham'  emails that you could try to classify correctly by tweaking the feature amounts and removing more stopwords.
 
@@ -1090,7 +1090,7 @@ We see our values ranging roughly between (4.4 and 8.6) which shows that outlier
 
 As you can see the highest weights are given to emails which almost instantly got a follow up email response, whereas the lowest weights are given to emails with very long timeframes. This allows for emails with a very low frequency to still be rated as very important based on the timeframe in which they were sent. With this we have 2 features: the amount of emails from a sender ```mailsGroupedBySender```, and the weight of emails that belong to an existing thread ```threadGroupedWithWeights```.
 
-Let's continue with the next feature, as we want to base our ranking values on as much features as possible. This next feature will be based on the weight ranking that we just computed. The idea is that new emails with different subjects will arrive. However, chances are that they contain keywords that are similar to earlier received important subjects. This will allow us to rank emails as important before a thread (multiple messages with the same subject) was started. For that we specify the weight of the keywords to be the weight of the subject in which the term occurred. If this term occurred in multiple threads, we take the highest weight as the leading one.
+Let's continue with the next feature, as we want to base our ranking values on as many features as possible. This next feature will be based on the weight ranking that we just computed. The idea is that new emails with different subjects will arrive. However, chances are that they contain keywords that are similar to earlier received important subjects. This will allow us to rank emails as important before a thread (multiple messages with the same subject) was started. For that we specify the weight of the keywords to be the weight of the subject in which the term occurred. If this term occurred in multiple threads, we take the highest weight as the leading one.
 
 There is one issue with this feature, which are stop words. Luckily we have a stop words file that allows us to remove (most) english stop words for now. However, when designing your own system you should take into account that multiple languages can occur, thus you should remove stop words for all languages that can occur in the system. Additionally you might need to be careful with removing stop words from different languages, as some words may have different meanings among the different languages. As for now we stick with removing English stop words. The code for this feature is as follows:
 
@@ -1281,7 +1281,7 @@ Let's now look at how many emails from the testing set will be ranked as priorit
 
 ```
 
-After actually running this test code, you will see that the amount of emails ranked as priority from the test set is actually 563. This is 45% of the test email set. This is quite a high value, so we could tweak a bit with the *decision boundary*. However, since we picked this for illustration purposes, and should not be picked to be the mean in practice, we wont look into that percentage any further. Instead we will look at the ranking of the top 10 of the priority emails. 
+After actually running this test code, you will see that the amount of emails ranked as priority from the test set is actually 563. This is 45% of the test email set. This is quite a high value, so we could tweak a bit with the *decision boundary*. However, since we picked this for illustration purposes, and should not be picked to be the mean in practice, we won't look into that percentage any further. Instead we will look at the ranking of the top 10 of the priority emails. 
 
 Note that I've removed part of the email address to prevent spam bots from crawling these mail addresses. We see in the table below that most of these top 10 priority emails are threads grouped together, which had very high activity. Take for example the highest ranked email. This email was a follow up to an email of 9 minutes earlier. This indicates that the email thread was important.  
 
@@ -1298,7 +1298,7 @@ Note that I've removed part of the email address to prevent spam bots from crawl
 | Sat Sep 07 06:40:45 CEST 2002 | tim.one@... | [spambayes] maybe change x-spam-disposition to something else... | 72.62 |
 | Sat Sep 07 05:05:45 CEST 2002 | skip@... | [spambayes] maybe change x-spam-disposition to something else... | 72.27 |
 
-Additionally we see that ```time.one...``` occurs a lot in this table.  This indicates that either all his emails are important, or he sent so many emails, that the ranker automatically ranks them as priority.  As final step of this example we will look into this a bit more:
+Additionally we see that ```tim.one...``` occurs a lot in this table.  This indicates that either all his emails are important, or he sent so many emails, that the ranker automatically ranks them as priority.  As final step of this example we will look into this a bit more:
 
 ```scala
 
@@ -1337,7 +1337,7 @@ If we recall that our decision boundary was the mean, which is 25.06, then we se
 
 Validating a ranker like this is rather hard when you have no ground truth. One of the most common ways of validating and improving it is by actually presenting it to the user and letting him/her mark correct mistakes. These corrections can then be used to improve the system.
 
-To recap, we saw how get features from raw data, even when the data had 'huge' outliers, and  how to combine these features into a final ranking value. Furthermore we had an attempt at evaluating these features, but due to the lack of knowledge about the dataset we could not draw explicit conclusions. However, if you were to do the same on data you do know, then this should get you started on building your own ranking system. 
+To recap, we saw how to get features from raw data, even when the data had 'huge' outliers, and  how to combine these features into a final ranking value. Furthermore we had an attempt at evaluating these features, but due to the lack of knowledge about the dataset we could not draw explicit conclusions. However, if you were to do the same on data you do know, then this should get you started on building your own ranking system. 
 
 ##Predicting weight based on height (using Ordinary Least Squares)
 In this section we will introduce the [Ordinary Least Squares](http://en.wikipedia.org/wiki/Ordinary_least_squares) technique which is a form of linear regression. As this technique is quite powerful, it is important to have read [regression](#regression) and the [common pitfalls](#common-pitfalls) before starting with this example. We will cover some of these issues in this section, while others are shown in the sections [underfitting](#underfitting) and [overfitting](#overfitting).
@@ -1418,7 +1418,7 @@ If you execute the code here above, a window will pop up which shows the **right
 <img src="./Images/HumanDataPoints.png" width="275px" />
 <img src="./Images/MaleFemalePlot.png" width="275px" />
 
-In this plot, given that green is female, and blue is male, you can see that there is a big overlap in their weights and heights. So if we where to ignore the difference between male and female it would still look like there was a linear function in the data (which can be seen in the **left** plot). However when ignoring this difference, the function would be not as accurate as it would be when we incorporate the information regarding males and females. 
+In this plot, given that green is female, and blue is male, you can see that there is a big overlap in their weights and heights. So if we were to ignore the difference between male and female it would still look like there was a linear function in the data (which can be seen in the **left** plot). However when ignoring this difference, the function would be not as accurate as it would be when we incorporate the information regarding males and females. 
 
 Finding this distinction is trivial in this example, but you might encounter datasets where these groups are not so obvious. Making you aware of this this possibility might help you find groups in your data, which can improve the performance of your machine learning application.
 
@@ -1939,9 +1939,9 @@ In this example we present the most commonly used kernel for SVMs, namely the Ga
 
 It is clear from this plot that a linear regression line would not work. Instead we will use a SVM to make predictions. In the first code we gave, the ```GaussianKernel``` with a sigma of 0.01, a margin penalty of 1.0 and the amount of classes of 2 is passed to SVM. Now what does this all mean?
 
-Lets start with the ```GaussianKernel```. This kernel represents the way in which the SVM will calculate the similarity over pairs of datapoints in the system. For the ```GaussianKernel``` the variance in the euclidian distance is used. The reason for picking the GaussianKernel specifically is because the data does not contain a clear structure such as a linear, polynomial or hyperbolic function. Instead the data is clustered in 3 groups. 
+Let's start with the ```GaussianKernel```. This kernel represents the way in which the SVM will calculate the similarity over pairs of datapoints in the system. For the ```GaussianKernel``` the variance in the euclidian distance is used. The reason for picking the GaussianKernel specifically is because the data does not contain a clear structure such as a linear, polynomial or hyperbolic function. Instead the data is clustered in 3 groups. 
 
-The parameter we pass in the constructor of the ```GaussianKernel``` is the sigma. This sigma value represents a smoothness value of the kernel. We will show what changing this parameter has for effect in the predictions. As margin penalty we pass 1. This parameter defines the margin of the vectors in the system, thus making this value lower results in more bounded vectors. We will show with a set of runs and their results what kind of effect this has in practice. Note that the `s:` stands for sigma, and the `c:` stands for the correction penalty. The percentages represent the error rate in the prediction, which is simply the percentage of false predictions on the same dataset after training.
+The parameter we pass in the constructor of the ```GaussianKernel``` is the sigma. This sigma value represents a smoothness value of the kernel. We will show how changing this parameter affects the predictions. As margin penalty we pass 1. This parameter defines the margin of the vectors in the system, thus making this value lower results in more bounded vectors. We will show with a set of runs and their results what kind of effect this has in practice. Note that the `s:` stands for sigma, and the `c:` stands for the correction penalty. The percentages represent the error rate in the prediction, which is simply the percentage of false predictions on the same dataset after training.
 
 | c, s-> | 0.001 |  0.01 |  0.1 |  0.2 | 0.5 | 1.0 |  2.0 |  3.0 |  10.0 |
 | :-- | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: |
@@ -2025,7 +2025,7 @@ This concludes the section on Support Vector machines.
 After reading the global idea of machine learning you should be able to identify your case as a [classification](#classification), [regression](#regression) or [dimension reduction](#principal-components-analysis-pca) problem. Additionally you should understand the basic concept of machine learning, what a [model](#model) is, and you should be aware of some of the [common pitfalls](#common-pitfalls) in machine learning.
 
 
-After working through the practical examples on this blog you should be able to use [K-NN](#labeling-isps-based-on-their-downupload-speed-k-nn-using-smile-in-scala), [Naive Bayes](#classifying-email-as-spam-or-ham-naive-bayes), and [linear regression](#predicting-weight-based-on-height-using-ordinary-least-squares). Additionally you should be able to perform [text regression](#an-attempt-at-rank-prediction-for-top-selling-books-using-text-regression), merge features using [PCA](#using-unsupervised-learning-to-merge-features-pca) and use [Support Vector Machines](#using-support-vector-machines-svms). And as at last but not least build your own [recommendation system](#ranking-emails-based-on-their-content-recommendation-system).
+After working through the practical examples on this blog you should be able to use [K-NN](#labeling-isps-based-on-their-downupload-speed-k-nn-using-smile-in-scala), [Naive Bayes](#classifying-email-as-spam-or-ham-naive-bayes), and [linear regression](#predicting-weight-based-on-height-using-ordinary-least-squares). Additionally you should be able to perform [text regression](#an-attempt-at-rank-prediction-for-top-selling-books-using-text-regression), merge features using [PCA](#using-unsupervised-learning-to-merge-features-pca) and use [Support Vector Machines](#using-support-vector-machines-svms), and last but not least build your own [recommendation system](#ranking-emails-based-on-their-content-recommendation-system).
 
 In case you have questions or feedback regarding this blog, feel free to contact me via [Github](https://github.com/Xyclade), [LinkedIn](https://www.linkedin.com/profile/public-profile-settings?trk=prof-edit-edit-public_profile) or [Twitter](https://twitter.com/Mikedewaard).
 
