@@ -322,7 +322,9 @@ For this example we do [2-fold Cross Validation](http://en.wikipedia.org/wiki/Cr
     val testDataWithIndices = (testData
     							._1
     							.zipWithIndex, 
-    							testData    									._2    											.zipWithIndex)
+    							testData
+    							._2
+    							.zipWithIndex)
 
     val trainingDPSets = cv.train
       .map(indexList => indexList
@@ -498,7 +500,8 @@ And finally let's define a set of paths that make it easier to load the differen
      // (note that in this case it is not necessary to randomly
      // sample as the emails are already randomly ordered)
      
-  	val listOfHamFiles =   getFilesFromDir(easyHamPath)  		.take(amountOfSamplesPerSet)
+  	val listOfHamFiles =   getFilesFromDir(easyHamPath)
+  		.take(amountOfSamplesPerSet)
   	//Get the messages that are contained in the ham files
   	val hamMails  = listOfHamFiles
   		.map{x => (x,getMessage(x)) }
@@ -696,8 +699,9 @@ println(	unknownClassifications +
 			"were unknowingly classified"
 		)
 		
-println(	(	(unknownClassifications.toDouble / 			 	listOfSpam2Files.length) * 100)  + 
-				"% was unknowingly classified"
+println(	(	(unknownClassifications.toDouble / 
+				listOfSpam2Files.length) * 100)  + 
+				% was unknowingly classified"
 		)
 
 ```
@@ -921,14 +925,16 @@ The first recommendation feature we will make is based on the sender of the emai
 
 //Add to the top body:
 
-//First we group the emails by Sender, then we extract only the sender address and amount of emails, and finally we sort them on amounts ascending
+//First we group the emails by Sender, then we extract only the sender address 
+//and amount of emails, and finally we sort them on amounts ascending
 val mailsGroupedBySender = trainingData
 .groupBy(x => x.sender)
 .map(x => (x._1, x._2.length))
 .toArray
 .sortBy(x => x._2)
 
-//In order to plot the data we split the values from the addresses as this is how the plotting library accepts the data.
+//In order to plot the data we split the values from the addresses as 
+//this is how the plotting library accepts the data.
 val senderDescriptions = mailsGroupedBySender
 	.map(x => x._1)
 	
@@ -1019,8 +1025,12 @@ val mailGroupsWithMinMaxDates = mailsGroupedByThread
     		 (x._2
     			.maxBy(x => x.emailDate)
     			.emailDate.getTime - 
-    		 x._2.minBy(x => x.emailDate)    					.emailDate.getTime
-    						) / 1000))
+    		 x._2
+    		 	.minBy(x => x.emailDate)
+    		 	.emailDate.getTime
+    						) / 1000
+    		  )
+      )
 
 //turn into a list of tuples with (topic, list of emails, 
 // time difference, and weight) filtered that only threads occur
@@ -1275,8 +1285,6 @@ After actually running this test code, you will see that the amount of emails ra
 
 Note that I've removed part of the email address to prevent spam bots from crawling these mail addresses. We see in the table below that most of these top 10 priority emails are threads grouped together, which had very high activity. Take for example the highest ranked email. This email was a follow up to an email of 9 minutes earlier. This indicates that the email thread was important.  
 
-
-
 |Date | Sender  | Subject  | Rank | 
 | :--- | : -- | :--  | :-- |  
 | Sat Sep 07 06:45:23 CEST 2002 | skip@... | [spambayes] can't write to cvs... | 81.11 |
@@ -1292,11 +1300,20 @@ Note that I've removed part of the email address to prevent spam bots from crawl
 
 Additionally we see that ```time.one...``` occurs a lot in this table.  This indicates that either all his emails are important, or he sent so many emails, that the ranker automatically ranks them as priority.  As final step of this example we will look into this a bit more:
 
-```
-scala
-val timsEmails = testingRanks.filter(x => x._1.sender == "tim.one@...")
-      .sortBy(x => -x._2)
-timsEmails.foreach(x => println("| " + x._1.emailDate + " | "  + x._1.subject + " | " + df.format(x._2) + " |"))
+```scala
+
+val timsEmails = testingRanks
+	.filter(x => x._1.sender == "tim.one@...")
+    .sortBy(x => -x._2)
+timsEmails
+	.foreach(x => println(	"| " + 
+							x._1.emailDate +
+						 	" | "  + 
+						 	x._1.subject + 
+						 	" | " + 
+						 	df.format(x._2) + 
+						 	" |")
+						 )
 
 ```
 If you run this code, a list of 45 emails is printed, and the bottom 10 ranks are as follows:
@@ -1381,7 +1398,11 @@ object LinearRegressionExample extends SimpleSwingApplication {
 
     val plotData = (testData._1 zip testData._2).map(x => Array(x._1(1) ,x._2))
     val maleFemaleLabels = testData._1.map( x=> x(0).toInt)
-    val plot =  ScatterPlot.plot(plotData,maleFemaleLabels,'@',Array(Color.blue, Color.green))
+    val plot =  ScatterPlot.plot(	plotData,
+    								maleFemaleLabels,
+    								'@',
+    								Array(Color.blue, Color.green)
+    							 )
     plot.setTitle("Weight and heights for male and females")
     plot.setAxisLabel(0,"Heights")
     plot.setAxisLabel(1,"Weights")
@@ -1513,7 +1534,8 @@ class DTM {
       //Add the rank to the array of ranks
       ranks = ranks :+ x.rank.toDouble
 
-      //And create an array representing all words and their occurrences for this document:
+      //And create an array representing all words and their occurrences 
+      //for this document:
       var dtmNumericRecord: Array[Double] = Array()
       wordList.foreach { y =>
 
@@ -1533,7 +1555,10 @@ class DTM {
   }
 }
 
-class DTMRecord(val document : String, val rank : Int, var occurrences :  mutable.HashMap[String,Int] )
+class DTMRecord(val document : String, 
+				val rank : Int, 
+				var occurrences :  mutable.HashMap[String,Int] 
+				)
 
 ```
 
@@ -1608,7 +1633,11 @@ We need to find an optimal lambda however, thus we should try for several lambda
 
         //Compute the RMSE for this model with this lambda
         val results = dpForTesting.map(y => model.predict(y)) zip classifiersForTesting
-        val RMSE = Math.sqrt(results.map(x => Math.pow(x._1 - x._2, 2)).sum / results.length)
+        val RMSE = Math
+        	.sqrt(results
+        			.map(x => Math.pow(x._1 - x._2, 2)).sum /
+        						 results.length
+        				)
         println("Lambda: " + x + " RMSE: " + RMSE)
 
       }
@@ -1782,7 +1811,12 @@ Replace the ```getDJIFromFile``` method with the following:
 def getDJIFromFile(file: File): (Array[Date],Array[Double]) = {
     val source = scala.io.Source.fromFile(file)
     //Get all the records (minus the header)
-    val data = source.getLines().drop(1).map(x => getDJIRecordFromString(x)).toArray
+    val data = source
+    	.getLines()
+    	.drop(1)
+    	.map(x => getDJIRecordFromString(x))
+    	.toArray
+    	
     source.close()
 
     //turn the tuples into two separate arrays for easier use later on
@@ -1803,7 +1837,9 @@ and replace the `plotData` definition in the method```def top``` with
 val maxDataValue = points.maxBy(x => x(0))
 val minDataValue = points.minBy(x => x(0))
 val rangeValue = maxDataValue(0) - minDataValue(0)
-val plotData = points.zipWithIndex.map(x => Array(x._2.toDouble, -x._1(0) / rangeValue))
+val plotData = points
+	.zipWithIndex
+	.map(x => Array(x._2.toDouble, -x._1(0) / rangeValue))
 ```
 
 <img src="./Images/PCA_Normalised.png" width="400px" />
