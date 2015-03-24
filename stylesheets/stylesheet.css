@@ -598,6 +598,8 @@ td {
   font-weight: 300;
   text-align: center;
   border: 1px solid #ebebeb;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 form {
