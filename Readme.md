@@ -358,7 +358,7 @@ For this example we do [2-fold Cross Validation](http://en.wikipedia.org/wiki/Cr
     validationRoundRecords
     	.foreach { record =>
 
-      val knn = KNN.learn(testData._1, testData._2, 3)
+      val knn = KNN.learn(record._1, record._2, 3)
 
       //And for each test data point make a prediction with the model
       val predictions = record
