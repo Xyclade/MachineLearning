@@ -38,6 +38,7 @@ figure,
 footer,
 header,
 hgroup,
+nav,
 main,
 menu,
 nav,
@@ -498,9 +499,9 @@ header h2 {
   max-width: 100%;
 }
 
-aside#sidebar {
+nav#sidebar {
   float: left;
-  position: float;
+  position: relative;
   width: 250px;
   min-height: 58208px;
   padding-left: 20px;
@@ -536,7 +537,7 @@ header a.button {
   right: 0;
   background: transparent url(../Images/github-button.png) 0 0 no-repeat;
 }
-aside a.button {
+nav a.button {
   display: block;
   width: 138px;
   padding-left: 64px;
@@ -848,18 +849,18 @@ footer a:hover {
     font-size: 13px;
   }
   #main-content,
-  aside#sidebar {
+  nav#sidebar {
     float: none;
     width: 100% ! important;
   }
-  aside#sidebar {
+  nav#sidebar {
     min-height: 0;
     padding: 20px 0;
     margin-top: 20px;
     background-image: none;
     border-top: solid 1px #ddd;
   }
-  aside#sidebar a.button {
+  nav#sidebar a.button {
     display: none;
   }
   #main-content h1:before,
@@ -972,9 +973,7 @@ footer a:hover {
   font-size: 16px;
   line-height: 150%;
 }
-.p-index {
- position: fixed;
-}
+
 .index-h2 {
   font-weight: bolder;
   display: block;
@@ -1008,6 +1007,12 @@ footer a:hover {
   content: "///";
   color: #2c6ab7;
 }
+
+.stick {
+  position:fixed;
+  top: 30px;
+}
+
 /* Mobile Landscape Size to Tablet Portrait (devices and browsers) */
 @media only screen and (min-width: 480px) and (max-width: 767px) { }
 
