@@ -463,7 +463,7 @@
     validationRoundRecords
         .foreach { record <span class="pl-k">=&gt;</span>
 
-      <span class="pl-k">val</span> <span class="pl-en">knn</span> <span class="pl-k">=</span> <span class="pl-en">KNN</span>.learn(testData._1, testData._2, <span class="pl-c1">3</span>)
+      <span class="pl-k">val</span> <span class="pl-en">knn</span> <span class="pl-k">=</span> <span class="pl-en">KNN</span>.learn(record._1, record._2, <span class="pl-c1">3</span>)
 
       <span class="pl-c">//And for each test data point make a prediction with the model</span>
       <span class="pl-k">val</span> <span class="pl-en">predictions</span> <span class="pl-k">=</span> record
