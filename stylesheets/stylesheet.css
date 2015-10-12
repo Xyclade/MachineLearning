@@ -854,6 +854,9 @@ footer a:hover {
     width: 100% ! important;
   }
   nav#sidebar {
+    /* added visibility hidden as the menu was overlapping, a better fix will be done later*/
+    visibility: hidden;
+    
     min-height: 0;
     padding: 20px 0;
     margin-top: 20px;
