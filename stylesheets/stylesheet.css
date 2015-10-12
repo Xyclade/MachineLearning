@@ -503,6 +503,7 @@ nav#sidebar {
   float: left;
   position: relative;
   min-height: 58208px;
+  width: 220px;
   padding-left: 20px;
   margin-left: 10px;
   font-size: 12px;
