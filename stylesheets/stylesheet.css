@@ -502,7 +502,6 @@ header h2 {
 nav#sidebar {
   float: left;
   position: relative;
-  width: 250px;
   min-height: 58208px;
   padding-left: 20px;
   margin-left: 10px;
