@@ -451,8 +451,8 @@ a:hover {
 }
 
 header {
-  padding-top: 40px;
-  padding-bottom: 40px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif;
   background: #2e7bcf url(../Images/header-bg.jpg) 0 0 repeat-x;
   border-bottom: solid 1px #021979;
@@ -483,7 +483,7 @@ header h2 {
   position: relative;
   width: 100%;
   margin: 0 auto;
-  padding: 40px;
+  padding: 20px;
 }
 
 #content-wrapper {
@@ -603,11 +603,7 @@ td {
   padding-right: 10px;
 }
 
-form {
-  padding: 20px;
-  background: #f2f2f2;
 
-}
 
 
 /* GENERAL ELEMENT TYPE STYLES */
