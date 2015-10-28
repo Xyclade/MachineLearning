@@ -13,11 +13,13 @@ object RecommendationSystem extends SimpleSwingApplication {
   case class EmailData(emailDate : Date, sender : String, subject : String, body : String)
 
   def top = new MainFrame {
-    title = "Recommendation System Example"
+    title = "Recommendation System Example from http://xyclade.ml"
 
-    val basePath = "/Users/mikedewaard/ML_for_Hackers/03-Classification/data"
+    val basePath = "data"
     val easyHamPath = basePath + "/easy_ham"
 
+    try
+      {
     val mails = getFilesFromDir(easyHamPath).map(x => getFullEmail(x))
     val timeSortedMails = mails
       .map(x => EmailData(getDateFromEmail(x), getSenderFromEmail(x), getSubjectFromEmail(x), getMessageBodyFromEmail(x)))
@@ -210,6 +212,11 @@ object RecommendationSystem extends SimpleSwingApplication {
     println(priorityEmails.length + " ranked as priority")
 
   }
+    catch
+      {
+        case e: Exception => println("You probably are missing the sample data. You can download these from the spamassasin corpus (mentioned in the example on http://xyclade.ml) and place them in the directory 'data' in this project. Check the exception for more details: " + e);
+      }
+  }
 
   def getFilesFromDir(path: String): List[File] = {
     val d = new File(path)
@@ -319,7 +326,7 @@ object RecommendationSystem extends SimpleSwingApplication {
   }
 
   def getStopWords: List[String] = {
-    val source = scala.io.Source.fromFile(new File("/Users/mikedewaard/MachineLearning/Example Data/stopwords.txt"))("latin1")
+    val source = scala.io.Source.fromFile(new File("data/stopwords.txt"))("latin1")
     val lines = source.mkString.split("\n")
     source.close()
     lines.toList
