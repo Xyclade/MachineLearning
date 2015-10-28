@@ -12,9 +12,9 @@ object SupportVectorMachine extends SimpleSwingApplication {
 
 
   def top = new MainFrame {
-    title = "SVM Examples"
+    title = "SVM Example 1"
     //File path (this changes per example)
-    val path =  "/users/mikedewaard/MachineLearning/Example Data/SVM_Example_1.csv"
+    val path =  "data/SVM_Example_1.csv"
     val df = new DecimalFormat("#.#")
     //Loading of the test data and plot generation stays the same
     val testData = GetDataFromCSV(new File(path))

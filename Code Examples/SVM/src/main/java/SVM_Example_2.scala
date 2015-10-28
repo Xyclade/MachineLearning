@@ -14,8 +14,8 @@ object SVM_Example_2 extends SimpleSwingApplication {
   def top = new MainFrame {
     title = "SVM Example 2"
     //File path (this changes per example)
-    val trainingPath =  "/users/mikedewaard/SVM_Example_2.csv"
-    val testingPath = "/users/mikedewaard/SVM_Example_2_Test_data.csv"
+    val trainingPath =  "data/SVM_Example_2.csv"
+    val testingPath = "data/SVM_Example_2_Test_data.csv"
     val df = new DecimalFormat("#.#")
     //Loading of the test data and plot generation stays the same
     val trainingData = GetDataFromCSV(new File(trainingPath))

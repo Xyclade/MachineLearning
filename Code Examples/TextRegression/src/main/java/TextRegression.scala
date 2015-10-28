@@ -5,17 +5,13 @@ import com.github.tototoshi.csv._
 import smile.plot._
 import smile.regression.{LASSO, RidgeRegression}
 import smile.validation.CrossValidation
-
-import scala.swing._
-
-
 object TextRegression  {
 
   def main(args: Array[String]): Unit = {
 
 
     //Get the example data
-    val basePath = "/users/mikedewaard/MachineLearning/Example Data/TextRegression_Example_4.csv"
+    val basePath = "data/TextRegression_Example_1.csv"
     val testData = GetDataFromCSV(new File(basePath))
 
     //Create a document term matrix for the data
@@ -36,7 +32,7 @@ object TextRegression  {
       val classifiersForTesting = numericDTM._2.zipWithIndex.filter(x => !cv.test(i).contains(x._2)).map(y => y._1)
 
       //These are the lambda values we will verify against
-      val lambdas: Array[Double] = Array(0.1, 0.25, 0.5, 10.0, 20.0, 50.0)
+      val lambdas: Array[Double] = Array(0.1, 0.25, 0.5, 1.0, 2.0, 5.0)
 
       lambdas.foreach { x =>
         //Define a new model based on the training data and one of the lambda's
