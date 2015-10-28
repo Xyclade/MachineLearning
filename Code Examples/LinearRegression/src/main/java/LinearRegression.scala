@@ -8,8 +8,8 @@ import scala.swing._
 
 object LinearRegression extends SimpleSwingApplication {
   def top = new MainFrame {
-    title = "KNN Example!"
-    val basePath = "/Users/../Example Data/OLS_Regression_Example_3.csv"
+    title = "Linear regression Example from http://Xyclade.ml"
+    val basePath = "data/OLS_Regression_Example_3.csv"
 
     val test_data = GetDataFromCSV(new File(basePath))
 
