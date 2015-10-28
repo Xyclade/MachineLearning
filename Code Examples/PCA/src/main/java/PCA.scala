@@ -16,9 +16,9 @@ object PCA extends SimpleSwingApplication{
 
   def top = new MainFrame {
 
-     title = "PCA Example"
+     title = "PCA Example from http://xyclade.ml"
     //Get the example data
-    val basePath = "/users/mikedewaard/MachineLearning/Example Data/"
+    val basePath = "data/"
     val exampleDataPath = basePath + "PCA_Example_1.csv"
     val trainData = GetStockDataFromCSV(new File(exampleDataPath))
 
@@ -44,7 +44,7 @@ object PCA extends SimpleSwingApplication{
 
 
     peer.setContentPane(canvas)
-    size = new Dimension(400, 400)
+    size = new Dimension(700, 400)
 
   }
 
